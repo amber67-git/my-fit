@@ -75,7 +75,11 @@ nav.tabs button.on{color:var(--accent)}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
 
 .card{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:12px;display:flex;align-items:center;gap:12px;width:100%;text-align:left}
-.card .ic{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex:none;background:var(--soft)}
+.card .ic,.ic{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--soft);color:var(--fg)}
+.ico-svg{display:block}
+.bigico{display:grid;place-items:center;width:96px;height:96px;border-radius:24px;background:var(--soft);margin:0 auto;color:var(--fg)}
+.howto .hc .fig{color:var(--fg)}
+.board .mini .ico-svg{flex:none}
 .card .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .sub{font-size:12px;color:var(--muted)}
 .card.done{opacity:.55}
@@ -184,7 +188,7 @@ nav.tabs button.on{color:var(--accent)}
 .delta.up{color:var(--good)} .delta.down{color:var(--warn)}
 .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;z-index:40}
 .icons{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
-.icons button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);font-size:22px;flex:none;background:var(--card)}
+.icons button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);flex:none;background:var(--card);display:grid;place-items:center;color:var(--fg)}
 .icons button.on{border-color:var(--accent);background:var(--accent-soft)}
 .empty{border:1px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;color:var(--muted)}
 .statusline{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
@@ -240,8 +244,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.6.0';
+const APP_VERSION='0.7.0';
 const CHANGELOG=[
+ {v:'0.7.0',date:'2026-10-19',en:['Line icons drawn for the app replace emoji','Exercises from the bodyweight, kettlebell, band, dumbbell, yoga, barbell, stability ball and stretching posters','Equipment filter in library and picker','Firebase sign-in and sync for the GitHub Pages build'],ko:['이모지 대신 앱 전용 선 아이콘','맨몸·케틀벨·밴드·덤벨·요가·바벨·짐볼·스트레칭 포스터 운동 추가','라이브러리와 선택 화면에 도구 필터','GitHub Pages 빌드에 Firebase 로그인·동기화']},
  {v:'0.6.0',date:'2026-10-19',en:['Smart mode in Weekly: alternate-day schedule, split by days per week, auto progression','Weekly board without the day panel; add and edit inside each day','Smart settings and version notes in Settings'],ko:['Weekly에 스마트 모드: 격일 배치, 주당 일수에 맞는 분할, 자동 증량','날짜 상세 패널 없이 요일 칸에서 바로 추가·편집','설정 페이지에 스마트 옵션과 버전 안내']},
  {v:'0.5.0',date:'2026-10-19',en:['Daily automatic backup, keep 14, restore from Settings'],ko:['하루 1회 자동 백업, 14개 보관, 설정에서 복원']},
  {v:'0.4.0',date:'2026-10-19',en:['6 preset routines (Push/Pull/Legs, Upper/Lower, Full body, Home, Dumbbell, Cardio+core)','Save a week as your own routine'],ko:['프리셋 루틴 6개','이번 주를 내 루틴으로 저장']},
@@ -251,7 +256,44 @@ const CHANGELOG=[
 ];
 const TYPES=['stretch','warmup','strength','cardio','cooldown'];
 const TYPE_META={stretch:{en:'Stretch',ko:'스트레칭'},warmup:{en:'Warm-up',ko:'워밍업'},strength:{en:'Strength',ko:'근력'},cardio:{en:'Cardio',ko:'유산소'},cooldown:{en:'Cool-down',ko:'쿨다운'}};
-const ICONS=['🏋️','🤸','🏃','🧘','🦵','💪','🍑','🚴','🏊','🚣','🧍','🔥','🪢','🤾'];
+// Simple line pictograms (24x24, stroke). Drawn for this app; no third-party license involved.
+const ICON_DEFS={
+ pushup:'<circle cx="5" cy="9" r="2"/><path d="M7 11l13 4M10 12l-1.5 5M20 15l1.5 3.5M2 20h20"/>',
+ plank:'<circle cx="5" cy="10" r="2"/><path d="M7 11.5l13 3M7.5 12l-1.5 5.5M20 14.5l1.5 4M2 20h20"/>',
+ squat:'<circle cx="12" cy="4" r="2"/><path d="M12 6v6M12 12l-4 3 1 5M12 12l4 3-1 5M12 8h5"/>',
+ lunge:'<circle cx="11" cy="4" r="2"/><path d="M11 6v6M11 12l-5 2v6M11 12l5 3-2 5M11 8l4-1"/>',
+ bridge:'<circle cx="4" cy="16" r="2"/><path d="M6 15l6-5h5l2 8M2 20h20"/>',
+ crunch:'<circle cx="4" cy="14" r="2"/><path d="M6 15l6-1 3-4 4 2-1 6M2 20h20M6 15l2 3"/>',
+ pullup:'<path d="M3 4h18M8 4v4M16 4v4"/><circle cx="12" cy="9" r="2"/><path d="M8 8l4 3 4-3M12 11v5l-2 4M12 16l2 4"/>',
+ dip:'<path d="M4 8h4M16 8h4"/><circle cx="12" cy="6" r="2"/><path d="M8 8l4 2 4-2M12 10v5l-3 5M12 15l3 5"/>',
+ press:'<circle cx="12" cy="6" r="2"/><path d="M12 8v6M12 14l-3 6M12 14l3 6M9 9l-2-5M15 9l2-5M5 4h4M15 4h4"/>',
+ row:'<circle cx="6" cy="6" r="2"/><path d="M8 7l6 2 4 11M14 9l-2 5M8 7l-2 5 2 8M10 13h5"/>',
+ barbell:'<path d="M2 12h3M19 12h3M5 8v8M8 7v10M16 7v10M19 8v8M8 12h8"/>',
+ dumbbell:'<path d="M3 10v4M21 10v4M5 8v8M8 6v12M16 6v12M19 8v8M8 12h8"/>',
+ kettlebell:'<circle cx="12" cy="15" r="5"/><path d="M9 10a3 3 0 0 1 6 0"/>',
+ band:'<path d="M3 7v4M21 13v4M3 9q9 0 9 3t9 3"/>',
+ ball:'<circle cx="10" cy="16" r="5"/><circle cx="17" cy="6" r="2"/><path d="M16 8l-4 3 2 2M12 11l-3-2"/>',
+ run:'<circle cx="14" cy="4" r="2"/><path d="M13 6l-3 5 3 3-2 6M10 11l-4 1M13 9l4 2 2-1M13 14l4 4"/>',
+ walk:'<circle cx="12" cy="4" r="2"/><path d="M12 6v6M12 12l-3 8M12 12l3 3v5M12 8l-3 3M12 8l3 3"/>',
+ bike:'<circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-7h6l2 7M10 9H7M13 9l1-4h3"/>',
+ swim:'<circle cx="15" cy="7" r="2"/><path d="M4 12l6-4 4 3M3 18q3-2 6 0t6 0 6 0M3 15q3-2 6 0t6 0 6 0"/>',
+ jump:'<circle cx="12" cy="4" r="2"/><path d="M12 6v7M12 6l-5-3M12 6l5-3M12 13l-4 7M12 13l4 7"/>',
+ rope:'<circle cx="12" cy="5" r="2"/><path d="M12 7v6M12 13l-2 6M12 13l2 6M9 9l-3 2M15 9l3 2M6 11q6 12 12 0"/>',
+ stretch:'<path d="M3 17h18"/><circle cx="7" cy="7" r="2"/><path d="M8.5 8.5L14 13h6M4 17l5-6 5 2"/>',
+ yoga:'<circle cx="12" cy="4" r="2"/><path d="M12 6v7M12 13l-3 7M12 13l2 2-2 2M12 6l-4 3M12 6l4 3"/>',
+ breath:'<circle cx="12" cy="13" r="7"/><path d="M12 9v4l3 2M9 3h6"/>',
+ twist:'<circle cx="12" cy="5" r="2"/><path d="M12 7v6M12 13l-3 6M12 13l3 6M6 10l6 1 6-3"/>',
+ legs:'<path d="M9 4v8l-2 8M15 4v8l2 8M9 6h6"/>'
+};
+const ICON_IDS=Object.keys(ICON_DEFS);
+function iconSvg(id,size){ const d=ICON_DEFS[id]||ICON_DEFS.dumbbell; return `<svg class="ico-svg" viewBox="0 0 24 24" width="${size||22}" height="${size||22}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`; }
+function defaultIconFor(e){ const id=e.id||''; const by={ex_lunge:'lunge',ex_bulgarian:'lunge',ex_stepup:'lunge',ex_plank:'plank',ex_sideplank:'plank',ex_wallsit:'squat',ex_jog:'run',ex_cycling:'bike',ex_swim:'swim',ex_jumprope:'rope',ex_rowing:'row',ex_jacks:'jump',ex_burpee:'jump',ex_highknees:'run',ex_mountain:'plank',ex_breathing:'breath',ex_russian:'twist',ex_bicycle:'crunch',ex_deadbug:'crunch',ex_abwheel:'plank',ex_kneeraise:'pullup',ex_pullup:'pullup',ex_dips:'dip',ex_benchdip:'dip',ex_hipthrust:'bridge',ex_glutebridge:'bridge',ex_calf:'legs',ex_legext:'legs',ex_legcurl:'legs',ex_legpress:'legs',ex_ohp:'press',ex_dbpress:'press',ex_arnold:'press',ex_catcow:'yoga',ex_downdog:'yoga',ex_childpose:'yoga',ex_pigeon:'yoga',ex_inchworm:'plank',ex_bwsquat:'squat',ex_goblet:'squat',ex_sumo:'squat',ex_squat:'squat',ex_bbsquat:'barbell'};
+  if(by[id])return by[id];
+  if(e.equip==='barbell')return 'barbell'; if(e.equip==='dumbbell')return 'dumbbell'; if(e.equip==='kettlebell')return 'kettlebell'; if(e.equip==='band')return 'band'; if(e.equip==='ball')return 'ball'; if(e.equip==='yoga')return 'yoga';
+  if(e.type==='cardio')return 'run'; if(e.type==='stretch'||e.type==='cooldown')return 'stretch'; if(e.type==='warmup')return 'jump';
+  const m={chest:'pushup',back:'pullup',shoulders:'press',arms:'dip',legs:'squat',glutes:'bridge',core:'crunch',full:'jump'}; return m[e.muscle]||'dumbbell'; }
+
+const ICONS=ICON_IDS;
 const I18N={
 en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Settings',
  this_week:'This week',workout_days:'Workout days',total_time:'Total time',streak:'Streak',days:'days',d:'d',
@@ -294,12 +336,12 @@ ko:{tab_dash:'대시보드',tab_week:'주간',tab_month:'월간',tab_settings:'�
 };
 const MUSCLE_META={chest:{en:'Chest',ko:'가슴'},back:{en:'Back',ko:'등'},shoulders:{en:'Shoulders',ko:'어깨'},arms:{en:'Arms',ko:'팔'},legs:{en:'Legs',ko:'하체'},glutes:{en:'Glutes',ko:'엉덩이'},core:{en:'Core',ko:'코어'},full:{en:'Full body',ko:'전신'}};
 const MUSCLES=Object.keys(MUSCLE_META);
-const EQUIP_META={bodyweight:{en:'Bodyweight',ko:'맨몸'},dumbbell:{en:'Dumbbell',ko:'덤벨'},barbell:{en:'Barbell',ko:'바벨'},machine:{en:'Machine',ko:'머신'},cable:{en:'Cable',ko:'케이블'},band:{en:'Band',ko:'밴드'},kettlebell:{en:'Kettlebell',ko:'케틀벨'},other:{en:'Other',ko:'기타'}};
+const EQUIP_META={bodyweight:{en:'Bodyweight',ko:'맨몸'},dumbbell:{en:'Dumbbell',ko:'덤벨'},barbell:{en:'Barbell',ko:'바벨'},machine:{en:'Machine',ko:'머신'},cable:{en:'Cable',ko:'케이블'},band:{en:'Band',ko:'밴드'},kettlebell:{en:'Kettlebell',ko:'케틀벨'},ball:{en:'Stability ball',ko:'짐볼'},yoga:{en:'Yoga',ko:'요가'},other:{en:'Other',ko:'기타'}};
 const EQUIPS=Object.keys(EQUIP_META);
 function stepsOf(a){return a.map(s=>({titleEn:s[0],titleKo:s[1],cueEn:s[2],cueKo:s[3],mistakeEn:s[4]||'',mistakeKo:s[5]||''}));}
 // sets-type: X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps)   time-type: T(id,en,ko,icon,type,muscle,equip,minutes,steps)
-function X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps){return {id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'sets',sets,reps,weight,rest,minutes:Math.max(1,Math.round(sets*(reps*3+rest)/60)),steps:stepsOf(steps)};}
-function T(id,en,ko,icon,type,muscle,equip,minutes,steps){return {id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'time',sets:1,reps:1,weight:0,rest:0,minutes,steps:stepsOf(steps)};}
+function X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps){const e={id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'sets',sets,reps,weight,rest,minutes:Math.max(1,Math.round(sets*(reps*3+rest)/60)),steps:stepsOf(steps)}; if(!ICON_DEFS[icon])e.icon=defaultIconFor(e); return e;}
+function T(id,en,ko,icon,type,muscle,equip,minutes,steps){const e={id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'time',sets:1,reps:1,weight:0,rest:0,minutes,steps:stepsOf(steps)}; if(!ICON_DEFS[icon])e.icon=defaultIconFor(e); return e;}
 function DEFAULT_EXERCISES(){return [
 // ---- Chest ----
 X('ex_pushup','Push-up','푸시업','💪','strength','chest','bodyweight',3,10,0,60,[['Set up','자세','Hands a bit wider than shoulders, body in one line','손은 어깨보다 조금 넓게, 몸 일직선','Hips sagging','허리 꺾임'],['Lower','내려가기','Elbows at 45°, chest close to the floor','팔꿈치 45도로 가슴을 바닥 가까이','Elbows flaring out','팔꿈치 너무 벌어짐'],['Press','올라오기','Push the floor away through your palms','손바닥으로 밀어 올라오기','Head dropping','고개 떨어짐']]),
@@ -396,7 +438,178 @@ T('ex_figure4','Figure-4 stretch','피겨4 스트레칭','🪢','cooldown','glut
 T('ex_spinaltwist','Lying spinal twist','누워서 척추 비틀기','🪢','cooldown','back','bodyweight',2,[['Lie down','눕기','Arms out, knees bent','팔 벌리고 무릎 굽히기','',''],['Twist','비틀기','Drop knees to one side, look the other way, hold 30s','무릎을 한쪽으로, 시선은 반대로, 30초','Shoulder lifting','어깨가 뜸'],['Switch','바꾸기','Switch sides','반대쪽','','']]),
 T('ex_downdog','Downward dog','다운독','🪢','cooldown','full','bodyweight',1,[['Set up','자세','Hands and feet on floor, hips high','손발 바닥, 엉덩이 높이','',''],['Press','밀기','Push chest toward thighs, heels down, hold 30s','가슴을 허벅지 쪽으로, 뒤꿈치 내려 30초','Rounding the back','등 말림']]),
 T('ex_forwardfold','Standing forward fold','선 전굴','🪢','cooldown','legs','bodyweight',1,[['Stand','서기','Feet hip-width, soft knees','발 골반너비, 무릎 살짝','',''],['Fold','숙이기','Fold forward, let the head hang, hold 30s','숙여서 머리 늘어뜨리고 30초','Locking knees','무릎 완전히 폄']]),
-T('ex_breathing','Deep breathing','심호흡','🪢','cooldown','full','bodyweight',2,[['Sit','앉기','Sit or lie comfortably','편하게 앉거나 눕기','',''],['Breathe','호흡','In for 4, hold 4, out for 6','4초 들이쉬고 4초 멈추고 6초 내쉬기','',''],['Relax','이완','Let shoulders drop, repeat','어깨 힘 빼고 반복','','']])
+T('ex_breathing','Deep breathing','심호흡','🪢','cooldown','full','bodyweight',2,[['Sit','앉기','Sit or lie comfortably','편하게 앉거나 눕기','',''],['Breathe','호흡','In for 4, hold 4, out for 6','4초 들이쉬고 4초 멈추고 6초 내쉬기','',''],['Relax','이완','Let shoulders drop, repeat','어깨 힘 빼고 반복','','']]),
+// ---- Poster exercises (bodyweight, kettlebell, band, dumbbell, yoga, barbell, stability ball, stretching) ----
+// Bodyweight
+X('ex_widepushup','Wide push-up','와이드 푸시업','pushup','strength','chest','bodyweight',3,10,0,60,[['Set up','자세','Hands well wider than shoulders','손을 어깨보다 훨씬 넓게','',''],['Lower','내려가기','Chest to the floor, elbows out','가슴을 바닥 가까이, 팔꿈치 바깥','Hips sagging','허리 꺾임'],['Press','올라오기','Push up, squeeze the chest','밀어 올리며 가슴 조이기','','']]),
+X('ex_pikepress','Pike press','파이크 프레스','pushup','strength','shoulders','bodyweight',3,8,0,60,[['Set up','자세','Hips high in an inverted V','엉덩이를 높이 들어 V자','',''],['Lower','내리기','Bend elbows, head toward the floor','팔꿈치 굽혀 머리를 바닥 쪽으로','Hips dropping','엉덩이 내려감'],['Press','밀기','Push back to the start','다시 밀어 올리기','','']]),
+X('ex_birddog','Bird dog','버드독','plank','strength','core','bodyweight',3,10,0,45,[['All fours','네발 자세','Hands under shoulders, knees under hips','손은 어깨 아래, 무릎은 골반 아래','',''],['Extend','뻗기','Opposite arm and leg out, hold 2s','반대 팔다리 뻗고 2초','Hips rotating','골반 회전'],['Switch','교대','Return and switch sides','돌아와서 반대쪽','','']]),
+X('ex_invrow','Inverted row','인버티드 로우','pullup','strength','back','bodyweight',3,8,0,60,[['Hang','매달리기','Under a bar, body straight, heels on floor','바 아래에서 몸 일직선, 뒤꿈치 바닥','',''],['Pull','당기기','Pull chest to the bar','가슴을 바로 당기기','Hips sagging','허리 처짐'],['Lower','내리기','Lower slowly to straight arms','팔이 펴질 때까지 천천히','','']]),
+X('ex_donkey','Donkey kick','덩키 킥','bridge','strength','glutes','bodyweight',3,12,0,45,[['All fours','네발 자세','Knees bent 90°, back flat','무릎 90도, 등 평평','',''],['Kick','차기','Push the sole toward the ceiling','발바닥을 천장으로 밀기','Arching the back','허리 젖힘'],['Lower','내리기','Lower without touching, switch sides','닿지 않게 내리고 반대쪽','','']]),
+X('ex_toetouch','Walking toe touch','워킹 토 터치','walk','warmup','legs','bodyweight',2,10,0,30,[['Step','걷기','Step forward, kick the leg straight up','한 발 내디디며 다리를 곧게 차올리기','',''],['Touch','터치','Touch the toe with the opposite hand','반대 손으로 발끝 터치','Rounding the back','등 말림'],['Alternate','교대','Keep walking, alternate legs','걸으며 다리 교대','','']]),
+X('ex_scissor','Scissor kick','시저 킥','crunch','strength','core','bodyweight',3,20,0,45,[['Lie down','눕기','Hands under hips, legs lifted','손은 엉덩이 아래, 다리 들기','',''],['Scissor','교차','Cross legs over each other, small fast moves','다리를 작고 빠르게 교차','Lower back lifting','허리 뜸']]),
+X('ex_revcrunch','Reverse crunch','리버스 크런치','crunch','strength','core','bodyweight',3,12,0,45,[['Lie down','눕기','Knees bent, arms at sides','무릎 굽히고 팔은 옆','',''],['Curl','말기','Lift hips, pull knees to chest','골반 들어 무릎을 가슴으로','Swinging legs','다리 반동'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_wiper','Windshield wiper','윈드실드 와이퍼','twist','strength','core','bodyweight',3,10,0,45,[['Lie down','눕기','Arms out, legs straight up','팔 벌리고 다리를 수직으로','',''],['Wipe','좌우로','Lower legs to one side, then the other','다리를 한쪽으로, 반대쪽으로','Shoulders lifting','어깨 뜸']]),
+X('ex_boxjump','Box jump','박스 점프','jump','cardio','legs','bodyweight',3,8,0,60,[['Set up','자세','Stand a step from the box, arms back','박스 앞에서 팔 뒤로','',''],['Jump','점프','Swing arms, land softly with bent knees','팔 흔들며 점프, 무릎 굽혀 부드럽게 착지','Landing stiff','뻣뻣하게 착지'],['Step down','내려오기','Step down, never jump down','점프하지 말고 걸어 내려오기','','']]),
+// Kettlebell
+X('ex_kbfloorpress','Kettlebell floor press','케틀벨 플로어 프레스','kettlebell','strength','chest','kettlebell',3,10,12,60,[['Lie down','눕기','Bell at chest, elbow on floor','벨을 가슴에, 팔꿈치는 바닥','',''],['Press','밀기','Press straight up','수직으로 밀기','',''],['Lower','내리기','Lower until the elbow touches','팔꿈치가 닿을 때까지','','']]),
+X('ex_kbpress','Kettlebell shoulder press','케틀벨 숄더 프레스','kettlebell','strength','shoulders','kettlebell',3,8,12,75,[['Rack','랙','Bell at shoulder, elbow in','벨을 어깨에, 팔꿈치 안쪽','',''],['Press','밀기','Press overhead, lock out','머리 위로 밀어 올리기','Leaning back','뒤로 젖힘'],['Lower','내리기','Lower back to the rack','랙 위치로 내리기','','']]),
+X('ex_kbsideraise','Kettlebell side raise','케틀벨 사이드 레이즈','kettlebell','strength','shoulders','kettlebell',3,12,6,45,[['Hold','잡기','Bell at side, slight elbow bend','벨을 옆에, 팔꿈치 살짝','',''],['Raise','들기','Raise to shoulder height','어깨 높이까지','Shrugging','어깨 올라감'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_kbpushpress','Kettlebell push press','케틀벨 푸시 프레스','kettlebell','strength','shoulders','kettlebell',3,8,16,75,[['Rack','랙','Bell at shoulder','벨을 어깨에','',''],['Dip and drive','딥 앤 드라이브','Bend knees slightly, drive up with the legs','무릎 살짝 굽혔다 다리로 밀어 올리기','',''],['Lock out','마무리','Finish with a straight arm overhead','머리 위에서 팔 펴기','','']]),
+X('ex_kbtricep','Kettlebell triceps press','케틀벨 트라이셉스 프레스','kettlebell','strength','arms','kettlebell',3,10,8,60,[['Hold','잡기','Both hands on the handle overhead','양손으로 손잡이 잡고 머리 위','',''],['Lower','내리기','Bend elbows behind the head','팔꿈치 굽혀 머리 뒤로','Elbows flaring','팔꿈치 벌어짐'],['Extend','펴기','Press back up','다시 펴기','','']]),
+X('ex_kbcurl','Kettlebell biceps curl','케틀벨 바이셉 컬','kettlebell','strength','arms','kettlebell',3,10,8,60,[['Hold','잡기','Bell by the handle, elbows at sides','손잡이 잡고 팔꿈치 옆에 고정','',''],['Curl','들기','Curl to the shoulder','어깨까지 들기','Swinging','반동'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_halo','Kettlebell halo','케틀벨 헤일로','kettlebell','warmup','shoulders','kettlebell',2,8,8,30,[['Hold','잡기','Bell upside down at chest','벨을 거꾸로 가슴 앞에','',''],['Circle','돌리기','Circle around the head, close to it','머리 주위를 가깝게 돌리기','Arching the back','허리 젖힘'],['Reverse','반대로','Switch direction each rep','매 회 방향 바꾸기','','']]),
+X('ex_kbrow','Kettlebell bent-over row','케틀벨 벤트오버 로우','kettlebell','strength','back','kettlebell',3,10,12,60,[['Hinge','숙이기','Hinge at hips, back flat','엉덩이 접어 숙이기, 등 평평','',''],['Row','당기기','Pull the bell to the hip','벨을 골반으로 당기기','Twisting','몸통 비틀림'],['Lower','내리기','Lower under control','천천히 내리기','','']]),
+X('ex_kbgoblet','Kettlebell goblet squat','케틀벨 고블릿 스쿼트','kettlebell','strength','legs','kettlebell',3,12,12,60,[['Hold','잡기','Bell by the horns at chest','벨 손잡이 양옆을 잡고 가슴 앞','',''],['Squat','앉기','Sit between the knees, elbows inside','무릎 사이로 앉기','Leaning forward','상체 쏠림'],['Stand','일어서기','Drive up through the heels','뒤꿈치로 밀기','','']]),
+X('ex_kbsumo','Kettlebell sumo squat','케틀벨 스모 스쿼트','kettlebell','strength','legs','kettlebell',3,12,12,60,[['Stance','자세','Wide stance, bell hanging between legs','넓게 서서 벨은 다리 사이','',''],['Squat','앉기','Sit down, knees over toes','앉기, 무릎은 발끝 방향','Knees caving','무릎 모임'],['Stand','일어서기','Squeeze glutes at the top','위에서 엉덩이 조이기','','']]),
+T('ex_farmer','Farmer\'s walk','파머스 워크','walk','strength','full','kettlebell',2,[['Pick up','들기','One bell in each hand, stand tall','양손에 벨, 바르게 서기','',''],['Walk','걷기','Walk with short steps, shoulders back','짧은 보폭으로 걷기, 어깨 뒤로','Leaning to one side','한쪽으로 기움']]),
+X('ex_kblunge','Kettlebell lunge','케틀벨 런지','lunge','strength','legs','kettlebell',3,10,12,60,[['Rack','랙','Bell at the chest or in the rack','벨을 가슴 앞이나 랙에','',''],['Lunge','런지','Step forward, back knee near the floor','한 발 앞으로, 뒤 무릎 바닥 근처','',''],['Return','돌아오기','Push off the front foot','앞발로 밀며 돌아오기','','']]),
+X('ex_sidelunge','Side lunge','사이드 런지','lunge','strength','legs','kettlebell',3,10,8,60,[['Step','옆으로','Big step to the side, other leg straight','옆으로 크게, 반대 다리는 펴기','',''],['Sit','앉기','Sit back into the bent leg','굽힌 다리 쪽으로 앉기','Knee past toes','무릎이 발끝 앞으로'],['Return','돌아오기','Push back to center, switch','밀어 돌아와 반대쪽','','']]),
+X('ex_kbstepup','Kettlebell step-up','케틀벨 스텝업','lunge','strength','legs','kettlebell',3,10,12,60,[['Set up','자세','Bell in one hand, foot on the box','한 손에 벨, 발을 박스에','',''],['Step up','올라가기','Drive through the top foot','위쪽 발로 밀어 올라서기','Pushing off the floor foot','바닥 발로 뜀'],['Step down','내려오기','Lower under control','천천히 내려오기','','']]),
+X('ex_sldl','Single-leg deadlift','싱글 레그 데드리프트','lunge','strength','glutes','kettlebell',3,8,12,60,[['Stand','서기','Bell in one hand, stand on the opposite leg','한 손에 벨, 반대 다리로 서기','',''],['Hinge','숙이기','Hinge forward, rear leg lifts in line with the back','상체 숙이며 뒷다리를 등과 일직선으로','Hips opening','골반 열림'],['Stand','일어서기','Squeeze the glute to return','엉덩이 조이며 돌아오기','','']]),
+X('ex_situppress','Sit-up to press','싯업 투 프레스','kettlebell','strength','core','kettlebell',3,10,8,45,[['Lie down','눕기','Bell at chest, knees bent','벨을 가슴에, 무릎 굽히기','',''],['Sit up','올라오기','Sit up all the way','끝까지 올라오기','',''],['Press','밀기','Press the bell overhead at the top','위에서 벨을 머리 위로 밀기','','']]),
+X('ex_flutter','Flutter kick','플러터 킥','crunch','strength','core','bodyweight',3,20,0,45,[['Lie down','눕기','Hands under hips, legs lifted slightly','손은 엉덩이 아래, 다리 살짝 들기','',''],['Kick','차기','Small alternating up-down kicks','작게 위아래로 번갈아 차기','Lower back lifting','허리 뜸']]),
+X('ex_ohsitup','Overhead sit-up','오버헤드 싯업','kettlebell','strength','core','kettlebell',3,10,8,45,[['Lie down','눕기','Bell held straight over the chest','벨을 가슴 위로 곧게 들기','',''],['Sit up','올라오기','Sit up keeping the arms vertical','팔을 수직으로 유지하며 올라오기','Arms drifting forward','팔이 앞으로 쏠림'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_kbswing','Kettlebell swing','케틀벨 스윙','kettlebell','cardio','full','kettlebell',3,15,16,60,[['Hike','뒤로','Hinge, swing the bell back between the legs','엉덩이 접고 벨을 다리 사이로','Squatting','스쿼트처럼 앉음'],['Snap','튕기기','Snap the hips forward, bell floats to chest height','골반을 앞으로 튕겨 벨을 가슴 높이로','Lifting with arms','팔로 들어올림'],['Repeat','반복','Let it swing back and repeat','다시 뒤로 보내며 반복','','']]),
+X('ex_thruster','Thruster','스러스터','kettlebell','cardio','full','kettlebell',3,10,12,60,[['Rack','랙','Bell at the shoulders','벨을 어깨에','',''],['Squat','앉기','Full squat','완전히 앉기','',''],['Drive and press','밀어 올리기','Stand and press overhead in one motion','일어서며 한 동작으로 머리 위로 밀기','','']]),
+X('ex_tgu','Turkish get-up','터키시 겟업','kettlebell','strength','full','kettlebell',3,3,8,90,[['Lie down','눕기','Bell pressed up, same-side knee bent','벨을 위로 든 채 같은 쪽 무릎 굽히기','',''],['Rise','일어나기','Elbow, hand, hip, then kneel, keep the arm vertical','팔꿈치 → 손 → 골반 → 무릎, 팔은 수직','Looking away from the bell','벨에서 시선 뗌'],['Stand and reverse','서고 되돌리기','Stand up, then reverse every step','일어선 뒤 역순으로','','']]),
+X('ex_snatch','Kettlebell snatch','케틀벨 스내치','kettlebell','cardio','full','kettlebell',3,8,12,75,[['Hike','뒤로','Swing the bell back','벨을 뒤로 스윙','',''],['Pull','당기기','Snap hips, pull the elbow high','골반 튕기고 팔꿈치 높이 당기기','',''],['Punch','펀치','Punch the hand through, lock out overhead','손을 위로 찔러 넣어 머리 위에서 고정','Bell flipping over','벨이 손목을 때림']]),
+X('ex_cleanpress','Clean and press','클린 앤 프레스','kettlebell','strength','full','kettlebell',3,6,12,75,[['Clean','클린','Swing and tuck the bell into the rack','스윙해서 벨을 랙으로','',''],['Press','프레스','Press overhead','머리 위로 밀기','',''],['Lower','내리기','Lower to the rack, then swing down','랙으로 내린 뒤 아래로','','']]),
+// Resistance band
+X('ex_bdupright','Band upright row','밴드 업라이트 로우','band','strength','shoulders','band',3,12,0,45,[['Stand','서기','Stand on the band, handles in front','밴드를 밟고 손잡이는 앞','',''],['Pull','당기기','Pull up to chest, elbows high','가슴까지, 팔꿈치 높게','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bdpress','Band shoulder press','밴드 숄더 프레스','band','strength','shoulders','band',3,12,0,45,[['Stand','서기','Stand on the band, hands at shoulders','밴드를 밟고 손은 어깨','',''],['Press','밀기','Press overhead','머리 위로 밀기','',''],['Lower','내리기','Lower under control','천천히 내리기','','']]),
+X('ex_bdraise','Band front and side raise','밴드 프론트/사이드 레이즈','band','strength','shoulders','band',3,12,0,45,[['Stand','서기','Stand on the band, arms down','밴드를 밟고 팔 내리기','',''],['Raise','들기','Raise forward, then to the sides','앞으로, 그다음 옆으로 들기','Shrugging','어깨 올라감'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bdchestpress','Band standing chest press','밴드 체스트 프레스','band','strength','chest','band',3,12,0,45,[['Anchor','고정','Band behind you at chest height','밴드를 뒤쪽 가슴 높이에 고정','',''],['Press','밀기','Press forward until arms are straight','팔이 펴질 때까지 앞으로','',''],['Return','돌아오기','Return slowly','천천히 돌아오기','','']]),
+X('ex_bdfly','Band chest fly','밴드 체스트 플라이','band','strength','chest','band',3,12,0,45,[['Anchor','고정','Band behind you, arms out wide','밴드 뒤에 고정, 팔을 옆으로','',''],['Fly','모으기','Bring hands together in front','손을 앞에서 모으기','Bending the elbows','팔꿈치 굽힘'],['Open','벌리기','Open slowly','천천히 벌리기','','']]),
+X('ex_bdcurl','Band biceps curl','밴드 바이셉 컬','band','strength','arms','band',3,15,0,45,[['Stand','서기','Stand on the band, elbows at sides','밴드 밟고 팔꿈치 옆에 고정','',''],['Curl','들기','Curl to the shoulders','어깨까지 들기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bdpushdown','Band triceps pushdown','밴드 트라이셉스 푸시다운','band','strength','arms','band',3,15,0,45,[['Anchor','고정','Band anchored high, elbows at sides','밴드를 높이 고정, 팔꿈치 옆에','',''],['Push','밀기','Push down to straight arms','팔이 펴질 때까지 아래로','',''],['Return','돌아오기','Return to 90°','90도로 돌아오기','','']]),
+X('ex_bdtriext','Band triceps extension','밴드 트라이셉스 익스텐션','band','strength','arms','band',3,12,0,45,[['Hold','잡기','Band behind the back, one hand overhead','밴드를 등 뒤로, 한 손은 머리 위','',''],['Extend','펴기','Straighten the top arm','위쪽 팔 펴기','',''],['Lower','내리기','Lower slowly, switch','천천히 내리고 교대','','']]),
+X('ex_bdpulldown','Band pull-down','밴드 풀다운','band','strength','back','band',3,12,0,45,[['Hold','잡기','Band overhead, hands wide','밴드를 머리 위에서 넓게','',''],['Pull','당기기','Pull down to the chest, elbows down','가슴까지, 팔꿈치 아래로','',''],['Return','돌아오기','Return slowly','천천히 돌아오기','','']]),
+X('ex_bdfacepull','Band face pull','밴드 페이스 풀','band','strength','shoulders','band',3,15,0,45,[['Anchor','고정','Band at face height','밴드를 얼굴 높이에','',''],['Pull','당기기','Pull to the face, elbows high and wide','얼굴로, 팔꿈치 높고 넓게','',''],['Return','돌아오기','Return slowly','천천히 돌아오기','','']]),
+X('ex_bdrow','Band seated row','밴드 시티드 로우','band','strength','back','band',3,12,0,45,[['Sit','앉기','Band around the feet, sit tall','밴드를 발에 걸고 바르게 앉기','',''],['Row','당기기','Pull to the belly, squeeze the blades','배로 당기며 견갑골 모으기','Leaning back','뒤로 젖힘'],['Return','돌아오기','Extend slowly','천천히 뻗기','','']]),
+X('ex_bdrevfly','Band reverse fly','밴드 리버스 플라이','band','strength','shoulders','band',3,15,0,45,[['Hold','잡기','Arms forward, hands shoulder-width on the band','팔 앞으로, 밴드를 어깨너비로','',''],['Open','벌리기','Pull the band apart to a T','밴드를 당겨 T자로','',''],['Return','돌아오기','Return slowly','천천히 돌아오기','','']]),
+X('ex_bdcrunch','Band crunch','밴드 크런치','band','strength','core','band',3,15,0,45,[['Lie down','눕기','Band anchored behind, hands by the head','밴드를 뒤에 고정, 손은 머리 옆','',''],['Crunch','올리기','Curl up against the band','밴드에 저항하며 올라오기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bdrevcrunch','Band reverse crunch','밴드 리버스 크런치','band','strength','core','band',3,12,0,45,[['Lie down','눕기','Band around the feet, anchored ahead','밴드를 발에 걸고 앞쪽 고정','',''],['Curl','말기','Pull knees to the chest, lift hips','무릎을 가슴으로, 골반 들기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bdtwist','Band Russian twist','밴드 러시안 트위스트','band','strength','core','band',3,16,0,45,[['Sit','앉기','Band anchored to the side, lean back','밴드를 옆에 고정하고 뒤로 기울이기','',''],['Twist','비틀기','Rotate away from the anchor','고정점 반대쪽으로 회전','',''],['Return','돌아오기','Return slowly, switch sides','천천히 돌아와 반대쪽','','']]),
+X('ex_woodchop','Band reverse woodchop','밴드 리버스 우드촙','band','strength','core','band',3,12,0,45,[['Anchor','고정','Band low to one side','밴드를 한쪽 아래에 고정','',''],['Chop','올리기','Pull diagonally up across the body','몸을 가로질러 대각선 위로','Arms only','팔만 사용'],['Return','돌아오기','Return slowly, switch sides','천천히 돌아와 반대쪽','','']]),
+X('ex_bdsquat','Band squat','밴드 스쿼트','band','strength','legs','band',3,15,0,45,[['Stand','서기','Stand on the band, handles at shoulders','밴드를 밟고 손잡이는 어깨','',''],['Squat','앉기','Squat to parallel','허벅지 수평까지','',''],['Stand','일어서기','Drive up against the band','밴드에 저항하며 일어서기','','']]),
+X('ex_bdhamcurl','Band hamstring curl','밴드 햄스트링 컬','band','strength','legs','band',3,15,0,45,[['Lie down','엎드리기','Face down, band around the ankle, anchored ahead','엎드려 발목에 밴드, 앞쪽 고정','',''],['Curl','굽히기','Pull the heel to the glute','뒤꿈치를 엉덩이로','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bdlateral','Band lateral lunge','밴드 래터럴 런지','lunge','strength','legs','band',3,10,0,45,[['Stand','서기','Band under the standing foot','밴드를 축 발로 밟기','',''],['Lunge','옆으로','Step wide to the side and sit','옆으로 넓게 내디뎌 앉기','',''],['Return','돌아오기','Push back to center','밀어 돌아오기','','']]),
+X('ex_bdlunge','Band lunge','밴드 런지','lunge','strength','legs','band',3,12,0,45,[['Set up','자세','Front foot on the band, handles at shoulders','앞발로 밴드 밟기, 손잡이는 어깨','',''],['Lower','내려가기','Back knee near the floor','뒤 무릎 바닥 근처','',''],['Stand','일어서기','Drive through the front heel','앞 뒤꿈치로 밀기','','']]),
+X('ex_abduction','Band hip abduction','밴드 힙 어브덕션','legs','strength','glutes','band',3,15,0,45,[['Stand','서기','Band around the ankles','밴드를 발목에','',''],['Lift','벌리기','Lift one leg straight out to the side','한 다리를 옆으로','Leaning away','몸이 기움'],['Return','돌아오기','Return slowly, switch','천천히 돌아와 교대','','']]),
+X('ex_bdrdl','Band Romanian deadlift','밴드 루마니안 데드리프트','band','strength','legs','band',3,12,0,45,[['Stand','서기','Stand on the band, soft knees','밴드 밟고 무릎 살짝','',''],['Hinge','숙이기','Push hips back, flat back','엉덩이 뒤로, 등 평평','Rounding','등 말림'],['Stand','일어서기','Squeeze glutes to stand','엉덩이 조이며 일어서기','','']]),
+X('ex_bddonkey','Band donkey kick','밴드 덩키 킥','bridge','strength','glutes','band',3,12,0,45,[['All fours','네발 자세','Band around the foot, held under the hands','밴드를 발에 걸고 손으로 누르기','',''],['Kick','차기','Push the foot back and up','발을 뒤로 위로','',''],['Return','돌아오기','Return slowly','천천히 돌아오기','','']]),
+X('ex_bdbridge','Band glute bridge','밴드 글루트 브릿지','bridge','strength','glutes','band',3,15,0,45,[['Lie down','눕기','Band above the knees, feet flat','밴드를 무릎 위에, 발 바닥','',''],['Lift','들기','Lift hips, push knees out','골반 들며 무릎 바깥으로','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_rdlrow','One-leg RDL to row','원레그 RDL 투 로우','band','strength','full','band',3,8,0,60,[['Hinge','숙이기','Band under the foot, hinge on one leg','밴드 밟고 한 다리로 숙이기','',''],['Row','당기기','Row at the bottom','아래에서 당기기','',''],['Stand','일어서기','Return to standing, switch','일어서서 교대','','']]),
+X('ex_bdthruster','Band thruster','밴드 스러스터','band','cardio','full','band',3,12,0,45,[['Rack','랙','Stand on the band, handles at shoulders','밴드 밟고 손잡이는 어깨','',''],['Squat','앉기','Full squat','완전히 앉기','',''],['Press','밀기','Stand and press overhead','일어서며 머리 위로','','']]),
+X('ex_squatrow','Band squat row','밴드 스쿼트 로우','band','strength','full','band',3,12,0,45,[['Anchor','고정','Band anchored ahead, arms extended','밴드를 앞에 고정, 팔 뻗기','',''],['Squat','앉기','Squat with arms forward','팔 앞으로 뻗은 채 앉기','',''],['Row','당기기','Stand and row to the belly','일어서며 배로 당기기','','']]),
+// Dumbbell additions
+X('ex_hammerpress','Dumbbell hammer press','덤벨 해머 프레스','dumbbell','strength','chest','dumbbell',3,10,12,75,[['Set up','자세','Lie back, palms facing each other','누워서 손바닥 마주 보게','',''],['Lower','내리기','Lower to the sides of the chest','가슴 옆까지','',''],['Press','밀기','Press up, keep palms facing in','손바닥 마주 본 채 밀기','','']]),
+X('ex_shrug','Dumbbell shrug','덤벨 슈러그','dumbbell','strength','shoulders','dumbbell',3,12,12,45,[['Hold','잡기','Dumbbells at sides, arms straight','덤벨 옆에, 팔 펴기','',''],['Shrug','올리기','Lift shoulders straight up, hold 1s','어깨를 수직으로 올려 1초','Rolling shoulders','어깨 돌림'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_dbbentrow','Dumbbell bent-over row','덤벨 벤트오버 로우','dumbbell','strength','back','dumbbell',3,10,12,60,[['Hinge','숙이기','Hinge at hips, both dumbbells hanging','엉덩이 접고 덤벨 양손','Rounding','등 말림'],['Row','당기기','Pull to the hips, squeeze the back','골반 쪽으로 당기며 등 조이기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_dbdeadlift','Dumbbell deadlift','덤벨 데드리프트','dumbbell','strength','back','dumbbell',3,10,14,75,[['Set up','자세','Dumbbells beside the feet, flat back','덤벨을 발 옆에, 등 평평','',''],['Lift','들기','Drive with the legs, dumbbells close','다리로 밀며 덤벨은 몸 가까이','',''],['Lower','내리기','Hips back, lower slowly','엉덩이 뒤로, 천천히','','']]),
+X('ex_dbsquat','Dumbbell squat','덤벨 스쿼트','dumbbell','strength','legs','dumbbell',3,12,10,60,[['Hold','잡기','Dumbbells at sides','덤벨을 양옆에','',''],['Squat','앉기','Sit to parallel, chest up','허벅지 수평까지, 가슴 펴기','',''],['Stand','일어서기','Drive through the heels','뒤꿈치로 밀기','','']]),
+X('ex_dblunge','Dumbbell lunge','덤벨 런지','lunge','strength','legs','dumbbell',3,10,8,60,[['Hold','잡기','Dumbbells at sides','덤벨을 양옆에','',''],['Lunge','런지','Step forward, back knee near the floor','앞으로, 뒤 무릎 바닥 근처','',''],['Return','돌아오기','Push off the front foot','앞발로 밀기','','']]),
+X('ex_dbstepup','Dumbbell step-up','덤벨 스텝업','lunge','strength','legs','dumbbell',3,10,8,60,[['Set up','자세','Dumbbells at sides, foot on the box','덤벨 들고 발을 박스에','',''],['Step up','올라가기','Drive through the top foot','위쪽 발로 밀기','',''],['Step down','내려오기','Lower slowly','천천히 내려오기','','']]),
+X('ex_dbcalf','Dumbbell calf raise','덤벨 카프 레이즈','legs','strength','legs','dumbbell',3,15,10,45,[['Hold','잡기','Dumbbells at sides, balls of feet on a step','덤벨 들고 발 앞부분을 계단에','',''],['Raise','들기','Rise as high as possible','최대한 높이','',''],['Lower','내리기','Lower below the step','계단 아래까지','','']]),
+X('ex_dbrdl','Dumbbell Romanian deadlift','덤벨 루마니안 데드리프트','dumbbell','strength','legs','dumbbell',3,10,12,75,[['Stand','서기','Dumbbells in front of thighs, soft knees','덤벨은 허벅지 앞, 무릎 살짝','',''],['Hinge','숙이기','Push hips back, dumbbells slide down the legs','엉덩이 뒤로, 덤벨은 다리 따라','Rounding','등 말림'],['Stand','일어서기','Squeeze glutes','엉덩이 조이기','','']]),
+X('ex_dbhipraise','Dumbbell hip raise','덤벨 힙 레이즈','bridge','strength','glutes','dumbbell',3,12,10,60,[['Set up','자세','Upper back on bench, dumbbell on hips','등을 벤치에, 덤벨은 골반 위','',''],['Raise','들기','Drive hips up, squeeze','골반 올리며 조이기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_dbtwist','Dumbbell Russian twist','덤벨 러시안 트위스트','twist','strength','core','dumbbell',3,16,5,45,[['Sit','앉기','Lean back, dumbbell at chest','뒤로 기울이고 덤벨은 가슴','',''],['Twist','비틀기','Rotate side to side','좌우로 회전','',''],['Keep tall','유지','Chest up throughout','가슴 편 채 유지','','']]),
+X('ex_sidebend','Dumbbell side bend','덤벨 사이드 벤드','dumbbell','strength','core','dumbbell',3,12,10,45,[['Hold','잡기','Dumbbell in one hand at the side','한 손에 덤벨','',''],['Bend','굽히기','Bend sideways toward the weight','덤벨 쪽으로 옆으로 굽히기','Leaning forward','앞으로 숙임'],['Return','돌아오기','Return and switch sides','돌아와서 반대쪽','','']]),
+X('ex_woodchopper','Dumbbell wood chopper','덤벨 우드 촙퍼','twist','strength','core','dumbbell',3,12,6,45,[['Start','시작','Dumbbell at one hip, knees bent','덤벨을 한쪽 골반에','',''],['Chop','올리기','Swing diagonally up and across','대각선 위로 가로질러','',''],['Return','돌아오기','Return slowly, switch sides','천천히 돌아와 반대쪽','','']]),
+X('ex_vup','V-up','브이업','crunch','strength','core','bodyweight',3,10,0,45,[['Lie down','눕기','Arms overhead, legs straight','팔 머리 위, 다리 펴기','',''],['Fold','접기','Lift arms and legs together to a V','팔다리를 동시에 들어 V자','Jerking the neck','목 반동'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+// Barbell additions
+X('ex_closegrip','Close-grip bench press','클로즈 그립 벤치프레스','barbell','strength','arms','barbell',3,8,30,90,[['Set up','자세','Grip shoulder-width, elbows tucked','어깨너비로 잡고 팔꿈치 붙이기','',''],['Lower','내리기','Lower to the lower chest','아래 가슴까지','',''],['Press','밀기','Press up, triceps do the work','삼두로 밀어 올리기','','']]),
+X('ex_declinepress','Decline bench press','디클라인 벤치프레스','barbell','strength','chest','barbell',3,8,40,90,[['Set up','자세','Decline bench, feet hooked','디클라인 벤치, 발 고정','',''],['Lower','내리기','Lower to the lower chest','아래 가슴까지','',''],['Press','밀기','Press up and slightly back','위로, 살짝 뒤로','','']]),
+X('ex_bbincline','Barbell incline press','바벨 인클라인 프레스','barbell','strength','chest','barbell',3,8,30,90,[['Set up','자세','Bench at 30°, bar over the upper chest','벤치 30도, 바는 윗가슴 위','',''],['Lower','내리기','Lower to the upper chest','윗가슴까지','',''],['Press','밀기','Press straight up','수직으로 밀기','','']]),
+X('ex_bbfrontraise','Barbell front raise','바벨 프론트 레이즈','barbell','strength','shoulders','barbell',3,12,10,45,[['Hold','잡기','Bar at the thighs','바를 허벅지 앞에','',''],['Raise','들기','Raise to eye level','눈높이까지','Swinging','반동'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bbshrug','Barbell shrug','바벨 슈러그','barbell','strength','shoulders','barbell',3,12,40,60,[['Hold','잡기','Bar at the thighs, arms straight','바를 허벅지 앞, 팔 펴기','',''],['Shrug','올리기','Shoulders straight up, hold 1s','어깨를 수직으로, 1초','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bbupright','Barbell upright row','바벨 업라이트 로우','barbell','strength','shoulders','barbell',3,10,20,60,[['Hold','잡기','Narrow grip at the thighs','좁게 잡고 허벅지 앞','',''],['Pull','당기기','Pull up along the body to the chest','몸을 따라 가슴까지','Pulling too high','너무 높이 당김'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_revcurl','Barbell reverse curl','바벨 리버스 컬','barbell','strength','arms','barbell',3,10,10,60,[['Hold','잡기','Overhand grip, elbows at sides','손등이 위로, 팔꿈치 옆에','',''],['Curl','들기','Curl up, wrists straight','손목 곧게 유지하며 들기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bbkickback','Barbell kickback','바벨 킥백','barbell','strength','arms','barbell',3,12,10,45,[['Hinge','숙이기','Hinge forward, bar behind the thighs','숙이고 바는 허벅지 뒤','',''],['Extend','펴기','Extend the arms straight back','팔을 뒤로 펴기','',''],['Return','돌아오기','Bend slowly','천천히 굽히기','','']]),
+X('ex_pullover','Barbell pullover','바벨 풀오버','barbell','strength','back','barbell',3,10,15,60,[['Lie down','눕기','Bar over the chest, slight elbow bend','바를 가슴 위, 팔꿈치 살짝','',''],['Lower','내리기','Lower the bar behind the head','바를 머리 뒤로','Arching the back','허리 젖힘'],['Pull','당기기','Pull back over the chest','가슴 위로 당기기','','']]),
+X('ex_sumodead','Sumo deadlift','스모 데드리프트','barbell','strength','legs','barbell',3,6,50,120,[['Set up','자세','Wide stance, toes out, grip inside the knees','넓게 서서 발끝 바깥, 무릎 안쪽으로 잡기','',''],['Pull','들기','Push the knees out, drive the floor away','무릎 벌리며 바닥 밀기','Hips rising first','엉덩이 먼저 올라감'],['Lower','내리기','Hips back, lower under control','엉덩이 뒤로, 천천히','','']]),
+X('ex_frontsquat','Front squat','프론트 스쿼트','barbell','strength','legs','barbell',3,6,30,120,[['Rack','랙','Bar on the front shoulders, elbows high','바를 어깨 앞에, 팔꿈치 높게','Elbows dropping','팔꿈치 떨어짐'],['Squat','앉기','Sit straight down, chest up','수직으로 앉기, 가슴 펴기','',''],['Stand','일어서기','Drive up, elbows stay high','팔꿈치 높인 채 일어서기','','']]),
+X('ex_bbbridge','Barbell glute bridge','바벨 글루트 브릿지','bridge','strength','glutes','barbell',3,12,30,75,[['Lie down','눕기','Bar over the hips, feet flat','바를 골반 위에, 발 바닥','',''],['Lift','들기','Drive hips up, squeeze','골반 올리며 조이기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bblunge','Barbell lunge','바벨 런지','lunge','strength','legs','barbell',3,8,20,90,[['Rack','랙','Bar on the upper back','바를 등 위쪽에','',''],['Lunge','런지','Step forward, back knee near the floor','앞으로, 뒤 무릎 바닥 근처','',''],['Return','돌아오기','Push back to standing','밀어 돌아오기','','']]),
+X('ex_goodmorning','Good morning','굿모닝','barbell','strength','back','barbell',3,10,20,75,[['Rack','랙','Bar on the upper back, soft knees','바를 등 위쪽에, 무릎 살짝','',''],['Hinge','숙이기','Push hips back, torso near parallel','엉덩이 뒤로, 상체 수평 근처','Rounding','등 말림'],['Stand','일어서기','Squeeze glutes to stand','엉덩이 조이며 일어서기','','']]),
+X('ex_bbstepup','Barbell step-up','바벨 스텝업','lunge','strength','legs','barbell',3,8,20,90,[['Rack','랙','Bar on the back, foot on the box','바를 등에, 발을 박스에','',''],['Step up','올라가기','Drive through the top foot','위쪽 발로 밀기','',''],['Step down','내려오기','Lower under control','천천히 내려오기','','']]),
+X('ex_bbcalf','Barbell calf raise','바벨 카프 레이즈','legs','strength','legs','barbell',3,15,30,45,[['Rack','랙','Bar on the back, balls of feet on a step','바를 등에, 발 앞부분을 계단에','',''],['Raise','들기','Rise as high as possible','최대한 높이','',''],['Lower','내리기','Lower below the step','계단 아래까지','','']]),
+X('ex_bbsidebend','Barbell side bend','바벨 사이드 벤드','barbell','strength','core','barbell',3,12,15,45,[['Rack','랙','Bar on the back','바를 등에','',''],['Bend','굽히기','Bend sideways slowly','천천히 옆으로 굽히기','',''],['Return','돌아오기','Return, switch sides','돌아와서 반대쪽','','']]),
+X('ex_torsorot','Barbell torso rotation','바벨 토르소 로테이션','twist','strength','core','barbell',3,12,15,45,[['Rack','랙','Bar on the back, feet wide','바를 등에, 발 넓게','',''],['Rotate','회전','Rotate the torso side to side','몸통을 좌우로 회전','Rotating from the knees','무릎으로 회전'],['Control','통제','Slow and controlled','천천히 통제','','']]),
+X('ex_bbohsitup','Barbell overhead sit-up','바벨 오버헤드 싯업','barbell','strength','core','barbell',3,10,15,60,[['Lie down','눕기','Bar held over the chest','바를 가슴 위로 들기','',''],['Sit up','올라오기','Sit up, bar stays over the head','바를 머리 위에 둔 채 올라오기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+// Stability ball
+X('ex_ballpress','Ball shoulder press','짐볼 숄더 프레스','ball','strength','shoulders','ball',3,10,8,60,[['Sit','앉기','Sit tall on the ball, dumbbells at shoulders','볼에 바르게 앉아 덤벨은 어깨','',''],['Press','밀기','Press overhead','머리 위로 밀기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_ballchest','Ball chest press','짐볼 체스트 프레스','ball','strength','chest','ball',3,10,10,60,[['Set up','자세','Upper back on the ball, hips up','등 위쪽을 볼에, 골반 올리기','Hips sagging','골반 처짐'],['Lower','내리기','Lower dumbbells to chest level','덤벨을 가슴 높이로','',''],['Press','밀기','Press up','밀어 올리기','','']]),
+X('ex_ballinclinepu','Ball incline push-up','짐볼 인클라인 푸시업','pushup','strength','chest','ball',3,10,0,60,[['Set up','자세','Hands on the ball, body straight','손을 볼에, 몸 일직선','',''],['Lower','내리기','Lower the chest to the ball','가슴을 볼까지','',''],['Press','밀기','Push up, keep the ball still','볼 흔들리지 않게 밀기','','']]),
+X('ex_ballfly','Ball chest fly','짐볼 체스트 플라이','ball','strength','chest','ball',3,12,6,60,[['Set up','자세','Upper back on the ball, arms up','등을 볼에, 팔 위로','',''],['Open','벌리기','Lower in a wide arc','넓게 벌리며 내리기','',''],['Squeeze','모으기','Bring dumbbells together','덤벨 모으기','','']]),
+X('ex_balldeclinepu','Ball decline push-up','짐볼 디클라인 푸시업','pushup','strength','chest','ball',3,8,0,60,[['Set up','자세','Shins on the ball, hands on the floor','정강이를 볼에, 손은 바닥','',''],['Lower','내리기','Lower the chest to the floor','가슴을 바닥 가까이','Hips sagging','허리 꺾임'],['Press','밀기','Push back up','밀어 올리기','','']]),
+X('ex_backext','Ball back extension','짐볼 백 익스텐션','ball','strength','back','ball',3,12,0,45,[['Set up','자세','Hips on the ball, feet against a wall','골반을 볼에, 발은 벽에','',''],['Lift','들기','Raise the torso until straight','상체를 일직선까지','Hyperextending','과하게 젖힘'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_ballpullover','Ball lat pullover','짐볼 랫 풀오버','ball','strength','back','ball',3,12,8,60,[['Set up','자세','Upper back on the ball, dumbbell over the chest','등을 볼에, 덤벨은 가슴 위','',''],['Lower','내리기','Lower behind the head','머리 뒤로 내리기','',''],['Pull','당기기','Pull back over the chest','가슴 위로 당기기','','']]),
+X('ex_balldip','Ball triceps dip','짐볼 트라이셉스 딥','dip','strength','arms','ball',3,10,0,60,[['Set up','자세','Hands on the ball behind you','볼을 뒤로 짚기','',''],['Lower','내리기','Bend elbows to 90°','팔꿈치 90도','',''],['Press','밀기','Push back up','밀어 올리기','','']]),
+X('ex_jackknife','Ball jackknife','짐볼 잭나이프','ball','strength','core','ball',3,10,0,45,[['Set up','자세','Plank with shins on the ball','정강이를 볼에 올린 플랭크','',''],['Tuck','당기기','Pull knees to the chest','무릎을 가슴으로','',''],['Extend','펴기','Roll back to plank','플랭크로 돌아가기','','']]),
+X('ex_obliquecrunch','Ball oblique crunch','짐볼 오블리크 크런치','ball','strength','core','ball',3,12,0,45,[['Set up','자세','Side of the hip on the ball, feet against a wall','골반 옆면을 볼에, 발은 벽에','',''],['Crunch','올리기','Crunch sideways','옆으로 올리기','',''],['Lower','내리기','Lower slowly, switch sides','천천히 내리고 반대쪽','','']]),
+X('ex_ballcrunch','Ball crunch','짐볼 크런치','ball','strength','core','ball',3,15,0,45,[['Set up','자세','Lower back on the ball, feet flat','허리를 볼에, 발 바닥','',''],['Crunch','올리기','Curl the ribs toward the hips','갈비뼈를 골반 쪽으로','Pulling the neck','목 당김'],['Lower','내리기','Lower over the ball','볼 위로 내리기','','']]),
+T('ex_ballplank','Ball plank','짐볼 플랭크','ball','strength','core','ball',1,[['Set up','자세','Forearms on the ball, body straight','팔뚝을 볼에, 몸 일직선','',''],['Hold','유지','Hold, keep the ball still','볼 흔들리지 않게 유지','Hips sagging','허리 꺾임']]),
+T('ex_ballsideplank','Ball side plank','짐볼 사이드 플랭크','ball','strength','core','ball',1,[['Set up','자세','Forearm on the ball, feet stacked','팔뚝을 볼에, 발 포개기','',''],['Hold','유지','Lift hips, hold, switch sides','골반 들고 유지, 반대쪽','','']]),
+X('ex_balltwist','Ball Russian twist','짐볼 러시안 트위스트','ball','strength','core','ball',3,16,0,45,[['Set up','자세','Upper back on the ball, arms up','등을 볼에, 팔 위로','',''],['Twist','비틀기','Rotate the arms side to side','팔을 좌우로 회전','',''],['Control','통제','Hips stay up','골반 유지','','']]),
+X('ex_ballrollout','Ball roll-out','짐볼 롤아웃','ball','strength','core','ball',3,10,0,45,[['Kneel','무릎 꿇기','Forearms on the ball','팔뚝을 볼에','',''],['Roll out','밀기','Roll the ball forward','볼을 앞으로 굴리기','Hips sagging','허리 꺾임'],['Pull back','당기기','Pull back with the abs','복근으로 당기기','','']]),
+X('ex_pikecrunch','Ball pike crunch','짐볼 파이크 크런치','ball','strength','core','ball',3,10,0,45,[['Set up','자세','Plank with shins on the ball','정강이를 볼에 올린 플랭크','',''],['Pike','들기','Lift hips, roll the ball toward the hands','골반 들며 볼을 손 쪽으로','',''],['Lower','내리기','Return to plank','플랭크로','','']]),
+T('ex_ballwallsquat','Ball wall squat','짐볼 월 스쿼트','ball','strength','legs','ball',1,[['Set up','자세','Ball between the lower back and the wall','볼을 허리와 벽 사이에','',''],['Squat','앉기','Roll down to parallel and hold','수평까지 내려가 유지','','']]),
+X('ex_singlelegsquat','Ball single-leg squat','짐볼 싱글 레그 스쿼트','ball','strength','legs','ball',3,8,0,60,[['Set up','자세','Ball against the wall, one foot off the floor','볼을 벽에, 한 발 들기','',''],['Squat','앉기','Squat on one leg','한 다리로 앉기','Knee caving','무릎 모임'],['Stand','일어서기','Push up, switch legs','밀어 올리고 교대','','']]),
+X('ex_ballhipraise','Ball hip raise','짐볼 힙 레이즈','bridge','strength','glutes','ball',3,12,0,45,[['Lie down','눕기','Heels on the ball','뒤꿈치를 볼에','',''],['Raise','들기','Lift hips in a straight line','골반을 일직선까지','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_revhipraise','Ball reverse hip raise','짐볼 리버스 힙 레이즈','ball','strength','glutes','ball',3,12,0,45,[['Set up','자세','Lie face down over the ball, hands on the floor','볼 위에 엎드려 손은 바닥','',''],['Lift','들기','Lift both legs to hip height','두 다리를 골반 높이까지','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_buttblaster','Ball butt blaster','짐볼 벗 블래스터','ball','strength','glutes','ball',3,12,0,45,[['Set up','자세','Chest on the ball, hands on the floor','가슴을 볼에, 손은 바닥','',''],['Kick','차기','Kick one leg up and back','한 다리를 위로 뒤로','',''],['Lower','내리기','Lower, switch legs','내리고 교대','','']]),
+X('ex_hipext','Ball hip extension','짐볼 힙 익스텐션','bridge','strength','glutes','ball',3,12,0,45,[['Set up','자세','Shoulders on the ball, hips low','어깨를 볼에, 골반 낮게','',''],['Extend','들기','Drive hips up to a straight line','골반을 일직선까지','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_ballbridge','Ball glute bridge','짐볼 글루트 브릿지','bridge','strength','glutes','ball',3,12,0,45,[['Lie down','눕기','Feet flat on the ball, knees bent','발바닥을 볼에, 무릎 굽히기','',''],['Lift','들기','Lift hips, squeeze','골반 들며 조이기','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_ballhamcurl','Ball hamstring curl','짐볼 햄스트링 컬','ball','strength','legs','ball',3,12,0,45,[['Lie down','눕기','Heels on the ball, hips lifted','뒤꿈치를 볼에, 골반 들기','',''],['Curl','당기기','Roll the ball toward the hips','볼을 골반 쪽으로','Hips dropping','골반 처짐'],['Extend','펴기','Roll back out slowly','천천히 밀어내기','','']]),
+T('ex_ballmountain','Ball mountain climber','짐볼 마운틴 클라이머','ball','cardio','core','ball',1,[['Set up','자세','Hands on the ball in a plank','손을 볼에 올린 플랭크','',''],['Drive','무릎 당기기','Alternate knees to the chest','무릎을 번갈아 가슴으로','','']]),
+X('ex_vpass','Ball V-pass','짐볼 브이 패스','ball','strength','core','ball',3,10,0,45,[['Lie down','눕기','Ball between the hands overhead','볼을 양손으로 머리 위에','',''],['Pass','전달','Lift arms and legs, pass the ball to the feet','팔다리 들어 볼을 발로 전달','',''],['Return','돌아오기','Lower, lift again and pass back','내렸다가 다시 올려 손으로','','']]),
+X('ex_ballohsquat','Overhead ball squat','오버헤드 볼 스쿼트','ball','strength','full','ball',3,12,0,45,[['Hold','잡기','Ball overhead, arms straight','볼을 머리 위로','',''],['Squat','앉기','Squat, keep the ball over the head','볼을 머리 위에 둔 채 앉기','Arms dropping forward','팔이 앞으로 떨어짐'],['Stand','일어서기','Drive up','밀어 올리기','','']]),
+// Yoga (type stretch, equip yoga)
+T('ex_cat','Cat pose','고양이 자세','yoga','stretch','back','yoga',1,[['All fours','네발 자세','Hands under shoulders, knees under hips','손은 어깨 아래, 무릎은 골반 아래','',''],['Round','말기','Exhale, round the spine, tuck the chin','숨 내쉬며 등 둥글게, 턱 당기기','','']]),
+T('ex_cow','Cow pose','소 자세','yoga','stretch','back','yoga',1,[['All fours','네발 자세','Hands under shoulders','손은 어깨 아래','',''],['Arch','젖히기','Inhale, drop the belly, lift the gaze','숨 들이쉬며 배 내리고 시선 위로','','']]),
+T('ex_plow','Plow pose','쟁기 자세','yoga','stretch','back','yoga',1,[['Lie down','눕기','Lift legs over the head','다리를 머리 위로 넘기기','',''],['Hold','유지','Toes to the floor behind, hands support the back','발끝을 뒤 바닥에, 손은 등 받치기','Neck turning','목 돌림']]),
+T('ex_shoulderstand','Shoulder stand','어깨서기','yoga','stretch','full','yoga',1,[['Lift','들기','From plow, lift the legs straight up','쟁기 자세에서 다리를 수직으로','',''],['Hold','유지','Hands on the back, breathe slowly','손으로 등 받치고 천천히 호흡','Neck turning','목 돌림']]),
+T('ex_happybaby','Happy baby','해피 베이비','yoga','stretch','glutes','yoga',1,[['Lie down','눕기','Hold the outsides of the feet','발 바깥쪽 잡기','',''],['Open','열기','Knees toward the armpits, rock gently','무릎을 겨드랑이 쪽으로, 살살 흔들기','','']]),
+T('ex_prayer','Prayer pose','기도 자세','yoga','cooldown','full','yoga',1,[['Stand','서기','Feet together, palms at the chest','발 모으고 손바닥을 가슴 앞에','',''],['Breathe','호흡','Close the eyes, breathe slowly','눈 감고 천천히 호흡','','']]),
+T('ex_garland','Garland pose','화환 자세','yoga','stretch','legs','yoga',1,[['Squat','앉기','Deep squat, feet flat','깊게 앉기, 발 바닥','',''],['Press','밀기','Elbows push the knees out, palms together','팔꿈치로 무릎 밀며 손바닥 모으기','','']]),
+T('ex_halflord','Half lord of the fishes','반 물고기 왕 자세','yoga','stretch','back','yoga',1,[['Sit','앉기','One leg crossed over the other','한 다리를 반대 다리 위로','',''],['Twist','비틀기','Twist toward the top knee, hold, switch','위쪽 무릎 쪽으로 비틀어 유지, 반대쪽','','']]),
+T('ex_hero','Hero pose','영웅 자세','yoga','stretch','legs','yoga',1,[['Kneel','무릎 꿇기','Sit between the heels','뒤꿈치 사이에 앉기','',''],['Hold','유지','Spine tall, breathe','등 펴고 호흡','Knee pain','무릎 통증 시 중단']]),
+T('ex_wideangle','Wide-angle seated forward bend','박쥐 자세','yoga','stretch','legs','yoga',2,[['Sit','앉기','Legs wide, toes up','다리 넓게, 발끝 위로','',''],['Fold','숙이기','Walk the hands forward, flat back','손을 앞으로 걸어가며 등 펴기','','']]),
+T('ex_lowlunge','Low lunge','로우 런지','yoga','stretch','legs','yoga',2,[['Kneel','무릎 꿇기','Front foot forward, back knee down','앞발 앞으로, 뒷무릎 바닥','',''],['Sink','내리기','Sink the hips, arms up, switch sides','골반 내리고 팔 올리기, 반대쪽','','']]),
+T('ex_frog','Frog pose','개구리 자세','yoga','stretch','legs','yoga',2,[['Set up','자세','Knees wide, feet out, forearms down','무릎 넓게, 발 바깥, 팔뚝 바닥','',''],['Sink','내리기','Sink the hips back and down, breathe','골반을 뒤로 아래로, 호흡','','']]),
+T('ex_fish','Fish pose','물고기 자세','yoga','stretch','chest','yoga',1,[['Lie down','눕기','Hands under the hips','손을 엉덩이 아래에','',''],['Arch','젖히기','Lift the chest, crown of the head to the floor','가슴 들고 정수리를 바닥에','','']]),
+T('ex_pyramid','Pyramid pose','피라미드 자세','yoga','stretch','legs','yoga',2,[['Stand','서기','One foot forward, both legs straight','한 발 앞으로, 두 다리 펴기','',''],['Fold','숙이기','Fold over the front leg, switch','앞다리 위로 숙이기, 반대쪽','','']]),
+T('ex_widelegfold','Wide-leg forward bend','다리 벌려 전굴','yoga','stretch','legs','yoga',2,[['Stand','서기','Feet wide','발 넓게','',''],['Fold','숙이기','Fold forward, hands or head to the floor','숙여서 손이나 머리를 바닥으로','','']]),
+T('ex_tree','Tree pose','나무 자세','yoga','stretch','legs','yoga',1,[['Stand','서기','Foot on the inner thigh or calf, not the knee','발을 허벅지 안쪽이나 종아리에, 무릎은 피하기','',''],['Balance','균형','Palms together, hold, switch','손 모으고 유지, 반대쪽','','']]),
+T('ex_eagle','Eagle pose','독수리 자세','yoga','stretch','shoulders','yoga',1,[['Wrap','감기','Wrap one leg over the other, arms wrapped','한 다리와 팔을 반대쪽에 감기','',''],['Sink','내리기','Sink the hips, hold, switch','골반 내리고 유지, 반대쪽','','']]),
+T('ex_dancer','Lord of the dance','춤의 신 자세','yoga','stretch','legs','yoga',1,[['Hold','잡기','Hold one foot behind','한 발을 뒤에서 잡기','',''],['Kick','밀기','Kick into the hand, reach forward, switch','발을 손에 밀며 반대 팔 앞으로, 반대쪽','','']]),
+T('ex_halfmoon','Half moon','반달 자세','yoga','stretch','legs','yoga',1,[['Balance','균형','One hand down, other leg lifted to hip height','한 손 바닥, 반대 다리 골반 높이','',''],['Open','열기','Open the chest and top arm, switch','가슴과 위쪽 팔 열기, 반대쪽','','']]),
+T('ex_warrior3','Warrior III','전사 3','yoga','strength','full','yoga',1,[['Balance','균형','Torso forward, back leg lifted in line','상체 앞으로, 뒷다리 일직선','',''],['Reach','뻗기','Arms forward, hold, switch','팔 앞으로 뻗고 유지, 반대쪽','Hip opening','골반 열림']]),
+T('ex_warrior1','Warrior I','전사 1','yoga','strength','legs','yoga',1,[['Lunge','런지','Front knee bent, back foot angled','앞 무릎 굽히고 뒷발 비스듬히','',''],['Reach','뻗기','Arms overhead, hips square, switch','팔 머리 위, 골반 정면, 반대쪽','','']]),
+T('ex_warrior2','Warrior II','전사 2','yoga','strength','legs','yoga',1,[['Lunge','런지','Front knee over the ankle, back leg straight','앞 무릎 발목 위, 뒷다리 펴기','',''],['Open','열기','Arms out, gaze over the front hand, switch','팔 옆으로, 시선은 앞손, 반대쪽','','']]),
+T('ex_revwarrior','Reverse warrior','리버스 워리어','yoga','stretch','core','yoga',1,[['Warrior II','전사 2','Start in Warrior II','전사 2에서 시작','',''],['Lean','기울이기','Lean back, front arm up, switch','뒤로 기울이며 앞팔 위로, 반대쪽','','']]),
+T('ex_chair','Chair pose','의자 자세','yoga','strength','legs','yoga',1,[['Sit','앉기','Knees bent, weight in the heels','무릎 굽혀 체중은 뒤꿈치','',''],['Reach','뻗기','Arms overhead, hold','팔 머리 위로 유지','Knees past toes','무릎이 발끝 앞으로']]),
+T('ex_goddess','Goddess pose','여신 자세','yoga','strength','legs','yoga',1,[['Stance','자세','Feet wide, toes out','발 넓게, 발끝 바깥','',''],['Sink','내리기','Bend knees to 90°, arms bent up, hold','무릎 90도, 팔 굽혀 위로, 유지','','']]),
+T('ex_triangle','Triangle pose','삼각 자세','yoga','stretch','legs','yoga',1,[['Stance','자세','Feet wide, front foot forward','발 넓게, 앞발 정면','',''],['Reach','뻗기','Reach down to the shin, top arm up, switch','아래 손은 정강이, 위 팔은 위로, 반대쪽','','']]),
+T('ex_sideangle','Extended side angle','측면각 자세','yoga','stretch','core','yoga',1,[['Lunge','런지','Warrior II legs','전사 2 다리','',''],['Extend','뻗기','Forearm on the thigh, top arm over the ear, switch','팔뚝을 허벅지에, 위 팔은 귀 옆으로, 반대쪽','','']]),
+T('ex_boat','Boat pose','보트 자세','yoga','strength','core','yoga',1,[['Sit','앉기','Lean back, lift the legs','뒤로 기울여 다리 들기','',''],['Hold','유지','Arms forward, spine long, hold','팔 앞으로, 등 펴고 유지','Rounding the back','등 말림']]),
+T('ex_highplank','High plank','하이 플랭크','plank','strength','core','yoga',1,[['Set up','자세','Hands under shoulders, body straight','손은 어깨 아래, 몸 일직선','',''],['Hold','유지','Press the floor away, hold','바닥을 밀며 유지','Hips sagging','허리 꺾임']]),
+T('ex_yogabridge','Bridge pose','브릿지 자세','yoga','stretch','back','yoga',1,[['Lie down','눕기','Knees bent, feet flat','무릎 굽히고 발 바닥','',''],['Lift','들기','Lift the hips, clasp the hands under, hold','골반 들고 손을 아래에서 깍지, 유지','','']]),
+T('ex_cobra','Cobra pose','코브라 자세','yoga','stretch','back','yoga',1,[['Lie down','엎드리기','Hands under the shoulders','손을 어깨 아래에','',''],['Lift','들기','Lift the chest, elbows slightly bent, hold','가슴 들고 팔꿈치 살짝 굽혀 유지','Shoulders by the ears','어깨가 귀로']]),
+T('ex_updog','Upward facing dog','업독','yoga','stretch','back','yoga',1,[['Press','밀기','Straight arms, thighs off the floor','팔 펴고 허벅지를 바닥에서 띄우기','',''],['Open','열기','Open the chest, hold','가슴 열고 유지','','']]),
+T('ex_bow','Bow pose','활 자세','yoga','stretch','back','yoga',1,[['Grab','잡기','Lie face down, hold the ankles','엎드려 발목 잡기','',''],['Lift','들기','Kick into the hands, lift chest and thighs','발을 손에 밀며 가슴과 허벅지 들기','','']]),
+T('ex_camel','Camel pose','낙타 자세','yoga','stretch','chest','yoga',1,[['Kneel','무릎 서기','Kneel tall, hands on the lower back','무릎 서서 손을 허리에','',''],['Arch','젖히기','Lift the chest, reach for the heels, hold','가슴 들고 뒤꿈치 잡기, 유지','Dropping the head back hard','고개 세게 젖힘']]),
+T('ex_wheel','Upward bow (wheel)','위를 향한 활 자세','yoga','stretch','full','yoga',1,[['Set up','자세','Lie back, hands by the ears, feet flat','누워 손은 귀 옆, 발 바닥','',''],['Press','밀기','Press up into a full arch, hold','밀어 올려 아치, 유지','','']]),
+// Stretching poster
+T('ex_neckstretch','Neck stretch','목 스트레칭','stretch','stretch','shoulders','bodyweight',2,[['Tilt','기울이기','Ear toward the shoulder, hold 20s','귀를 어깨 쪽으로, 20초','Lifting the shoulder','어깨 올라감'],['Turn','돌리기','Look over each shoulder, hold','좌우로 돌려 유지','',''],['Down','숙이기','Chin to the chest, hands on the head','턱을 가슴으로, 손은 머리에','','']]),
+T('ex_shoulderarm','Shoulders and arms stretch','어깨·팔 스트레칭','stretch','stretch','shoulders','bodyweight',2,[['Cross','가로지르기','Arm across the chest, hold 20s','팔을 가슴 앞으로, 20초','',''],['Overhead','머리 위','Elbow behind the head, hold','팔꿈치 머리 뒤로, 유지','',''],['Behind','뒤로','Clasp hands behind the back, lift','등 뒤에서 깍지 끼고 들기','','']]),
+T('ex_backstretch','Back stretch','등 스트레칭','stretch','stretch','back','bodyweight',2,[['Child','아기 자세','Sit back on the heels, arms forward','뒤꿈치에 앉아 팔 앞으로','',''],['Side','옆으로','Walk the hands to each side, hold','손을 좌우로 옮겨 유지','',''],['Hang','매달리기','Hang from a bar if available','가능하면 바에 매달리기','','']]),
+T('ex_torsostretch','Torso and abs stretch','몸통·복부 스트레칭','stretch','stretch','core','bodyweight',2,[['Lie down','눕기','Press up into cobra, hold 20s','코브라로 올라가 20초','',''],['Twist','비틀기','Lying twist, knees to one side','누워서 무릎을 한쪽으로','',''],['Side reach','옆으로 뻗기','Reach one arm over the head to the side','한 팔을 머리 위로 옆으로','','']]),
+T('ex_glutequad','Glutes and quads stretch','둔근·허벅지 앞 스트레칭','stretch','stretch','legs','bodyweight',2,[['Figure 4','피겨4','Lying figure-4, pull the thigh, hold 20s','누워서 피겨4, 허벅지 당기기 20초','',''],['Quad','허벅지 앞','Standing quad stretch, heel to glute','서서 뒤꿈치를 엉덩이로','',''],['Kneel','무릎 꿇기','Half-kneel, push the hips forward','한 무릎 꿇고 골반 앞으로','','']]),
+T('ex_hipstretch','Hips stretch','고관절 스트레칭','stretch','stretch','legs','bodyweight',2,[['Butterfly','나비','Soles together, lean forward','발바닥 맞대고 숙이기','',''],['Pigeon','피전','Pigeon pose, hold each side','피전 포즈 양쪽','',''],['Side lunge','사이드 런지','Deep side lunge, hold','깊은 사이드 런지 유지','','']])
+
 ];}
 
 // Preset routines: R(id,en,ko,descEn,descKo,days[]) ; day: D(labelEn,labelKo,exIds[])
@@ -432,7 +645,7 @@ function BUILTIN_ROUTINES(){return [
 
 // ---------- state ----------
 const S={exercises:[],routines:[],settings:{lang:'en',weeklyGoal:3,unit:'kg',restSec:60,mode:'preset',smartAlternate:true,smartSplit:'auto',smartProgress:true,weightStep:2.5},plans:{},logs:{},tab:'dash',sub:null,
-  weekStart:null,month:null,selDay:null,backend:'local',canWrite:true,libFilter:'all',libMuscle:'all',libQuery:'',pickMuscle:'all'};
+  weekStart:null,month:null,selDay:null,backend:'local',canWrite:true,libFilter:'all',libMuscle:'all',libEquip:'all',libQuery:'',pickMuscle:'all',pickEquip:'all'};
 let DB=null;
 const uid=()=> 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
@@ -500,7 +713,7 @@ async function connectFirebase(){ if(!firebaseReady())return false; FB.configure
 async function signIn(){ if(!FB.auth)return; const prov=new firebase.auth.GoogleAuthProvider(); try{ await FB.auth.signInWithPopup(prov); }catch(e){ if(e&&(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'||e.code==='auth/cancelled-popup-request')){ try{await FB.auth.signInWithRedirect(prov);}catch(e2){toast(String(e2.code||e2.message||e2));} } else if(e&&e.code!=='auth/popup-closed-by-user'){ toast(String(e.code||e.message||e)); } } }
 async function signOut(){ if(FB.auth){ try{await FB.auth.signOut();}catch(e){} } S.localOnly=false; }
 function showLogin(){ if($('#login'))return; const el=document.createElement('div'); el.className='full'; el.id='login'; el.style.zIndex='35';
-  el.innerHTML=`<div class="body" style="display:flex;flex-direction:column;justify-content:center;gap:16px;max-width:420px;margin:0 auto;width:100%"><div style="text-align:center"><div style="font-size:56px">🏋️</div><h1>My Fit</h1><div class="cap" style="margin-top:6px">${esc(t('login_sub'))}</div></div>
+  el.innerHTML=`<div class="body" style="display:flex;flex-direction:column;justify-content:center;gap:16px;max-width:420px;margin:0 auto;width:100%"><div style="text-align:center"><div class="bigico" style="color:var(--accent)">${iconSvg('barbell',64)}</div><h1>My Fit</h1><div class="cap" style="margin-top:6px">${esc(t('login_sub'))}</div></div>
     <button class="btn pri" id="btn-signin">${esc(t('sign_in'))}</button><button class="btn ghost" id="btn-local">${esc(t('use_local'))}</button></div>`;
   document.body.appendChild(el);
   $('#btn-signin').addEventListener('click',signIn); $('#btn-local').addEventListener('click',()=>{S.localOnly=true;hideLogin();renderStatus();}); }
@@ -524,7 +737,7 @@ const equipName=q=>(EQUIP_META[q]||{})[S.settings.lang]||'';
 const exMeta=e=>[typeName(e.type),muscleName(e.muscle),equipName(e.equip)].filter(Boolean).join(' · ');
 function mergeDefaults(){ const defs=DEFAULT_EXERCISES(); let changed=false; const have=new Set(S.exercises.map(e=>e.id));
   defs.forEach(d=>{ if(!have.has(d.id)){S.exercises.push(d);changed=true;} else { const e=S.exercises.find(x=>x.id===d.id); if(!e.muscle){e.muscle=d.muscle;changed=true;} if(!e.equip){e.equip=d.equip;changed=true;} } });
-  S.exercises.forEach(e=>{ if(!e.muscle){e.muscle='full';changed=true;} if(!e.equip){e.equip='bodyweight';changed=true;} });
+  S.exercises.forEach(e=>{ if(!e.muscle){e.muscle='full';changed=true;} if(!e.equip){e.equip='bodyweight';changed=true;} if(!ICON_DEFS[e.icon]){e.icon=defaultIconFor(e);changed=true;} });
   return changed; }
 const planOf=date=>(S.plans[date]&&S.plans[date].items)||[];
 const logOf=date=>(S.logs[date]&&S.logs[date].entries)||[];
@@ -596,10 +809,10 @@ function renderDash(){
   html+=`<div class="statusline" id="status"></div></div>`;
   view.innerHTML=html; renderStatus();
 }
-function cardHtml(it,clickable){ const ex=exById(it.exId); const ic=ex?ex.icon:'🏋️'; const name=ex?exName(ex):'(deleted)';
+function cardHtml(it,clickable){ const ex=exById(it.exId); const ic=ex?ex.icon:'dumbbell'; const name=ex?exName(ex):'(deleted)';
   const sub=`<span class="dot b-${ex?ex.type:'strength'}"></span> ${esc(typeName(ex?ex.type:'strength'))} · ${esc(targetText(it))}`;
   const chk=it.status==='done'?`<span class="chk on">${ICO.check}</span>`:it.status==='skipped'?`<span class="cap">${esc(t('status_skipped'))}</span>`:`<span class="chk"></span>`;
-  return `<button class="card ${it.status==='done'?'done':''}" ${clickable?`data-act="open-item" data-id="${it.id}"`:'disabled'}><span class="ic">${ic}</span><span class="grow"><div class="nm">${esc(name)}</div><div class="sub row" style="gap:6px">${sub}</div></span>${chk}</button>`; }
+  return `<button class="card ${it.status==='done'?'done':''}" ${clickable?`data-act="open-item" data-id="${it.id}"`:'disabled'}><span class="ic">${iconSvg(ic,22)}</span><span class="grow"><div class="nm">${esc(name)}</div><div class="sub row" style="gap:6px">${sub}</div></span>${chk}</button>`; }
 
 // ---------- Weekly ----------
 function smartDays(ws,n){ if(S.settings.smartAlternate!==false&&n<=4){ let start=0; if(planOf(keyOf(addDays(ws,-1))).length)start=1; const days=[]; for(let d=start;d<7&&days.length<n;d+=2)days.push(d); if(days.length===n)return {days,alt:true}; if(start===1){const d2=[];for(let d=0;d<7&&d2.length<n;d+=2)d2.push(d); if(d2.length===n)return {days:d2,alt:true};} }
@@ -628,7 +841,7 @@ function renderWeek(){
   let cols='';
   for(let i=0;i<7;i++){ const d=addDays(ws,i),k=keyOf(d); const items=planOf(k);
     cols+=`<div class="col ${k===today?'sel today':''}"><span class="wd">${esc(wd[i])}</span><span class="d num">${d.getDate()}</span>
-      ${items.map(it=>{const ex=exById(it.exId);return `<button class="mini ${it.status==='done'?'done':''}" data-act="edit-item" data-k="${k}" data-id="${it.id}" title="${esc(ex?exName(ex):'')}"><i class="b-${ex?ex.type:'strength'}"></i>${ex?ex.icon:'🏋️'}<span class="mn">${esc(ex?exName(ex):'?')}</span></button>`;}).join('')}
+      ${items.map(it=>{const ex=exById(it.exId);return `<button class="mini ${it.status==='done'?'done':''}" data-act="edit-item" data-k="${k}" data-id="${it.id}" title="${esc(ex?exName(ex):'')}"><i class="b-${ex?ex.type:'strength'}"></i>${iconSvg(ex?ex.icon:'dumbbell',16)}<span class="mn">${esc(ex?exName(ex):'?')}</span></button>`;}).join('')}
       <button class="add" data-act="add-day" data-k="${k}" aria-label="add">+</button></div>`; }
   const weekEmpty=[0,1,2,3,4,5,6].every(i=>!planOf(keyOf(addDays(ws,i))).length);
   const total=[0,1,2,3,4,5,6].reduce((a,i)=>a+planOf(keyOf(addDays(ws,i))).reduce((b,it)=>b+estMin(it),0),0);
@@ -649,23 +862,24 @@ function renderWeek(){
   </div>`;
 }
 function openPicker(date){
-  S.pickMuscle='all'; S.pickQ='';
-  showSheet(`<h2 style="margin-bottom:10px">${esc(t('pick'))}</h2><input id="pickq" placeholder="${esc(t('search'))}" style="margin-bottom:10px"><div class="chips" id="pickchips" style="margin-bottom:10px"></div><div id="picklist"></div>`);
-  const draw=()=>{ $('#pickchips').innerHTML=['all',...MUSCLES].map(m=>`<button class="chip ${S.pickMuscle===m?'on':''}" data-pm="${m}">${m==='all'?esc(t('all')):esc(muscleName(m))}</button>`).join(''); $('#picklist').innerHTML=pickRows(); };
+  S.pickMuscle='all'; S.pickEquip='all'; S.pickQ='';
+  showSheet(`<h2 style="margin-bottom:10px">${esc(t('pick'))}</h2><input id="pickq" placeholder="${esc(t('search'))}" style="margin-bottom:10px"><div class="chips" id="pickchips" style="margin-bottom:8px"></div><div class="chips" id="pickequip" style="margin-bottom:10px"></div><div id="picklist"></div>`);
+  const draw=()=>{ $('#pickchips').innerHTML=['all',...MUSCLES].map(m=>`<button class="chip ${S.pickMuscle===m?'on':''}" data-pm="${m}">${m==='all'?esc(t('all')):esc(muscleName(m))}</button>`).join(''); $('#pickequip').innerHTML=['all',...EQUIPS].map(q=>`<button class="chip ${S.pickEquip===q?'on':''}" data-pe="${q}">${q==='all'?esc(t('all')):esc(equipName(q))}</button>`).join(''); $('#picklist').innerHTML=pickRows(); };
   draw();
   $('#pickq').addEventListener('input',e=>{S.pickQ=e.target.value.toLowerCase();$('#picklist').innerHTML=pickRows();});
   $('#pickchips').addEventListener('click',e=>{const b=e.target.closest('[data-pm]');if(!b)return;S.pickMuscle=b.dataset.pm;draw();});
+  $('#pickequip').addEventListener('click',e=>{const b=e.target.closest('[data-pe]');if(!b)return;S.pickEquip=b.dataset.pe;draw();});
   $('#picklist').addEventListener('click',e=>{const b=e.target.closest('[data-ex]');if(!b)return;addPlanItem(date,exById(b.dataset.ex));closeSheet();render();});
 }
-function pickRows(){ const q=S.pickQ||''; const list=S.exercises.filter(e=>!e.hidden&&(S.pickMuscle==='all'||e.muscle===S.pickMuscle)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
-  const row=e=>`<button class="li" data-ex="${e.id}"><span style="font-size:20px;width:36px;text-align:center">${e.icon}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span></button>`;
+function pickRows(){ const q=S.pickQ||''; const list=S.exercises.filter(e=>!e.hidden&&(S.pickMuscle==='all'||e.muscle===S.pickMuscle)&&(S.pickEquip==='all'||e.equip===S.pickEquip)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
+  const row=e=>`<button class="li" data-ex="${e.id}"><span class="ic" style="width:36px;height:36px">${iconSvg(e.icon,20)}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span></button>`;
   if(!list.length)return `<div class="empty">—</div>`;
-  if(S.pickMuscle!=='all'||q)return `<div class="list">${list.map(row).join('')}</div>`;
+  if(S.pickMuscle!=='all'||S.pickEquip!=='all'||q)return `<div class="list">${list.map(row).join('')}</div>`;
   return MUSCLES.map(m=>{const g=list.filter(e=>e.muscle===m); return g.length?`<div class="cap" style="margin:12px 0 6px">${esc(muscleName(m))}</div><div class="list">${g.map(row).join('')}</div>`:'';}).join(''); }
 function openItemEditor(date,itemId){
   const it=planOf(date).find(x=>x.id===itemId); if(!it)return; const ex=exById(it.exId);
   const num=(k,label,step,unit)=>`<div class="field"><label>${esc(label)}</label><div class="step"><button data-st="${k}" data-d="-${step}">−</button><span class="sv num" id="sv-${k}">${it[k]}${unit?' '+unit:''}</span><button data-st="${k}" data-d="${step}">+</button></div></div>`;
-  showSheet(`<div class="row" style="margin-bottom:12px"><span class="ic" style="font-size:22px">${ex?ex.icon:'🏋️'}</span><div><h2>${esc(ex?exName(ex):'?')}</h2><div class="cap">${esc(t('target'))}</div></div></div>
+  showSheet(`<div class="row" style="margin-bottom:12px"><span class="ic">${iconSvg(ex?ex.icon:'dumbbell',22)}</span><div><h2>${esc(ex?exName(ex):'?')}</h2><div class="cap">${esc(t('target'))}</div></div></div>
    <div class="stack" style="gap:12px">
    ${it.mode==='time'?num('minutes',t('minutes'),1,t('min')):num('sets',t('sets'),1,'')+num('reps',t('reps'),1,'')+num('weight',t('weight'),2.5,S.settings.unit)+num('rest',t('rest'),15,t('sec'))}
    ${it.status!=='planned'?`<button class="btn sec" data-act="reset-item">${esc(t('status_planned'))}</button>`:''}
@@ -695,7 +909,7 @@ function renderMonth(){
   </div>`;
 }
 function openDayDetail(k){ const items=planOf(k); const entries=logOf(k);
-  const rows=items.map(it=>{const ex=exById(it.exId);const e=entries.find(x=>x.planItemId===it.id);return `<div class="li"><span style="font-size:20px">${ex?ex.icon:'🏋️'}</span><span class="grow"><div class="nm">${esc(ex?exName(ex):'(deleted)')}</div><div class="sub">${esc(targetText(it))}${e?' → '+esc(entrySummary(e))+(e.memo?' · '+esc(e.memo):''):''}</div></span><span class="cap">${esc(t('status_'+it.status))}</span></div>`;}).join('');
+  const rows=items.map(it=>{const ex=exById(it.exId);const e=entries.find(x=>x.planItemId===it.id);return `<div class="li"><span class="ic" style="width:36px;height:36px">${iconSvg(ex?ex.icon:'dumbbell',20)}</span><span class="grow"><div class="nm">${esc(ex?exName(ex):'(deleted)')}</div><div class="sub">${esc(targetText(it))}${e?' → '+esc(entrySummary(e))+(e.memo?' · '+esc(e.memo):''):''}</div></span><span class="cap">${esc(t('status_'+it.status))}</span></div>`;}).join('');
   showSheet(`<h2 style="margin-bottom:10px">${esc(fmtLong(parseKey(k)))}</h2>${rows?`<div class="list">${rows}</div>`:`<div class="empty">${esc(t('nothing_logged'))}</div>`}
    <button class="btn sec" style="margin-top:12px" data-act="go-day" data-k="${k}">${esc(t('tab_week'))} ${ICO.chev}</button>`);
 }
@@ -735,7 +949,7 @@ function openRoutineList(){ const b=BUILTIN_ROUTINES(), m=S.routines;
 function openRoutine(id){ const r=allRoutines().find(x=>x.id===id); if(!r)return; const wd=t('week_days'); const map=(DEFAULT_WD[r.days.length]||DEFAULT_WD[7]).slice(0,r.days.length);
   const ws=S.weekStart?parseKey(S.weekStart):startOfWeek(new Date()); if(!S.weekStart)S.weekStart=keyOf(ws);
   const hasItems=[0,1,2,3,4,5,6].some(i=>planOf(keyOf(addDays(ws,i))).length);
-  const dayHtml=(d,i)=>`<div class="tile stack" style="gap:8px"><div class="row between"><b>${esc(dayLabel(d))}</b><div class="seg" data-day="${i}">${wd.map((w,j)=>`<button data-wd="${j}" class="${map[i]===j?'on':''}" style="padding:4px 7px">${esc(w)}</button>`).join('')}</div></div><div class="cap">${esc(d.exIds.map(x=>{const e=exById(x);return e?e.icon+' '+exName(e):'';}).filter(Boolean).join(' · '))}</div></div>`;
+  const dayHtml=(d,i)=>`<div class="tile stack" style="gap:8px"><div class="row between"><b>${esc(dayLabel(d))}</b><div class="seg" data-day="${i}">${wd.map((w,j)=>`<button data-wd="${j}" class="${map[i]===j?'on':''}" style="padding:4px 7px">${esc(w)}</button>`).join('')}</div></div><div class="cap">${esc(d.exIds.map(x=>{const e=exById(x);return e?exName(e):'';}).filter(Boolean).join(' · '))}</div></div>`;
   showSheet(`<h2>${esc(rtName(r))}</h2><div class="cap" style="margin:4px 0 12px">${esc(rtDesc(r))}</div><div class="stack" style="gap:8px">${r.days.map(dayHtml).join('')}</div>
     <div class="cap num" style="margin:12px 0 4px">${esc(fmtMD(ws))} – ${esc(fmtMD(addDays(ws,6)))}</div>
     ${hasItems?`<div class="cap" style="margin-bottom:8px">${esc(t('replace_week'))}</div><div class="row" style="gap:8px"><button class="btn sec" id="rt-add">${esc(t('add_on'))}</button><button class="btn pri" id="rt-replace">${esc(t('replace'))}</button></div>`:`<button class="btn pri" id="rt-apply">${esc(t('apply_week'))}</button>`}
@@ -783,13 +997,14 @@ function renderSettings(){
 }
 function renderLibrary(){
   const q=S.libQuery.toLowerCase(); const f=S.libFilter;
-  const m=S.libMuscle; const all=S.exercises.filter(e=>(f==='all'||e.type===f)&&(m==='all'||e.muscle===m)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
+  const m=S.libMuscle; const q2=S.libEquip; const all=S.exercises.filter(e=>(f==='all'||e.type===f)&&(m==='all'||e.muscle===m)&&(q2==='all'||e.equip===q2)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
   const vis=all.filter(e=>!e.hidden), hid=all.filter(e=>e.hidden);
-  const row=e=>`<button class="li" data-act="edit-ex" data-id="${e.id}"><span style="font-size:22px;width:32px;text-align:center">${e.icon}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span>${ICO.chev}</button>`;
+  const row=e=>`<button class="li" data-act="edit-ex" data-id="${e.id}"><span class="ic" style="width:36px;height:36px">${iconSvg(e.icon,20)}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span>${ICO.chev}</button>`;
   view.innerHTML=`<div class="stack">
    <div class="row"><button class="icon-btn" data-act="back">${ICO.back}</button><input id="libq" class="grow" placeholder="${esc(t('search'))}" value="${esc(S.libQuery)}"><button class="btn sm pri" style="width:auto" data-act="new-ex">+ ${esc(t('new'))}</button></div>
    <div class="chips">${['all',...TYPES].map(ty=>`<button class="chip ${f===ty?'on':''}" data-filter="${ty}">${ty==='all'?esc(t('all')):esc(typeName(ty))}</button>`).join('')}</div>
    <div class="chips">${['all',...MUSCLES].map(mm=>`<button class="chip ${m===mm?'on':''}" data-mfilter="${mm}">${mm==='all'?esc(t('all')):esc(muscleName(mm))}</button>`).join('')}</div>
+   <div class="chips">${['all',...EQUIPS].map(qq=>`<button class="chip ${q2===qq?'on':''}" data-efilter="${qq}">${qq==='all'?esc(t('all')):esc(equipName(qq))}</button>`).join('')}</div>
    <div class="cap">${vis.length} ${esc(t('exercises'))}</div>
    <div class="list">${vis.map(row).join('')||`<div class="empty">—</div>`}</div>
    ${hid.length?`<details><summary class="cap" style="cursor:pointer">${esc(t('hidden'))} (${hid.length})</summary><div class="list" style="margin-top:8px;opacity:.7">${hid.map(row).join('')}</div></details>`:''}
@@ -806,7 +1021,7 @@ function renderEdit(){
     <input data-f="steps.${i}.mistakeEn" value="${esc(s.mistakeEn)}" placeholder="${esc(t('mistake'))} EN"><input data-f="steps.${i}.mistakeKo" value="${esc(s.mistakeKo)}" placeholder="${esc(t('mistake'))} KO"></div>`;
   view.innerHTML=`<div class="stack">
    <div class="row between"><button class="icon-btn" data-act="back-edit">${ICO.back}</button><button class="btn sm pri" style="width:auto" data-act="save-ex">${esc(t('save'))}</button></div>
-   <div class="field"><label>${esc(t('icon'))}</label><div class="icons">${ICONS.map(ic=>`<button data-icon="${ic}" class="${e.icon===ic?'on':''}">${ic}</button>`).join('')}</div></div>
+   <div class="field"><label>${esc(t('icon'))}</label><div class="icons">${ICONS.map(ic=>`<button data-icon="${ic}" class="${e.icon===ic?'on':''}" title="${ic}">${iconSvg(ic,22)}</button>`).join('')}</div></div>
    <div class="field"><label>${esc(t('name_en'))}</label><input data-f="nameEn" value="${esc(e.nameEn)}"></div>
    <div class="field"><label>${esc(t('name_ko'))}</label><input data-f="nameKo" value="${esc(e.nameKo)}"></div>
    <div class="field"><label>${esc(t('type'))}</label><div class="chips">${TYPES.map(ty=>`<button class="chip ${e.type===ty?'on':''}" data-type="${ty}">${esc(typeName(ty))}</button>`).join('')}</div></div>
@@ -857,12 +1072,12 @@ function renderPerform(keep){
   const n=P.queue.length>1?`<span class="cap num">${P.idx+1} / ${P.queue.length}</span>`:'<span></span>';
   let body='',foot='';
   if(P.stage==='prepare'){ const last=lastEntry(ex.id,date);
-    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div style="font-size:64px;line-height:1">${ex.icon}</div><h1 style="margin-top:8px">${esc(exName(ex))}</h1><div class="cap" style="margin-top:4px"><span class="dot b-${ex.type}"></span> ${esc(typeName(ex.type))}</div></div>
+    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div class="bigico">${iconSvg(ex.icon,64)}</div><h1 style="margin-top:8px">${esc(exName(ex))}</h1><div class="cap" style="margin-top:4px"><span class="dot b-${ex.type}"></span> ${esc(typeName(ex.type))}</div></div>
       <div class="tiles"><div class="tile"><div class="cap">${esc(t('target'))}</div><div class="v num" style="font-size:18px">${esc(targetText(it))}</div></div><div class="tile"><div class="cap">${esc(t('last'))}</div><div class="v num" style="font-size:18px">${esc(entrySummary(last))}</div></div></div>
       <button class="btn sec" data-p="howto">${esc(t('view_howto'))}</button></div>`;
     foot=`<button class="btn pri" data-p="start">${esc(t('start'))}</button><button class="btn ghost" data-p="skip">${esc(t('skip'))}</button>`; }
   else if(P.stage==='howto'){ const steps=ex.steps||[];
-    body=`<h2 style="margin:4px 0 12px">${esc(exName(ex))}</h2><div class="howto" id="howto">${steps.map((s,i)=>`<div class="hc"><div class="fig">${ex.icon}</div><div class="k">${esc(t('step'))} ${i+1} · ${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="cue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div>${(ko?s.mistakeKo:s.mistakeEn)?`<div class="mis">✕ ${esc(ko?s.mistakeKo:s.mistakeEn)}</div>`:''}</div>`).join('')||`<div class="empty grow">—</div>`}</div><div class="dots" id="dots">${steps.map((s,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>`;
+    body=`<h2 style="margin:4px 0 12px">${esc(exName(ex))}</h2><div class="howto" id="howto">${steps.map((s,i)=>`<div class="hc"><div class="fig">${iconSvg(ex.icon,56)}</div><div class="k">${esc(t('step'))} ${i+1} · ${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="cue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div>${(ko?s.mistakeKo:s.mistakeEn)?`<div class="mis">✕ ${esc(ko?s.mistakeKo:s.mistakeEn)}</div>`:''}</div>`).join('')||`<div class="empty grow">—</div>`}</div><div class="dots" id="dots">${steps.map((s,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>`;
     foot=`<button class="btn pri" data-p="start">${esc(t('begin'))}</button>`; }
   else if(P.stage==='perform'){
     if(it.mode==='time'){ body=`<div class="timer"><div class="cap" style="margin-bottom:16px">${esc(exName(ex))} · ${it.minutes} ${esc(t('min'))}</div><div class="ring" id="ring" style="--p:${(100-P.remaining/P.total*100)}%"><div><div class="big num" id="big">${mmss(P.remaining)}</div></div></div></div>
@@ -878,7 +1093,7 @@ function renderPerform(keep){
   else if(P.stage==='complete'){ const r=P.result; const prevS=entryScore(P.prev), curS=entryScore(r); let delta='';
     if(prevS!=null&&curS!=null){ const d=curS-prevS; const cls=d>0?'up':d<0?'down':''; delta=`<span class="delta ${cls}">${d>0?'↑':d<0?'↓':'='} ${r.mode==='time'?mmss(Math.abs(d)):Math.abs(Math.round(d*10)/10)}</span> <span class="cap">${esc(t('vs_last'))} ${esc(entrySummary(P.prev))}</span>`; }
     const doneSets=r.sets.filter(s=>s.done);
-    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div style="font-size:48px">✅</div><h1>${esc(exName(ex))}</h1><div class="cap">${esc(t('complete'))}</div></div>
+    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div class="bigico" style="color:var(--good)"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg></div><h1>${esc(exName(ex))}</h1><div class="cap">${esc(t('complete'))}</div></div>
       <div class="tiles"><div class="tile"><div class="cap">${esc(t('duration'))}</div><div class="v num">${mmss(r.duration)}</div></div>
       <div class="tile"><div class="cap">${esc(r.mode==='time'?t('target'):t('volume'))}</div><div class="v num" style="font-size:18px">${esc(r.mode==='time'?it.minutes+' '+t('min'):entrySummary(r))}</div></div></div>
       ${delta?`<div style="text-align:center">${delta}</div>`:''}
@@ -921,6 +1136,7 @@ view.addEventListener('click',e=>{
   const eq=e.target.closest('[data-equip]'); if(eq&&S.sub==='edit'){S.editEx.equip=eq.dataset.equip;S.editDirty=true;view.querySelectorAll('[data-equip]').forEach(x=>x.classList.toggle('on',x===eq));return;}
   const fl=e.target.closest('[data-filter]'); if(fl){S.libFilter=fl.dataset.filter;renderLibrary();return;}
   const mf=e.target.closest('[data-mfilter]'); if(mf){S.libMuscle=mf.dataset.mfilter;renderLibrary();return;}
+  const ef=e.target.closest('[data-efilter]'); if(ef){S.libEquip=ef.dataset.efilter;renderLibrary();return;}
   const a=e.target.closest('[data-act]'); if(!a)return; const act=a.dataset.act;
   switch(act){
     case 'go-week': S.tab='week'; S.selDay=todayKey(); S.weekStart=keyOf(startOfWeek(new Date())); render(); break;
