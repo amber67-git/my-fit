@@ -7,14 +7,28 @@
 | 방법 | 주소 | 데이터 |
 |---|---|---|
 | claude.ai 아티팩트 (기본) | https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j | 계정 저장소에 동기화, 자동 백업 |
-| GitHub Pages | 저장소 설정에서 Pages를 켜면 `https://<user>.github.io/<repo>/` | 각 기기 브라우저에만 저장 (동기화 없음) |
-| 로컬 | `index.html`을 브라우저로 열기 | 각 기기 브라우저에만 저장 |
+| GitHub Pages (메인) | https://amber67-git.github.io/my-fit/ | Firebase(Google 로그인 + Firestore)에 사용자별 저장, 모든 기기 동기화, 자동 백업 |
+| 로컬 | `index.html`을 브라우저로 열기 | Firebase 설정이 있으면 동일, 없으면 기기 브라우저에만 저장 |
 
-기기 간 동기화와 자동 백업은 claude.ai 링크에서만 동작합니다. GitHub Pages나 로컬에서는 Settings › JSON 내보내기/가져오기로 옮깁니다.
+claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각각 claude.ai 저장소 / Firebase). 한쪽만 메인으로 쓰고, 옮길 때는 Settings › JSON 내보내기/가져오기를 씁니다.
+
+## Firebase 설정 (처음 한 번)
+
+1. https://console.firebase.google.com 에서 프로젝트 추가 (예: `my-fit`). Google 애널리틱스는 꺼도 됩니다.
+2. 왼쪽 **빌드 › Authentication › 시작하기 › 로그인 방법**에서 **Google** 사용 설정 → 저장.
+3. **Authentication › 설정 › 승인된 도메인**에 `amber67-git.github.io` 추가. (localhost는 기본 포함)
+4. **빌드 › Firestore Database › 데이터베이스 만들기** → 프로덕션 모드 → 위치 선택(asia-northeast3 서울).
+5. Firestore **규칙** 탭에 이 저장소의 `firestore.rules` 내용을 붙여넣고 게시.
+6. **프로젝트 설정(톱니) › 일반 › 내 앱 › 웹 앱(</>) 추가** → 앱 닉네임 `my-fit` → 등록 → "구성(Config)"에 나오는 `firebaseConfig` 값을 이 저장소의 `firebase-config.js`에 붙여넣기.
+7. 커밋/푸시하면 Pages에서 Google 로그인 화면이 뜹니다.
+
+데이터 위치: `users/{uid}/app/*`, `users/{uid}/plans/{날짜}`, `users/{uid}/logs/{날짜}`, `users/{uid}/backups/*`. 규칙에 따라 본인만 읽고 씁니다.
 
 ## 파일
 
-- `index.html`: 독립 실행용 페이지 (GitHub Pages, 로컬)
+- `index.html`: 독립 실행용 페이지 (GitHub Pages, 로컬). Firebase SDK와 `firebase-config.js`를 불러옴
+- `firebase-config.js`: Firebase 웹 앱 구성값 (직접 붙여넣기)
+- `firestore.rules`: Firestore 보안 규칙
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
@@ -28,3 +42,4 @@
 - Monthly 달력, 대시보드 요약
 - 하루 1회 자동 백업(14개 보관)과 복원, JSON 내보내기/가져오기
 - 앱 내 버전 안내와 변경 이력
+- Firebase: Google 로그인, Firestore 사용자별 저장, 오프라인 캐시, "계정 없이 사용" 선택 가능

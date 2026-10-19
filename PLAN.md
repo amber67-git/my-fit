@@ -395,3 +395,15 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 4일: 상체 / 하체(Upper / Lower) 2회씩.
 - 5~6일: 푸시(가슴·어깨·삼두) / 풀(등·이두) / 레그(하체·코어), 6일이면 PPL 두 바퀴.
 - 큰 근육군 분류: 가슴, 등, 어깨, 팔(이두·삼두), 하체(대퇴사두·햄스트링·둔근·종아리), 코어. 앱의 부위 태그가 이 분류를 따른다.
+
+---
+
+## 19. Firebase 연동 (v0.7.0)
+
+- 저장 계층은 그대로 두고 백엔드만 교체: 앱 코드는 `DB.doc()/collection()` 인터페이스 하나만 쓰고, 이 인터페이스를 (1) claude.ai 아티팩트 저장소 (2) Firebase Firestore 두 가지가 구현한다. 둘의 API 모양이 같아서 코드 분기가 거의 없다.
+- 실행 환경에 따라 자동 선택: `index.html`(GitHub Pages/로컬)은 Firebase SDK와 `firebase-config.js`를 불러오므로 Firebase, claude.ai 안에서는 SDK가 없으므로 아티팩트 저장소.
+- 인증: Google 로그인(팝업, 막히면 리다이렉트). 로그인 전에는 로그인 화면이 뜨고 "계정 없이 사용"을 고르면 기기 로컬 저장으로 쓸 수 있다.
+- Firestore 경로: `users/{uid}/app/exercises|settings|routines`, `users/{uid}/plans/{날짜}`, `users/{uid}/logs/{날짜}`, `users/{uid}/backups/{날짜}`. 규칙은 본인 uid만 읽기/쓰기.
+- 오프라인 캐시(enablePersistence) 켜서 네트워크 없이도 열리고 복귀 시 자동 동기화.
+- 백업 목록 쿼리는 복합 인덱스가 필요 없도록 where 하나만 쓰고 정렬은 클라이언트에서.
+- 설정 페이지에 계정 행(이메일, 로그아웃/로그인). Firebase 설정이 비어 있으면 안내 문구.
