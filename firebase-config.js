@@ -1,10 +1,9 @@
-// Firebase 콘솔 → 프로젝트 설정(톱니바퀴) → 일반 → "내 앱" → 웹 앱 → "SDK 설정 및 구성" → 구성(Config)
-// 거기 나오는 firebaseConfig 값을 아래에 그대로 붙여넣으세요. 이 값은 공개되어도 되는 식별자입니다(보안은 Firestore 규칙이 담당).
+// Firebase 웹 앱 구성값 (콘솔 → 프로젝트 설정 → 내 앱 → my-fit). 공개되어도 되는 식별자이며 보안은 firestore.rules가 담당합니다.
 window.FIREBASE_CONFIG = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT.firebaseapp.com",
-  projectId: "PASTE_PROJECT",
-  storageBucket: "PASTE_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyDwHaA-1HI_EVoMez8TkQawUcexR3glAMA",
+  authDomain: "my-fit-aeac1.firebaseapp.com",
+  projectId: "my-fit-aeac1",
+  storageBucket: "my-fit-aeac1.firebasestorage.app",
+  messagingSenderId: "644992115916",
+  appId: "1:644992115916:web:da013755e27eb49027ce69"
 };
