@@ -32,11 +32,11 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
-## 기능 (v0.7.0)
+## 기능 (v0.8.0)
 
 - 4탭: Dashboard / Weekly / Monthly / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 247개 (맨몸·바벨·덤벨·케틀벨·밴드·짐볼·요가·스트레칭, 부위·도구 태그, 2~4단계 운동 방법), 추가·편집·숨기기
-- 앱 전용 선 아이콘 26종 (이모지 없음)
+- game-icons.net 그림 53종 + 자극 부위를 빨간색으로 보여주는 바디맵 + 단계별 동작 배지
 - 프리셋 루틴 6개 + 이번 주를 내 루틴으로 저장
 - Weekly: Preset(직접 배치) / Smart(격일 배치, 주당 일수에 맞는 분할, 자동 증량)
 - 운동 수행: 준비 → 운동 방법 카드 → 타이머/세트 기록 → 완료 요약
@@ -44,3 +44,7 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - 하루 1회 자동 백업(14개 보관)과 복원, JSON 내보내기/가져오기
 - 앱 내 버전 안내와 변경 이력
 - Firebase: Google 로그인, Firestore 사용자별 저장, 오프라인 캐시, "계정 없이 사용" 선택 가능
+
+## 아이콘 출처
+
+운동 그림은 [game-icons.net](https://game-icons.net) 의 아이콘을 사용했으며 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) 라이선스입니다. 제작자: Lorc, Delapouite, Darkzaitzev, Caro Asercion, sbed. 앱 설정 화면 하단에도 같은 출처를 표기합니다. 바디맵(자극 부위 표시)과 단계 배지는 이 앱에서 직접 그렸습니다.
