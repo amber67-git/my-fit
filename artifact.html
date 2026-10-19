@@ -762,7 +762,7 @@ function renderSettings(){
     <button class="li" data-act="backups"><span class="grow nm">${esc(t('backups'))}</span>${ICO.chev}</button>
     <button class="li" data-act="reset"><span class="grow nm" style="color:#d9403c">${esc(t('reset'))}</span></button>
    </div></div>
-   ${FB.configured?`<div class="list"><div class="li"><span class="grow"><div class="nm">${esc(t('account'))}</div><div class="sub">${FB.user?esc(FB.user.email||FB.user.displayName||''):esc(t('local_only'))}</div></span>${FB.user?`<button class="btn sm sec" data-act="sign-out">${esc(t('sign_out'))}</button>`:`<button class="btn sm pri" data-act="sign-in">${esc(t('sign_in'))}</button>`}</div></div>`:(window.FIREBASE_CONFIG?`<div class="cap" style="text-align:center">${esc(t('fb_setup'))}</div>`:'')}
+   ${FB.configured?`<div class="list"><div class="li"><span class="grow"><div class="nm">${esc(t('account'))}</div><div class="sub">${FB.user?esc(FB.user.email||FB.user.displayName||''):esc(t('local_only'))}</div></span>${FB.user?`<button class="btn sm sec" data-act="sign-out">${esc(t('sign_out'))}</button>`:`<button class="btn sm pri" data-act="sign-in">${esc(t('sign_in'))}</button>`}</div></div>`:(window.FIREBASE_CONFIG?`<div class="cap" style="text-align:center">${esc(t('fb_setup'))}<br>${!window.firebase?'SDK: not loaded (gstatic.com blocked?)':'SDK: ok'} · config: ${esc(String((window.FIREBASE_CONFIG||{}).projectId||'-'))}</div>`:'')}
    <div class="list"><button class="li" data-act="changelog"><span class="grow"><div class="nm">${esc(t('version'))} ${APP_VERSION}</div><div class="sub">${esc(t('whats_new'))} · ${CHANGELOG[0].date}</div></span>${ICO.chev}</button></div>
    <div class="statusline" id="status"></div></div>`;
   renderStatus();
