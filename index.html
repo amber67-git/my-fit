@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<style>:root{color-scheme:light}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Weekly Workout Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* Layout: one-screen app. Sticky header, scrolling main, fixed bottom tab bar. White, one accent, five soft type colors. */
+:root{
+  --bg:#ffffff; --fg:#141516; --muted:#8a8d93; --line:#ebecee; --soft:#f5f6f8; --card:#ffffff;
+  --accent:#2f6bff; --accent-fg:#ffffff; --accent-soft:#e9efff;
+  --good:#1f9d6a; --warn:#d9822b;
+  --c-stretch:#2fb8a6; --c-warmup:#f2a93b; --c-strength:#2f6bff; --c-cardio:#f26b5b; --c-cooldown:#8b6cf2;
+  --font:"IBM Plex Sans KR","Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --r:12px; --nav-h:58px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111214; --fg:#f1f2f4; --muted:#8f9298; --line:#27292d; --soft:#1b1d21; --card:#17191c; --accent:#5b8bff; --accent-soft:#1d2a4d; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#111214; --fg:#f1f2f4; --muted:#8f9298; --line:#27292d; --soft:#1b1d21; --card:#17191c; --accent:#5b8bff; --accent-soft:#1d2a4d; color-scheme:dark; }
+
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+textarea{resize:vertical}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+h1{font-size:24px} h2{font-size:17px} h3{font-size:15px}
+.muted{color:var(--muted)} .cap{font-size:12px;color:var(--muted)} .num{font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+#app{height:100%;display:flex;flex-direction:column}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px}
+header.top .left{display:flex;align-items:center;gap:8px;min-width:0}
+header.top h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{flex:1;overflow-y:auto;padding-block:16px calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 24px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));display:flex}
+nav.tabs button{flex:1;height:var(--nav-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--muted)}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button.on{color:var(--accent)}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--soft)}
+.seg button{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg.wide button{flex:1;padding:8px 10px;font-size:13px}
+.seg.wide{display:flex;width:100%}
+
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;align-items:center;gap:8px}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--card)}
+.tile .v{font-size:22px;font-weight:600;line-height:1.1;margin-top:4px}
+.tile .v small{font-size:13px;font-weight:400;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:12px;display:flex;align-items:center;gap:12px;width:100%;text-align:left}
+.card .ic{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex:none;background:var(--soft)}
+.card .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .sub{font-size:12px;color:var(--muted)}
+.card.done{opacity:.55}
+.card.done .nm{text-decoration:line-through}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.chk{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none;color:var(--accent-fg)}
+.chk.on{background:var(--good);border-color:var(--good)}
+.chk svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:48px;padding:0 18px;border-radius:var(--r);font-weight:600;width:100%}
+.btn.pri{background:var(--accent);color:var(--accent-fg)}
+.btn.sec{border:1px solid var(--line);background:var(--card)}
+.btn.ghost{height:40px;color:var(--accent)}
+.btn.danger{color:#d9403c}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.sm{height:36px;padding:0 12px;width:auto;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.t-stretch{color:var(--c-stretch)} .t-warmup{color:var(--c-warmup)} .t-strength{color:var(--c-strength)} .t-cardio{color:var(--c-cardio)} .t-cooldown{color:var(--c-cooldown)}
+.b-stretch{background:var(--c-stretch)} .b-warmup{background:var(--c-warmup)} .b-strength{background:var(--c-strength)} .b-cardio{background:var(--c-cardio)} .b-cooldown{background:var(--c-cooldown)}
+
+/* weekly board */
+.board{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.board .col{border-radius:10px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px;border:1px solid transparent;min-width:0}
+.board .mini{min-width:0;max-width:100%}
+.onoff{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--soft)}
+.onoff button{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;color:var(--muted)}
+.onoff button.on{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.ver{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.board .col.sel{border-color:var(--accent);background:var(--accent-soft)}
+.board .col.today .d{color:var(--accent)}
+.board .wd{font-size:11px;color:var(--muted)} .board .d{font-size:13px;font-weight:600}
+.board .mini{width:26px;height:26px;border-radius:7px;background:var(--soft);display:grid;place-items:center;font-size:14px;position:relative}
+.board .mini.done::after{content:"";position:absolute;right:-2px;bottom:-2px;width:9px;height:9px;border-radius:50%;background:var(--good);border:2px solid var(--bg)}
+.board .mini i{position:absolute;left:3px;top:3px;width:5px;height:5px;border-radius:50%}
+
+/* monthly */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0}
+.cal .cell{aspect-ratio:1/1.15;border-radius:8px;padding:4px;display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid transparent}
+.cal .cell.other{opacity:.35}
+.cal .cell.today{border-color:var(--accent)}
+.cal .cell .d{font-size:12px;font-weight:600}
+.cal .bars{display:flex;gap:2px;width:100%;justify-content:center}
+.cal .bars i{width:5px;height:14px;border-radius:2px;opacity:.35}
+.cal .bars i.done{opacity:1}
+
+/* list rows */
+.list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card)}
+.list .li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);width:100%;text-align:left;min-height:52px}
+.list .li:last-child{border-bottom:0}
+.list .li .nm{font-weight:600} .list .li .sub{font-size:12px;color:var(--muted)}
+.list .li .arrow{color:var(--muted);flex:none}
+.step{display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.step button{width:40px;height:40px;font-size:18px;color:var(--accent)}
+.step .sv{min-width:56px;text-align:center;font-weight:600}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+
+/* sheets and overlays */
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--bg);border-radius:18px 18px 0 0;max-height:88%;overflow-y:auto;
+  padding-block:8px calc(16px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  animation:up .22s ease-out}
+.sheet .grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.full{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.full .bar-top{display:flex;align-items:center;justify-content:space-between;min-height:56px;gap:8px}
+.full .body{flex:1;overflow-y:auto;padding-bottom:16px}
+.full .foot{padding-block:12px 16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line)}
+.icon-btn{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:var(--fg)}
+.icon-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* how-to carousel */
+.howto{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.howto::-webkit-scrollbar{display:none}
+.howto .hc{flex:0 0 100%;scroll-snap-align:center;border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--card);display:flex;flex-direction:column;gap:10px;min-height:280px}
+.howto .hc .fig{height:120px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:48px}
+.howto .hc .k{font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.howto .hc .cue{font-size:17px;font-weight:600}
+.howto .hc .mis{font-size:13px;color:var(--muted)}
+.dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--accent)}
+
+/* timer */
+.timer{text-align:center;padding:32px 0 16px}
+.timer .big{font-size:64px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.ring{width:220px;height:220px;margin:0 auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--p,0%),var(--soft) 0)}
+.ring>div{width:196px;height:196px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.setrow{display:grid;grid-template-columns:44px 1fr 1fr 44px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.setrow input{text-align:center;padding:8px 6px}
+.setrow .n{font-weight:600;color:var(--muted)}
+.setrow.done{opacity:.55}
+.setrow .cap{text-transform:capitalize}
+.restbox{border-radius:var(--r);background:var(--accent-soft);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cond{display:flex;gap:6px}
+.cond button{flex:1;height:44px;border-radius:10px;border:1px solid var(--line);font-weight:600}
+.cond button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.delta{font-weight:600}
+.delta.up{color:var(--good)} .delta.down{color:var(--warn)}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;z-index:40}
+.icons{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.icons button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);font-size:22px;flex:none;background:var(--card)}
+.icons button.on{border-color:var(--accent);background:var(--accent-soft)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;color:var(--muted)}
+.statusline{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+.board .mini .mn{display:none}
+.board .mini{width:30px;height:30px;font-size:15px}
+.board .add{width:26px;height:26px;border-radius:7px;border:1px dashed var(--line);color:var(--muted);font-size:16px;display:grid;place-items:center;margin-top:auto}
+.board .col{min-height:140px}
+.smart{border:1px solid var(--accent);border-radius:var(--r);padding:12px 14px;background:var(--accent-soft);display:flex;flex-direction:column;gap:8px}
+.smart .k{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.03em;text-transform:uppercase}
+@media (prefers-reduced-motion: reduce){ .sheet{animation:none} }
+
+/* tablet and desktop: side navigation, centered content, wider board */
+@media (min-width: 820px){
+  :root{--nav-w:200px}
+  nav.tabs{top:calc(56px + env(safe-area-inset-top,0px));bottom:0;right:auto;width:var(--nav-w);flex-direction:column;border-top:0;border-right:1px solid var(--line);padding:12px 8px;gap:4px}
+  nav.tabs button{flex:none;height:44px;flex-direction:row;justify-content:flex-start;gap:12px;padding:0 12px;border-radius:10px;font-size:14px}
+  nav.tabs button.on{background:var(--accent-soft)}
+  header.top{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+  main{margin-left:var(--nav-w);padding-block:24px 40px;padding-left:32px;padding-right:32px}
+  main > .stack{max-width:960px;margin:0 auto;gap:20px}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .tile .v{font-size:26px}
+  .board{gap:8px}
+  .board .col{min-height:220px;padding:10px 6px;align-items:stretch;border-color:var(--line)}
+  .board .col .wd,.board .col .d{text-align:center}
+  .board .mini{width:100%;height:auto;flex-direction:row;display:flex;align-items:center;gap:6px;padding:7px 8px;font-size:13px;border-radius:8px;justify-content:flex-start}
+  .board .mini i{position:static;width:6px;height:6px;flex:none}
+  .board .mini .mn{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:12px}
+  .board .mini.done::after{right:4px;bottom:auto;top:50%;transform:translateY(-50%)}
+  .cal .cell{aspect-ratio:auto;min-height:88px;align-items:flex-start;padding:8px}
+  .cal .bars{justify-content:flex-start}
+  .cal .bars i{width:8px;height:20px}
+  .sheet{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(520px,92vw);border-radius:18px;max-height:85vh;padding:24px;animation:none}
+  .sheet .grip{display:none}
+  .full .bar-top,.full .body,.full .foot{width:100%;max-width:600px;margin-left:auto;margin-right:auto}
+  .howto{margin:0;padding:0}
+  .toast{bottom:24px;left:calc(50% + var(--nav-w) / 2)}
+}
+</style>
+
+<div id="app">
+  <header class="top">
+    <div class="left"><h1 id="title">Dashboard</h1></div>
+    <div class="seg" id="lang"><button data-l="en">EN</button><button data-l="ko">KO</button></div>
+  </header>
+  <main id="view"></main>
+  <nav class="tabs" id="tabs"></nav>
+</div>
+<div id="layer"></div>
+
+<script>
+(function(){
+'use strict';
+// ---------- constants ----------
+const LS_KEY='wwt.state.v1';
+const APP_VERSION='0.6.0';
+const CHANGELOG=[
+ {v:'0.6.0',date:'2026-10-19',en:['Smart mode in Weekly: alternate-day schedule, split by days per week, auto progression','Weekly board without the day panel; add and edit inside each day','Smart settings and version notes in Settings'],ko:['Weekly에 스마트 모드: 격일 배치, 주당 일수에 맞는 분할, 자동 증량','날짜 상세 패널 없이 요일 칸에서 바로 추가·편집','설정 페이지에 스마트 옵션과 버전 안내']},
+ {v:'0.5.0',date:'2026-10-19',en:['Daily automatic backup, keep 14, restore from Settings'],ko:['하루 1회 자동 백업, 14개 보관, 설정에서 복원']},
+ {v:'0.4.0',date:'2026-10-19',en:['6 preset routines (Push/Pull/Legs, Upper/Lower, Full body, Home, Dumbbell, Cardio+core)','Save a week as your own routine'],ko:['프리셋 루틴 6개','이번 주를 내 루틴으로 저장']},
+ {v:'0.3.0',date:'2026-10-19',en:['86 built-in exercises with muscle and equipment tags','Muscle filters in library and picker'],ko:['부위·도구 태그가 붙은 기본 운동 86개','라이브러리와 선택 화면에 부위 필터']},
+ {v:'0.2.0',date:'2026-10-19',en:['Tablet and desktop layout with side navigation'],ko:['태블릿·데스크톱 레이아웃(사이드 내비게이션)']},
+ {v:'0.1.0',date:'2026-10-19',en:['First version: dashboard, weekly, monthly, library, 3-step how-to, guided workout'],ko:['첫 버전: 대시보드, 주간, 월간, 라이브러리, 3단계 운동 방법, 운동 수행 흐름']}
+];
+const TYPES=['stretch','warmup','strength','cardio','cooldown'];
+const TYPE_META={stretch:{en:'Stretch',ko:'스트레칭'},warmup:{en:'Warm-up',ko:'워밍업'},strength:{en:'Strength',ko:'근력'},cardio:{en:'Cardio',ko:'유산소'},cooldown:{en:'Cool-down',ko:'쿨다운'}};
+const ICONS=['🏋️','🤸','🏃','🧘','🦵','💪','🍑','🚴','🏊','🚣','🧍','🔥','🪢','🤾'];
+const I18N={
+en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Settings',
+ this_week:'This week',workout_days:'Workout days',total_time:'Total time',streak:'Streak',days:'days',d:'d',
+ today:'Today',rest_day:'Rest day',rest_day_sub:'Nothing planned today.',tomorrow:'Tomorrow',est:'Est.',min:'min',
+ start_today:"Start today's workout",all_done:'All done for today',add_exercise:'Add exercise',copy_last_week:'Copy last week',
+ empty_day:'No exercises on this day.',status_planned:'Planned',status_done:'Done',status_skipped:'Skipped',
+ sets:'sets',reps:'reps',bw:'BW',rest:'Rest',sec:'s',library:'Exercise library',goals:'Goals',weekly_goal:'Weekly goal',
+ default_rest:'Rest between sets',language:'Language',unit:'Unit',data:'Data',export:'Export JSON',import:'Import JSON',
+ copy:'Copy',copied:'Copied',import_btn:'Import',imported:'Imported',import_fail:'Could not read that JSON.',reset:'Reset all data',
+ confirm_reset:'Delete everything? This cannot be undone.',cancel:'Cancel',delete:'Delete',search:'Search',all:'All',new:'New',
+ hidden:'Hidden',hide:'Hide',unhide:'Unhide',save:'Save',name_en:'Name (EN)',name_ko:'Name (KO)',type:'Type',measure:'Measure',
+ time:'Time',sets_mode:'Sets',minutes:'Minutes',weight:'Weight',howto:'How-to',step:'Step',add_step:'Add step',remove_step:'Remove last step',
+ title:'Title',cue:'Cue',mistake:'Common mistake',delete_exercise:'Delete exercise',confirm_delete_ex:'Delete this exercise? Past records keep its name.',
+ discard:'Discard changes?',keep_editing:'Keep editing',discard_btn:'Discard',icon:'Icon',prepare:'Get ready',last:'Last',target:'Target',
+ no_record:'No record yet',view_howto:'How to do it',start:'Start',skip:'Skip',begin:'Start now',pause:'Pause',resume:'Resume',plus30:'+30s',
+ done:'Done',finish:'Finish',skip_rest:'Skip rest',set_n:'Set',memo:'Memo',complete:'Complete',vs_last:'vs last',condition:'How did it feel?',
+ next_ex:'Next exercise',close:'Close',remove:'Remove from day',nothing_logged:'Nothing logged.',exercises:'exercises',
+ items:'items',of_goal:'of goal',planned:'planned',week:'Week',hide_builtin:'Built-in exercises can be hidden, not deleted.',
+ muscle:'Muscle',equipment:'Equipment',routines:'Routines',mode_preset:'Preset',mode_smart:'Smart',smart_section:'Smart mode',alternate:'Every other day when possible',alternate_label:'every other day',split:'Split',split_auto:'Auto by days',split_full:'Full body',split_ul:'Upper / Lower',split_ppl:'Push / Pull / Legs',split_home:'Home (bodyweight)',split_db:'Dumbbell',progression_on:'Auto progression',weight_step:'Weight step',version:'Version',whats_new:"What's new",updated_to:'Updated to',on:'On',off:'Off',smart_title:'Smart plan',generate:'Generate this week',regenerate:'Regenerate',smart_starter:'No history yet, so this is a starter plan.',smart_based:'Based on your last 4 weeks.',progression:'Progression',no_progress:'Same targets as last time.',confirm_regen:'Replace this week with a new smart plan?',smart_empty:'Turn on Smart to fill this week automatically.',rest_rule:'Rest day between sessions',backups:'Backups',restore:'Restore',confirm_restore:'Replace all current data with this backup?',auto_backup_note:'A snapshot is saved automatically once a day while synced. The last 14 are kept.',no_backups:'No backups yet.',restored:'Restored',backup_now:'Back up now',backed_up:'Backed up',apply_routine:'Apply routine',apply_week:'Apply to this week',days_week:'days / week',save_week_routine:'Save week as routine',routine_name:'Routine name',applied:'Applied',replace_week:'This week already has exercises.',replace:'Replace week',add_on:'Add on top',builtin_l:'Built-in',mine:'Mine',pick_routine:'Pick a routine',delete_routine:'Delete routine',week_empty_save:'Add exercises to the week first.',week_days:['M','T','W','T','F','S','S'],saved:'Saved',pick:'Pick an exercise',local_only:'Saved on this device only',
+ synced:'Synced to your account',cannot_write:'Read-only view: changes are not saved',volume:'Volume',duration:'Duration',total_sets:'Sets'},
+ko:{tab_dash:'대시보드',tab_week:'주간',tab_month:'월간',tab_settings:'설정',
+ this_week:'이번 주',workout_days:'운동일',total_time:'총 운동 시간',streak:'연속',days:'일',d:'일',
+ today:'오늘',rest_day:'휴식일',rest_day_sub:'오늘은 계획된 운동이 없어요.',tomorrow:'내일',est:'예상',min:'분',
+ start_today:'오늘 운동 시작',all_done:'오늘 운동 완료',add_exercise:'운동 추가',copy_last_week:'지난주 복사',
+ empty_day:'이 날은 운동이 없어요.',status_planned:'계획',status_done:'완료',status_skipped:'건너뜀',
+ sets:'세트',reps:'회',bw:'맨몸',rest:'휴식',sec:'초',library:'운동 라이브러리',goals:'목표',weekly_goal:'주간 목표 횟수',
+ default_rest:'세트 간 휴식',language:'언어',unit:'단위',data:'데이터',export:'JSON 내보내기',import:'JSON 가져오기',
+ copy:'복사',copied:'복사됨',import_btn:'가져오기',imported:'가져왔어요',import_fail:'JSON을 읽을 수 없어요.',reset:'모든 데이터 초기화',
+ confirm_reset:'모든 데이터를 삭제할까요? 되돌릴 수 없어요.',cancel:'취소',delete:'삭제',search:'검색',all:'전체',new:'새 운동',
+ hidden:'숨김',hide:'숨기기',unhide:'숨김 해제',save:'저장',name_en:'이름 (영어)',name_ko:'이름 (한국어)',type:'타입',measure:'측정 방식',
+ time:'시간',sets_mode:'세트',minutes:'분',weight:'무게',howto:'운동 방법',step:'단계',add_step:'단계 추가',remove_step:'마지막 단계 삭제',
+ title:'제목',cue:'핵심 동작',mistake:'흔한 실수',delete_exercise:'운동 삭제',confirm_delete_ex:'이 운동을 삭제할까요? 과거 기록의 이름은 남아요.',
+ discard:'변경 사항을 버릴까요?',keep_editing:'계속 편집',discard_btn:'버리기',icon:'아이콘',prepare:'준비',last:'지난번',target:'목표',
+ no_record:'기록 없음',view_howto:'운동 방법 보기',start:'시작',skip:'건너뛰기',begin:'시작하기',pause:'일시정지',resume:'계속',plus30:'+30초',
+ done:'완료',finish:'마치기',skip_rest:'휴식 건너뛰기',set_n:'세트',memo:'메모',complete:'완료',vs_last:'지난번 대비',condition:'컨디션은 어땠나요?',
+ next_ex:'다음 운동',close:'닫기',remove:'이 날에서 빼기',nothing_logged:'기록 없음.',exercises:'개 운동',
+ items:'개',of_goal:'목표',planned:'계획',week:'주',hide_builtin:'기본 운동은 삭제 대신 숨길 수 있어요.',
+ muscle:'부위',equipment:'도구',routines:'루틴',mode_preset:'프리셋',mode_smart:'스마트',smart_section:'스마트 모드',alternate:'가능하면 격일(퐁당퐁당)',alternate_label:'격일',split:'분할',split_auto:'일수에 따라 자동',split_full:'전신',split_ul:'상체 / 하체',split_ppl:'푸시 / 풀 / 레그',split_home:'홈트 (맨몸)',split_db:'덤벨',progression_on:'자동 증량',weight_step:'증량 단위',version:'버전',whats_new:'새로운 기능',updated_to:'업데이트됨',on:'켬',off:'끔',smart_title:'스마트 플랜',generate:'이번 주 생성',regenerate:'다시 생성',smart_starter:'아직 기록이 없어 기본 플랜으로 시작해요.',smart_based:'최근 4주 기록 기준.',progression:'증량',no_progress:'지난번과 같은 목표.',confirm_regen:'이번 주를 새 스마트 플랜으로 바꿀까요?',smart_empty:'스마트를 켜면 이번 주가 자동으로 채워져요.',rest_rule:'세션 사이 휴식일',backups:'백업',restore:'복원',confirm_restore:'현재 데이터를 이 백업으로 되돌릴까요?',auto_backup_note:'동기화 상태에서 하루 한 번 자동으로 스냅샷을 저장해요. 최근 14개 보관.',no_backups:'아직 백업이 없어요.',restored:'복원됨',backup_now:'지금 백업',backed_up:'백업됨',apply_routine:'루틴 적용',apply_week:'이번 주에 적용',days_week:'일 / 주',save_week_routine:'이번 주를 루틴으로 저장',routine_name:'루틴 이름',applied:'적용됨',replace_week:'이번 주에 이미 운동이 있어요.',replace:'덮어쓰기',add_on:'추가로 넣기',builtin_l:'기본',mine:'내 루틴',pick_routine:'루틴 선택',delete_routine:'루틴 삭제',week_empty_save:'먼저 이번 주에 운동을 넣어주세요.',week_days:['월','화','수','목','금','토','일'],saved:'저장됨',pick:'운동 선택',local_only:'이 기기에만 저장됨',
+ synced:'계정에 동기화됨',cannot_write:'읽기 전용: 변경 사항이 저장되지 않아요',volume:'볼륨',duration:'시간',total_sets:'세트'}
+};
+const MUSCLE_META={chest:{en:'Chest',ko:'가슴'},back:{en:'Back',ko:'등'},shoulders:{en:'Shoulders',ko:'어깨'},arms:{en:'Arms',ko:'팔'},legs:{en:'Legs',ko:'하체'},glutes:{en:'Glutes',ko:'엉덩이'},core:{en:'Core',ko:'코어'},full:{en:'Full body',ko:'전신'}};
+const MUSCLES=Object.keys(MUSCLE_META);
+const EQUIP_META={bodyweight:{en:'Bodyweight',ko:'맨몸'},dumbbell:{en:'Dumbbell',ko:'덤벨'},barbell:{en:'Barbell',ko:'바벨'},machine:{en:'Machine',ko:'머신'},cable:{en:'Cable',ko:'케이블'},band:{en:'Band',ko:'밴드'},kettlebell:{en:'Kettlebell',ko:'케틀벨'},other:{en:'Other',ko:'기타'}};
+const EQUIPS=Object.keys(EQUIP_META);
+function stepsOf(a){return a.map(s=>({titleEn:s[0],titleKo:s[1],cueEn:s[2],cueKo:s[3],mistakeEn:s[4]||'',mistakeKo:s[5]||''}));}
+// sets-type: X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps)   time-type: T(id,en,ko,icon,type,muscle,equip,minutes,steps)
+function X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps){return {id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'sets',sets,reps,weight,rest,minutes:Math.max(1,Math.round(sets*(reps*3+rest)/60)),steps:stepsOf(steps)};}
+function T(id,en,ko,icon,type,muscle,equip,minutes,steps){return {id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'time',sets:1,reps:1,weight:0,rest:0,minutes,steps:stepsOf(steps)};}
+function DEFAULT_EXERCISES(){return [
+// ---- Chest ----
+X('ex_pushup','Push-up','푸시업','💪','strength','chest','bodyweight',3,10,0,60,[['Set up','자세','Hands a bit wider than shoulders, body in one line','손은 어깨보다 조금 넓게, 몸 일직선','Hips sagging','허리 꺾임'],['Lower','내려가기','Elbows at 45°, chest close to the floor','팔꿈치 45도로 가슴을 바닥 가까이','Elbows flaring out','팔꿈치 너무 벌어짐'],['Press','올라오기','Push the floor away through your palms','손바닥으로 밀어 올라오기','Head dropping','고개 떨어짐']]),
+X('ex_bench','Bench press','벤치프레스','🏋️','strength','chest','barbell',3,8,40,90,[['Set up','자세','Shoulder blades back, feet flat, bar over eyes','견갑골 모으고 발은 바닥에, 바는 눈 위','Feet lifting','발이 뜸'],['Lower','내리기','Lower the bar to mid-chest with elbows at 45°','팔꿈치 45도로 바를 가슴 중앙까지','Bouncing off the chest','가슴에서 튕김'],['Press','밀기','Drive the bar up and slightly back','바를 위로, 살짝 뒤로 밀기','Wrists bending back','손목 꺾임']]),
+X('ex_dbbench','Dumbbell bench press','덤벨 벤치프레스','🏋️','strength','chest','dumbbell',3,10,12,75,[['Set up','자세','Lie back, dumbbells over chest, palms forward','누워서 덤벨은 가슴 위, 손바닥 앞으로','Arching the lower back','허리 과하게 꺾임'],['Lower','내리기','Lower until elbows pass the bench','팔꿈치가 벤치 아래로 갈 때까지','Elbows flaring out','팔꿈치 너무 벌어짐'],['Press','밀기','Press up and slightly inward','위로, 살짝 안쪽으로 모으며 밀기','Clanking dumbbells','덤벨끼리 부딪힘']]),
+X('ex_incline','Incline dumbbell press','인클라인 덤벨 프레스','🏋️','strength','chest','dumbbell',3,10,10,75,[['Set up','자세','Bench at 30°, dumbbells over upper chest','벤치 30도, 덤벨은 윗가슴 위','Bench too steep','벤치 각도 너무 높음'],['Lower','내리기','Lower slowly to chest level','천천히 가슴 높이까지','Dropping fast','빠르게 떨어뜨림'],['Press','밀기','Press up without locking elbows','팔꿈치 완전히 펴지 않고 밀기','Shrugging','어깨 올라감']]),
+X('ex_fly','Dumbbell fly','덤벨 플라이','🏋️','strength','chest','dumbbell',3,12,6,60,[['Set up','자세','Arms above chest, slight elbow bend','팔은 가슴 위, 팔꿈치 살짝 굽힘','Straight elbows','팔꿈치 완전히 폄'],['Open','벌리기','Lower in a wide arc until chest stretches','가슴이 늘어날 때까지 크게 벌리기','Going too low','너무 아래까지 내림'],['Squeeze','모으기','Bring dumbbells together, squeeze chest','가슴을 조이며 덤벨 모으기','Bending elbows more','팔꿈치 더 굽힘']]),
+X('ex_chestmachine','Chest press machine','체스트 프레스 머신','🏋️','strength','chest','machine',3,12,30,60,[['Set up','자세','Handles at chest height, back flat on pad','손잡이는 가슴 높이, 등은 패드에','Seat too low','시트 너무 낮음'],['Press','밀기','Push forward until arms are almost straight','팔이 거의 펴질 때까지 밀기','Locking elbows','팔꿈치 완전히 폄'],['Return','돌아오기','Return slowly, keep tension','천천히 돌아오며 긴장 유지','Letting weight slam','중량 쾅 떨어뜨림']]),
+X('ex_dips','Dips','딥스','💪','strength','chest','bodyweight',3,8,0,90,[['Set up','자세','Arms straight on bars, lean slightly forward','바를 잡고 팔 펴기, 상체 살짝 앞으로','Shoulders rolled forward','어깨가 앞으로 말림'],['Lower','내리기','Bend elbows until upper arms are parallel','팔꿈치가 수평이 될 때까지 내리기','Going too deep','너무 깊게 내림'],['Press','밀기','Push back up, squeeze chest','밀어 올리며 가슴 조이기','Swinging','몸이 흔들림']]),
+X('ex_crossover','Cable crossover','케이블 크로스오버','🏋️','strength','chest','cable',3,12,10,60,[['Set up','자세','Pulleys high, step forward, slight elbow bend','도르래 위쪽, 한 발 앞으로, 팔꿈치 살짝 굽힘','',''],['Pull','당기기','Bring hands together in front of hips','손을 골반 앞에서 모으기','Bending at the waist','허리를 숙임'],['Return','돌아오기','Open slowly until chest stretches','가슴이 늘어날 때까지 천천히 열기','','']]),
+// ---- Back ----
+X('ex_deadlift','Deadlift','데드리프트','🏋️','strength','back','barbell',3,8,40,90,[['Set up','자세','Bar over mid-foot, flat back','바 위에 발 중앙, 등 평평','Bar too far from shins','바가 정강이에서 멂'],['Brace','버티기','Big breath, chest up, grip tight','숨 크게, 가슴 펴고, 바 꽉 잡기','Hips too high','엉덩이가 너무 높음'],['Pull','들기','Drive with hips, bar close to the body','엉덩이 힘으로 바를 몸에 붙여 들기','Back rounding','등이 둥글게 말림'],['Lower','내리기','Hips back, lower slowly','엉덩이 뒤로 빼며 천천히 내리기','Dropping the bar','바를 떨어뜨림']]),
+X('ex_bbrow','Bent-over row','바벨 로우','🏋️','strength','back','barbell',3,10,30,90,[['Hinge','숙이기','Hinge at hips, back flat, bar below knees','엉덩이 접어 상체 숙이기, 등 평평','Rounding the back','등이 말림'],['Row','당기기','Pull the bar to the lower belly','바를 아랫배로 당기기','Using momentum','반동 사용'],['Lower','내리기','Lower under control','천천히 내리기','Standing up each rep','매 회 몸이 일어남']]),
+X('ex_dbrow','Dumbbell row','덤벨 로우','🏋️','strength','back','dumbbell',3,10,12,60,[['Set up','자세','One hand and knee on bench, back flat','한 손과 무릎을 벤치에, 등 평평','Twisting the torso','몸통이 비틀림'],['Row','당기기','Pull the dumbbell to your hip','덤벨을 골반 쪽으로 당기기','Pulling to the shoulder','어깨 쪽으로 당김'],['Lower','내리기','Lower slowly, feel the stretch','천천히 내리며 늘어나는 느낌','','']]),
+X('ex_pullup','Pull-up','풀업','💪','strength','back','bodyweight',3,6,0,90,[['Hang','매달리기','Grip wider than shoulders, arms straight','어깨보다 넓게 잡고 팔 펴기','Shoulders up by ears','어깨가 귀까지 올라감'],['Pull','당기기','Pull chest to the bar, elbows down','가슴을 바로, 팔꿈치는 아래로','Kipping','반동으로 올라감'],['Lower','내리기','Lower slowly to a full hang','천천히 완전히 내려오기','Half reps','절반만 내려옴']]),
+X('ex_latpull','Lat pulldown','랫풀다운','🏋️','strength','back','machine',3,10,30,60,[['Set up','자세','Wide grip, thighs under pad, chest up','넓게 잡고 허벅지 고정, 가슴 펴기','Leaning too far back','너무 뒤로 젖힘'],['Pull','당기기','Pull the bar to upper chest, elbows down','바를 윗가슴으로, 팔꿈치 아래로','Pulling behind the neck','목 뒤로 당김'],['Return','돌아오기','Let the bar rise slowly','바를 천천히 올려보내기','','']]),
+X('ex_cablerow','Seated cable row','시티드 케이블 로우','🏋️','strength','back','cable',3,12,30,60,[['Set up','자세','Sit tall, slight knee bend, arms extended','바르게 앉아 무릎 살짝 굽히고 팔 뻗기','',''],['Row','당기기','Pull handle to belly, squeeze shoulder blades','손잡이를 배로, 견갑골 모으기','Leaning back','상체가 뒤로 넘어감'],['Return','돌아오기','Extend arms slowly','천천히 팔 뻗기','Rounding forward','앞으로 말림']]),
+X('ex_facepull','Face pull','페이스 풀','🏋️','strength','shoulders','cable',3,15,10,45,[['Set up','자세','Rope at face height, step back','로프를 얼굴 높이에, 뒤로 물러서기','',''],['Pull','당기기','Pull rope to your face, elbows high and wide','로프를 얼굴로, 팔꿈치 높고 넓게','Elbows dropping','팔꿈치 떨어짐'],['Return','돌아오기','Extend slowly','천천히 돌아가기','','']]),
+X('ex_superman','Superman','슈퍼맨','🧍','strength','back','bodyweight',3,12,0,45,[['Lie down','엎드리기','Face down, arms forward','엎드려 팔을 앞으로','',''],['Lift','들기','Lift arms and legs together, hold 2s','팔다리를 동시에 들고 2초 유지','Craning the neck','목을 젖힘'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+// ---- Shoulders ----
+X('ex_ohp','Overhead press','오버헤드 프레스','🏋️','strength','shoulders','barbell',3,8,25,90,[['Set up','자세','Bar at collarbone, elbows slightly forward','바는 쇄골 높이, 팔꿈치 살짝 앞','',''],['Press','밀기','Press straight up, move head through','수직으로 밀고 머리를 바 아래로','Arching the back','허리가 꺾임'],['Lower','내리기','Lower to collarbone under control','쇄골까지 천천히 내리기','','']]),
+X('ex_dbpress','Dumbbell shoulder press','덤벨 숄더 프레스','🏋️','strength','shoulders','dumbbell',3,10,10,75,[['Set up','자세','Dumbbells at ear height, palms forward','덤벨은 귀 높이, 손바닥 앞으로','',''],['Press','밀기','Press up until arms are nearly straight','팔이 거의 펴질 때까지 밀기','Locking out hard','팔꿈치 세게 폄'],['Lower','내리기','Lower to ear height','귀 높이까지 내리기','Going too low','너무 아래까지 내림']]),
+X('ex_lateral','Lateral raise','사이드 레터럴 레이즈','🏋️','strength','shoulders','dumbbell',3,12,5,45,[['Set up','자세','Dumbbells at sides, slight elbow bend','덤벨은 옆에, 팔꿈치 살짝 굽힘','',''],['Raise','들기','Raise to shoulder height, lead with elbows','어깨 높이까지, 팔꿈치가 먼저','Shrugging','어깨가 올라감'],['Lower','내리기','Lower slowly','천천히 내리기','Swinging','반동 사용']]),
+X('ex_frontraise','Front raise','프론트 레이즈','🏋️','strength','shoulders','dumbbell',3,12,5,45,[['Set up','자세','Dumbbells in front of thighs','덤벨은 허벅지 앞','',''],['Raise','들기','Raise one or both to eye level','눈높이까지 들기','Leaning back','상체가 뒤로 젖힘'],['Lower','내리기','Lower under control','천천히 내리기','','']]),
+X('ex_reardelt','Rear delt fly','리어 델트 플라이','🏋️','strength','shoulders','dumbbell',3,12,5,45,[['Hinge','숙이기','Hinge forward, dumbbells hanging','상체 숙이고 덤벨은 아래로','Rounding the back','등이 말림'],['Open','벌리기','Raise arms out to the sides','팔을 옆으로 벌려 들기','Using momentum','반동 사용'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_upright','Upright row','업라이트 로우','🏋️','strength','shoulders','dumbbell',3,10,8,60,[['Set up','자세','Dumbbells in front, close grip','덤벨을 몸 앞에, 좁게 잡기','',''],['Pull','당기기','Pull up along the body, elbows high','몸을 따라 위로, 팔꿈치 높게','Pulling above the chest','가슴보다 높이 당김'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_arnold','Arnold press','아놀드 프레스','🏋️','strength','shoulders','dumbbell',3,10,8,75,[['Set up','자세','Dumbbells in front of shoulders, palms facing you','덤벨을 어깨 앞, 손바닥은 나를 향해','',''],['Rotate and press','돌리며 밀기','Rotate palms out as you press up','밀어 올리며 손바닥을 바깥으로','Rushing the rotation','회전을 급하게'],['Lower','내리기','Reverse the motion slowly','역순으로 천천히 내리기','','']]),
+// ---- Arms ----
+X('ex_curl','Dumbbell curl','덤벨 컬','💪','strength','arms','dumbbell',3,12,8,60,[['Set up','자세','Elbows pinned to sides, palms forward','팔꿈치 몸에 고정, 손바닥 앞으로','',''],['Curl','들기','Curl to shoulder without moving elbows','팔꿈치 고정한 채 어깨까지 들기','Swinging the body','몸을 흔듦'],['Lower','내리기','Lower slowly to full extension','완전히 펴질 때까지 천천히','Half reps','절반만 내림']]),
+X('ex_hammer','Hammer curl','해머 컬','💪','strength','arms','dumbbell',3,12,8,60,[['Set up','자세','Palms facing each other','손바닥이 서로 마주 보게','',''],['Curl','들기','Curl up, keep the thumbs up','엄지가 위를 향한 채 들기','Elbows drifting forward','팔꿈치가 앞으로 나감'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_bbcurl','Barbell curl','바벨 컬','💪','strength','arms','barbell',3,10,15,60,[['Set up','자세','Shoulder-width grip, elbows at sides','어깨너비로 잡고 팔꿈치는 옆에','',''],['Curl','들기','Curl the bar to chest height','바를 가슴 높이까지','Leaning back','뒤로 젖힘'],['Lower','내리기','Lower under control','천천히 내리기','','']]),
+X('ex_kickback','Triceps kickback','트라이셉스 킥백','💪','strength','arms','dumbbell',3,12,5,45,[['Hinge','숙이기','Hinge forward, upper arm parallel to floor','상체 숙이고 위팔은 바닥과 평행','',''],['Extend','펴기','Straighten the arm fully behind you','팔을 뒤로 완전히 펴기','Dropping the elbow','팔꿈치가 떨어짐'],['Return','돌아오기','Bend slowly to 90°','천천히 90도로 굽히기','','']]),
+X('ex_ohtri','Overhead triceps extension','오버헤드 트라이셉스 익스텐션','💪','strength','arms','dumbbell',3,12,8,60,[['Set up','자세','Hold one dumbbell overhead with both hands','덤벨 하나를 양손으로 머리 위에','',''],['Lower','내리기','Lower behind the head, elbows close','팔꿈치 모은 채 머리 뒤로 내리기','Elbows flaring','팔꿈치 벌어짐'],['Extend','펴기','Press back up to straight arms','팔이 펴질 때까지 올리기','','']]),
+X('ex_pushdown','Triceps pushdown','트라이셉스 푸시다운','💪','strength','arms','cable',3,12,15,60,[['Set up','자세','Elbows at sides, forearms at 90°','팔꿈치 옆에 고정, 팔뚝 90도','',''],['Push','밀기','Push down until arms are straight','팔이 펴질 때까지 밀기','Leaning onto the bar','바에 체중 실음'],['Return','돌아오기','Return to 90°, elbows still','팔꿈치 고정한 채 90도로','','']]),
+X('ex_skull','Skull crusher','스컬 크러셔','💪','strength','arms','barbell',3,10,15,60,[['Set up','자세','Lie back, arms straight above chest','누워서 팔을 가슴 위로 펴기','',''],['Lower','내리기','Bend elbows, bar toward forehead','팔꿈치 굽혀 바를 이마 쪽으로','Elbows flaring','팔꿈치 벌어짐'],['Extend','펴기','Extend back up','다시 펴 올리기','','']]),
+X('ex_benchdip','Bench dip','벤치 딥','💪','strength','arms','bodyweight',3,12,0,60,[['Set up','자세','Hands on bench behind you, legs out','벤치를 뒤로 짚고 다리 뻗기','',''],['Lower','내리기','Bend elbows to 90°, keep them back','팔꿈치 90도까지, 뒤를 향하게','Shoulders rolling forward','어깨 앞으로 말림'],['Press','밀기','Push back up','밀어 올리기','','']]),
+// ---- Legs & glutes ----
+X('ex_squat','Squat','스쿼트','🏋️','strength','legs','bodyweight',3,10,0,60,[['Stance','자세','Feet shoulder-width, chest up','발 어깨너비, 가슴 펴기','Knees caving inward','무릎이 안으로 모임'],['Lower','내려가기','Push hips back until thighs are parallel','엉덩이 뒤로 빼며 허벅지 수평까지','Heels lifting off','뒤꿈치가 뜸'],['Stand','일어서기','Drive through your heels','뒤꿈치로 밀며 일어서기','Rounding the lower back','허리가 둥글게 말림']]),
+X('ex_bbsquat','Barbell back squat','바벨 백스쿼트','🏋️','strength','legs','barbell',3,8,40,120,[['Set up','자세','Bar on upper back, feet shoulder-width','바는 등 위쪽, 발은 어깨너비','Bar on the neck','바가 목에 올라감'],['Lower','내려가기','Sit back and down, knees over toes','뒤로 앉듯이, 무릎은 발끝 방향','Knees caving','무릎이 모임'],['Stand','일어서기','Drive up through the whole foot','발바닥 전체로 밀며 일어서기','Hips rising first','엉덩이가 먼저 올라감']]),
+X('ex_goblet','Goblet squat','고블릿 스쿼트','🏋️','strength','legs','dumbbell',3,12,12,60,[['Hold','잡기','Hold a dumbbell at your chest','덤벨을 가슴 앞에 세워 잡기','',''],['Lower','내려가기','Squat between your knees, elbows inside','무릎 사이로 앉기, 팔꿈치는 안쪽','Leaning forward','상체가 앞으로 쏠림'],['Stand','일어서기','Drive up, chest stays tall','가슴 편 채 밀고 일어서기','','']]),
+X('ex_lunge','Lunge','런지','🦵','strength','legs','bodyweight',3,12,0,60,[['Step','한 발 앞으로','Take a big step forward','한 발 크게 앞으로','Step too short','보폭이 짧음'],['Lower','내려가기','Back knee close to the floor','뒤 무릎이 바닥 근처까지','Front knee past toes','앞 무릎이 발끝 앞으로 나감'],['Return','제자리','Push off the front foot','앞발로 밀며 제자리','Leaning forward','상체가 앞으로 쏠림']]),
+X('ex_bulgarian','Bulgarian split squat','불가리안 스플릿 스쿼트','🦵','strength','legs','dumbbell',3,10,8,75,[['Set up','자세','Rear foot on bench, front foot forward','뒷발을 벤치에, 앞발은 앞으로','Front foot too close','앞발이 너무 가까움'],['Lower','내려가기','Lower straight down, front knee over foot','수직으로 내려가기, 앞 무릎은 발 위','Leaning forward','상체가 쏠림'],['Stand','일어서기','Push through the front heel','앞 뒤꿈치로 밀기','','']]),
+X('ex_rdl','Romanian deadlift','루마니안 데드리프트','🏋️','strength','legs','barbell',3,10,30,90,[['Set up','자세','Stand tall, bar at thighs, soft knees','바르게 서서 바는 허벅지, 무릎 살짝','',''],['Hinge','숙이기','Push hips back, bar slides down legs','엉덩이 뒤로, 바는 다리를 따라 내리기','Rounding the back','등이 말림'],['Stand','일어서기','Squeeze glutes to stand','엉덩이 조이며 일어서기','Bending the knees too much','무릎을 너무 굽힘']]),
+X('ex_hipthrust','Hip thrust','힙 쓰러스트','🍑','strength','glutes','barbell',3,12,30,75,[['Set up','자세','Upper back on bench, bar over hips','등 위쪽을 벤치에, 바는 골반 위','',''],['Thrust','밀기','Drive hips up until body is flat, squeeze','몸이 수평이 될 때까지 골반 올리기','Arching the back','허리 과하게 젖힘'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_glutebridge','Glute bridge','글루트 브릿지','🍑','strength','glutes','bodyweight',3,15,0,45,[['Lie down','눕기','Knees bent, feet flat, arms at sides','무릎 굽히고 발은 바닥, 팔은 옆','',''],['Lift','들기','Lift hips, squeeze glutes at the top','골반 들고 위에서 엉덩이 조이기','Pushing with lower back','허리로 밀어 올림'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_legpress','Leg press','레그 프레스','🏋️','strength','legs','machine',3,10,60,90,[['Set up','자세','Feet shoulder-width on the plate','발판에 발 어깨너비','',''],['Lower','내리기','Bend knees to 90°','무릎 90도까지 내리기','Lower back lifting off','허리가 뜸'],['Press','밀기','Press without locking knees','무릎 완전히 펴지 않고 밀기','Locking knees','무릎 완전히 폄']]),
+X('ex_legext','Leg extension','레그 익스텐션','🦵','strength','legs','machine',3,12,25,60,[['Set up','자세','Pad on shins, back against seat','패드는 정강이, 등은 시트에','',''],['Extend','펴기','Straighten legs, pause at the top','다리를 펴고 위에서 잠깐 멈춤','Kicking fast','빠르게 참'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_legcurl','Leg curl','레그 컬','🦵','strength','legs','machine',3,12,25,60,[['Set up','자세','Pad above the heels','패드는 발뒤꿈치 위','',''],['Curl','굽히기','Curl heels toward glutes','발뒤꿈치를 엉덩이 쪽으로','Hips lifting','엉덩이가 뜸'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_calf','Calf raise','카프 레이즈','🦵','strength','legs','bodyweight',3,15,0,45,[['Stand','서기','Balls of feet on a step','발 앞부분을 계단에','',''],['Raise','들기','Rise as high as possible, pause','최대한 높이 올라가 멈춤','Bouncing','튕김'],['Lower','내리기','Lower below the step, feel the stretch','계단 아래까지 내리며 늘리기','','']]),
+X('ex_stepup','Step-up','스텝업','🦵','strength','legs','bodyweight',3,12,0,60,[['Set up','자세','Whole foot on a box or bench','발 전체를 박스나 벤치에','',''],['Step up','올라가기','Push through the top foot to stand','위쪽 발로 밀어 올라서기','Pushing off the bottom foot','아래 발로 뜀'],['Step down','내려오기','Lower slowly, control the descent','천천히 내려오기','','']]),
+X('ex_sumo','Sumo squat','스모 스쿼트','🏋️','strength','legs','dumbbell',3,12,10,60,[['Stance','자세','Wide stance, toes out','넓게 서서 발끝 바깥','',''],['Lower','내려가기','Sit straight down, knees track toes','수직으로 앉기, 무릎은 발끝 방향','Knees caving','무릎이 모임'],['Stand','일어서기','Squeeze inner thighs and glutes','허벅지 안쪽과 엉덩이 조이기','','']]),
+T('ex_wallsit','Wall sit','월싯','🧍','strength','legs','bodyweight',1,[['Set up','자세','Back on the wall, thighs parallel','등을 벽에, 허벅지 수평','Thighs too high','허벅지가 높음'],['Hold','유지','Hold, breathe steadily','호흡하며 유지','Hands on knees','손을 무릎에 짚음']]),
+// ---- Core ----
+T('ex_plank','Plank','플랭크','🧍','strength','core','bodyweight',1,[['Position','자세','Elbows under shoulders, body in one line','팔꿈치 어깨 아래, 몸 일직선','Hips too high','엉덩이가 높음'],['Hold','유지','Brace your core and hold for time','배에 힘주고 시간 유지','Holding your breath','숨 참기']]),
+T('ex_sideplank','Side plank','사이드 플랭크','🧍','strength','core','bodyweight',1,[['Position','자세','Elbow under shoulder, feet stacked','팔꿈치는 어깨 아래, 발은 포개기','',''],['Hold','유지','Lift hips, body in one line, switch sides','골반 들어 일직선, 반대쪽도','Hips sagging','골반이 처짐']]),
+X('ex_crunch','Crunch','크런치','🧍','strength','core','bodyweight',3,15,0,45,[['Lie down','눕기','Knees bent, hands by ears','무릎 굽히고 손은 귀 옆','',''],['Curl','올리기','Lift shoulders off the floor, exhale','어깨를 바닥에서 들며 숨 내쉬기','Pulling the neck','목을 당김'],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_legraise','Leg raise','레그 레이즈','🧍','strength','core','bodyweight',3,12,0,45,[['Lie down','눕기','Hands under hips, legs straight','손은 엉덩이 아래, 다리 펴기','',''],['Raise','들기','Lift legs to 90°','다리를 90도까지 들기','Lower back arching','허리가 뜸'],['Lower','내리기','Lower slowly without touching the floor','바닥에 닿지 않게 천천히','','']]),
+X('ex_russian','Russian twist','러시안 트위스트','🧍','strength','core','bodyweight',3,20,0,45,[['Sit','앉기','Lean back, feet off the floor','뒤로 기울이고 발 띄우기','',''],['Twist','비틀기','Rotate torso side to side','몸통을 좌우로 회전','Moving only the arms','팔만 움직임'],['Keep tall','유지','Chest stays up throughout','가슴 편 채 유지','','']]),
+X('ex_bicycle','Bicycle crunch','바이시클 크런치','🧍','strength','core','bodyweight',3,20,0,45,[['Lie down','눕기','Hands by ears, legs lifted','손은 귀 옆, 다리 들기','',''],['Twist','비틀기','Elbow to opposite knee, extend the other leg','팔꿈치를 반대 무릎에, 다른 다리 뻗기','Rushing','너무 빠름'],['Switch','교대','Alternate smoothly','부드럽게 교대','','']]),
+T('ex_mountain','Mountain climber','마운틴 클라이머','🏃','cardio','core','bodyweight',1,[['Set up','자세','High plank, hands under shoulders','하이 플랭크, 손은 어깨 아래','',''],['Drive','무릎 당기기','Drive knees to chest alternately','무릎을 번갈아 가슴으로','Hips rising','엉덩이가 올라감'],['Keep pace','속도 유지','Steady rhythm, core tight','일정한 리듬, 배에 힘','','']]),
+X('ex_deadbug','Dead bug','데드버그','🧍','strength','core','bodyweight',3,10,0,45,[['Lie down','눕기','Arms up, knees over hips','팔은 위로, 무릎은 골반 위','',''],['Extend','뻗기','Lower opposite arm and leg, back flat','반대 팔다리를 내리기, 허리는 바닥','Back arching','허리가 뜸'],['Return','돌아오기','Return and switch sides','돌아와서 반대쪽','','']]),
+X('ex_kneeraise','Hanging knee raise','행잉 니 레이즈','💪','strength','core','bodyweight',3,10,0,60,[['Hang','매달리기','Hang from the bar, body still','바에 매달려 몸 고정','Swinging','흔들림'],['Raise','들기','Lift knees to the chest','무릎을 가슴으로','',''],['Lower','내리기','Lower slowly','천천히 내리기','','']]),
+X('ex_abwheel','Ab wheel rollout','AB 휠 롤아웃','🧍','strength','core','other',3,8,0,60,[['Kneel','무릎 꿇기','Kneel, wheel under shoulders','무릎 꿇고 휠은 어깨 아래','',''],['Roll out','밀기','Roll forward as far as control allows','통제되는 만큼 앞으로','Hips sagging','허리가 꺾임'],['Pull back','당기기','Pull back using the abs','복근으로 당겨 돌아오기','','']]),
+// ---- Cardio ----
+T('ex_jog','Brisk walk / jog','빠르게 걷기 / 조깅','🏃','cardio','full','bodyweight',20,[['Pace','속도','Start easy for the first 3 minutes','처음 3분은 가볍게','Starting too fast','처음부터 너무 빠름'],['Steady','유지','Breathe in rhythm, relaxed shoulders','리듬 있게 호흡, 어깨 힘 빼기','',''],['Ease off','마무리','Slow down for the last 2 minutes','마지막 2분은 속도 줄이기','','']]),
+X('ex_burpee','Burpee','버피','🔥','cardio','full','bodyweight',3,10,0,60,[['Drop','내려가기','Squat down, hands on the floor','앉으며 손을 바닥에','',''],['Kick back','뻗기','Jump feet back to a plank, push-up optional','발을 뒤로 뻗어 플랭크, 푸시업은 선택','Sagging hips','허리 꺾임'],['Jump','점프','Jump feet in and jump up','발을 모으고 점프','','']]),
+T('ex_highknees','High knees','하이 니','🏃','cardio','full','bodyweight',1,[['Start','시작','Stand tall, arms bent','바르게 서서 팔 굽히기','',''],['Drive','무릎 올리기','Lift knees to hip height fast','무릎을 골반 높이로 빠르게','Leaning back','뒤로 젖힘'],['Arms','팔','Pump arms with the legs','다리와 함께 팔 흔들기','','']]),
+T('ex_jumprope','Jump rope','줄넘기','🪢','cardio','full','other',5,[['Set up','자세','Elbows close, rope handles at hips','팔꿈치 몸에 붙이고 손잡이는 골반','',''],['Jump','점프','Small jumps on the balls of feet','발 앞부분으로 작게 점프','Jumping too high','너무 높이 뜀'],['Wrists','손목','Turn the rope from the wrists','손목으로 줄 돌리기','','']]),
+T('ex_cycling','Cycling','사이클','🚴','cardio','legs','machine',20,[['Set up','자세','Seat at hip height, slight knee bend at bottom','안장은 골반 높이, 아래에서 무릎 살짝','',''],['Ride','타기','Steady cadence, breathe evenly','일정한 속도, 고른 호흡','',''],['Cool down','마무리','Easy pace for the last 2 minutes','마지막 2분은 천천히','','']]),
+T('ex_rowing','Rowing machine','로잉 머신','🚣','cardio','full','machine',15,[['Catch','준비','Shins vertical, arms straight','정강이 수직, 팔 펴기','',''],['Drive','당기기','Legs, then lean back, then pull','다리 → 상체 → 팔 순서로','Pulling with arms first','팔부터 당김'],['Recover','돌아오기','Arms, then lean forward, then legs','팔 → 상체 → 다리 순서로','','']]),
+T('ex_stairs','Stair climber','계단 오르기','🏃','cardio','legs','machine',15,[['Start','시작','Light grip on rails, stand tall','손잡이는 살짝, 바르게 서기','Leaning on rails','손잡이에 기댐'],['Climb','오르기','Full steps, push through the heel','발 전체로 딛고 뒤꿈치로 밀기','',''],['Finish','마무리','Slow the pace for the last minute','마지막 1분은 천천히','','']]),
+T('ex_swim','Swimming','수영','🏊','cardio','full','other',30,[['Warm up','준비','Easy laps for 5 minutes','5분 가볍게','',''],['Main','본운동','Steady laps, rest 20s between sets','꾸준히, 세트 사이 20초 휴식','',''],['Cool down','마무리','Easy strokes for the last 5 minutes','마지막 5분 가볍게','','']]),
+// ---- Warm-up ----
+T('ex_jacks','Jumping jacks','점핑잭','🤸','warmup','full','bodyweight',3,[['Start','시작','Stand tall, arms at sides','차렷 자세','',''],['Jump out','벌리기','Jump feet apart, arms overhead','팔 올리며 다리 벌리기','Landing hard on heels','뒤꿈치로 쿵 착지'],['Jump in','모으기','Return in one motion','동시에 되돌아오기','','']]),
+T('ex_armcircles','Arm circles','팔 돌리기','🔥','warmup','shoulders','bodyweight',2,[['Reach','팔 뻗기','Arms straight out to the sides','양팔을 옆으로 쭉 뻗기','',''],['Circle','돌리기','Small circles, then bigger ones','작은 원에서 점점 크게','Shrugging shoulders','어깨가 올라감'],['Reverse','반대로','Switch direction halfway','중간에 방향 바꾸기','','']]),
+T('ex_hipcircles','Hip circles','힙 서클','🔥','warmup','legs','bodyweight',2,[['Stand','서기','Hands on hips, feet shoulder-width','손은 골반, 발 어깨너비','',''],['Circle','돌리기','Big slow circles with the hips','골반으로 크고 천천히 원 그리기','',''],['Reverse','반대로','Switch direction halfway','중간에 방향 바꾸기','','']]),
+T('ex_legswings','Leg swings','레그 스윙','🔥','warmup','legs','bodyweight',2,[['Hold','잡기','Hold a wall for balance','벽을 잡고 균형','',''],['Swing','흔들기','Swing one leg forward and back','한 다리를 앞뒤로 흔들기','Twisting the torso','몸통이 비틀림'],['Side','옆으로','Then side to side, switch legs','이어서 좌우로, 다리 바꾸기','','']]),
+T('ex_inchworm','Inchworm','인치웜','🔥','warmup','full','bodyweight',2,[['Fold','숙이기','Bend forward, hands on floor','숙여서 손을 바닥에','',''],['Walk out','걸어나가기','Walk hands out to a plank','손으로 걸어 플랭크까지','Hips sagging','허리 꺾임'],['Walk back','돌아오기','Walk feet toward hands, stand','발을 손 쪽으로 걸어와 서기','','']]),
+T('ex_catcow','Cat-cow','캣카우','🧘','warmup','back','bodyweight',2,[['All fours','네발 자세','Hands under shoulders, knees under hips','손은 어깨 아래, 무릎은 골반 아래','',''],['Cow','소 자세','Inhale, drop belly, look up','숨 들이쉬며 배 내리고 위 보기','',''],['Cat','고양이 자세','Exhale, round the spine, tuck chin','숨 내쉬며 등 둥글게, 턱 당기기','','']]),
+T('ex_bwsquat','Bodyweight squat (warm-up)','맨몸 스쿼트 (워밍업)','🔥','warmup','legs','bodyweight',2,[['Stance','자세','Feet shoulder-width','발 어깨너비','',''],['Squat','앉기','Slow, controlled squats','천천히 통제하며 앉기','Rushing','너무 빠름'],['Stand','일어서기','Stand tall, squeeze glutes','엉덩이 조이며 일어서기','','']]),
+// ---- Stretch ----
+T('ex_hamstring','Hamstring stretch','햄스트링 스트레칭','🧘','stretch','legs','bodyweight',2,[['Sit','앉기','Sit with legs straight','다리 쭉 펴고 앉기','',''],['Fold','숙이기','Straight back, lean forward, hold 20s','등 펴고 상체 숙여 20초 유지','Rounding the back','등이 둥글게 말림']]),
+T('ex_quad','Quad stretch','허벅지 앞 스트레칭','🧘','stretch','legs','bodyweight',2,[['Stand','서기','Hold a wall, grab one ankle behind you','벽 잡고 한 발목을 뒤로 잡기','',''],['Pull','당기기','Pull heel to glute, knees together, hold 20s','뒤꿈치를 엉덩이로, 무릎 모으고 20초','Knee drifting out','무릎이 바깥으로'],['Switch','바꾸기','Switch legs','다리 바꾸기','','']]),
+T('ex_hipflexor','Hip flexor stretch','고관절 스트레칭','🧘','stretch','legs','bodyweight',2,[['Kneel','무릎 꿇기','Half-kneel, front foot forward','한 무릎 꿇고 앞발 앞으로','',''],['Shift','밀기','Shift hips forward, squeeze rear glute, hold 20s','골반 앞으로, 뒤쪽 엉덩이 조이며 20초','Arching the back','허리 젖힘'],['Switch','바꾸기','Switch sides','반대쪽','','']]),
+T('ex_cheststretch','Chest doorway stretch','가슴 스트레칭','🧘','stretch','chest','bodyweight',1,[['Set up','자세','Forearm on a doorframe at shoulder height','팔뚝을 문틀에 어깨 높이로','',''],['Lean','기울이기','Step through until chest stretches, hold 20s','가슴이 늘어날 때까지 앞으로, 20초','Shrugging','어깨 올라감'],['Switch','바꾸기','Switch arms','팔 바꾸기','','']]),
+T('ex_shoulderstretch','Cross-body shoulder stretch','어깨 스트레칭','🧘','stretch','shoulders','bodyweight',1,[['Reach','뻗기','Bring one arm across the chest','한 팔을 가슴 앞으로 가로지르기','',''],['Hold','유지','Pull gently with the other arm, hold 20s','다른 팔로 살짝 당겨 20초','Rotating the torso','몸통 회전'],['Switch','바꾸기','Switch arms','팔 바꾸기','','']]),
+T('ex_tristretch','Triceps stretch','삼두 스트레칭','🧘','stretch','arms','bodyweight',1,[['Reach','뻗기','Raise one arm, bend elbow behind head','한 팔 올려 팔꿈치를 머리 뒤로','',''],['Hold','유지','Press the elbow gently, hold 20s','팔꿈치를 살짝 눌러 20초','',''],['Switch','바꾸기','Switch arms','팔 바꾸기','','']]),
+T('ex_calfstretch','Calf stretch','종아리 스트레칭','🧘','stretch','legs','bodyweight',1,[['Set up','자세','Hands on wall, one leg back, heel down','벽 짚고 한 다리 뒤로, 뒤꿈치 바닥','',''],['Lean','기울이기','Lean in until calf stretches, hold 20s','종아리가 늘어날 때까지 20초','Heel lifting','뒤꿈치 뜸'],['Switch','바꾸기','Switch legs','다리 바꾸기','','']]),
+T('ex_pigeon','Pigeon pose','피전 포즈','🧘','stretch','glutes','bodyweight',2,[['Set up','자세','Front shin across, back leg straight','앞 정강이는 가로로, 뒷다리 펴기','',''],['Fold','숙이기','Lean forward over the front leg, hold 30s','앞다리 위로 숙여 30초','Hip tilting','골반 기울어짐'],['Switch','바꾸기','Switch sides','반대쪽','','']]),
+T('ex_butterfly','Butterfly stretch','나비 자세','🧘','stretch','legs','bodyweight',2,[['Sit','앉기','Soles together, hold feet','발바닥 맞대고 발 잡기','',''],['Press','누르기','Let knees drop, lean forward gently, hold 30s','무릎 내리며 살짝 숙여 30초','Rounding the back','등 말림']]),
+// ---- Cool-down ----
+T('ex_childpose','Child\'s pose','아기 자세','🪢','cooldown','back','bodyweight',2,[['Kneel','무릎 꿇기','Knees wide, big toes together','무릎 벌리고 엄지발가락 모으기','',''],['Rest','쉬기','Arms forward, forehead down, breathe slowly','팔 앞으로, 이마 바닥, 천천히 호흡','','']]),
+T('ex_figure4','Figure-4 stretch','피겨4 스트레칭','🪢','cooldown','glutes','bodyweight',2,[['Lie down','눕기','Cross one ankle over the other knee','한 발목을 반대 무릎 위에','',''],['Pull','당기기','Pull the bottom thigh toward you, hold 30s','아래 허벅지를 당겨 30초','',''],['Switch','바꾸기','Switch sides','반대쪽','','']]),
+T('ex_spinaltwist','Lying spinal twist','누워서 척추 비틀기','🪢','cooldown','back','bodyweight',2,[['Lie down','눕기','Arms out, knees bent','팔 벌리고 무릎 굽히기','',''],['Twist','비틀기','Drop knees to one side, look the other way, hold 30s','무릎을 한쪽으로, 시선은 반대로, 30초','Shoulder lifting','어깨가 뜸'],['Switch','바꾸기','Switch sides','반대쪽','','']]),
+T('ex_downdog','Downward dog','다운독','🪢','cooldown','full','bodyweight',1,[['Set up','자세','Hands and feet on floor, hips high','손발 바닥, 엉덩이 높이','',''],['Press','밀기','Push chest toward thighs, heels down, hold 30s','가슴을 허벅지 쪽으로, 뒤꿈치 내려 30초','Rounding the back','등 말림']]),
+T('ex_forwardfold','Standing forward fold','선 전굴','🪢','cooldown','legs','bodyweight',1,[['Stand','서기','Feet hip-width, soft knees','발 골반너비, 무릎 살짝','',''],['Fold','숙이기','Fold forward, let the head hang, hold 30s','숙여서 머리 늘어뜨리고 30초','Locking knees','무릎 완전히 폄']]),
+T('ex_breathing','Deep breathing','심호흡','🪢','cooldown','full','bodyweight',2,[['Sit','앉기','Sit or lie comfortably','편하게 앉거나 눕기','',''],['Breathe','호흡','In for 4, hold 4, out for 6','4초 들이쉬고 4초 멈추고 6초 내쉬기','',''],['Relax','이완','Let shoulders drop, repeat','어깨 힘 빼고 반복','','']])
+];}
+
+// Preset routines: R(id,en,ko,descEn,descKo,days[]) ; day: D(labelEn,labelKo,exIds[])
+function D(en,ko,ex){return {labelEn:en,labelKo:ko,exIds:ex};}
+function R(id,en,ko,dEn,dKo,days){return {id,builtin:true,nameEn:en,nameKo:ko,descEn:dEn,descKo:dKo,days};}
+function BUILTIN_ROUTINES(){return [
+ R('rt_ppl','Push / Pull / Legs','푸시 / 풀 / 레그','3 days. Chest, shoulders and triceps; back and biceps; legs and core.','주 3일. 가슴·어깨·삼두, 등·이두, 하체·코어로 나눈 분할.',[
+   D('Push','푸시',['ex_jacks','ex_bench','ex_incline','ex_dbpress','ex_lateral','ex_pushdown','ex_cheststretch']),
+   D('Pull','풀',['ex_armcircles','ex_deadlift','ex_latpull','ex_dbrow','ex_facepull','ex_curl','ex_childpose']),
+   D('Legs','레그',['ex_bwsquat','ex_bbsquat','ex_rdl','ex_legpress','ex_legcurl','ex_calf','ex_plank','ex_hamstring'])]),
+ R('rt_ul','Upper / Lower','상체 / 하체','4 days. Two upper days and two lower days with different lifts.','주 4일. 상체 2일, 하체 2일을 서로 다른 종목으로.',[
+   D('Upper A','상체 A',['ex_armcircles','ex_bench','ex_bbrow','ex_dbpress','ex_curl','ex_pushdown','ex_cheststretch']),
+   D('Lower A','하체 A',['ex_bwsquat','ex_bbsquat','ex_rdl','ex_legext','ex_calf','ex_plank','ex_hamstring']),
+   D('Upper B','상체 B',['ex_jacks','ex_incline','ex_latpull','ex_lateral','ex_hammer','ex_skull','ex_shoulderstretch']),
+   D('Lower B','하체 B',['ex_hipcircles','ex_legpress','ex_bulgarian','ex_hipthrust','ex_legcurl','ex_legraise','ex_pigeon'])]),
+ R('rt_full3','Full body 3-day','전신 3일','3 days, A / B / A. Every session hits the whole body. Good for beginners.','주 3일, A / B / A. 매 세션 전신. 입문자에게 적합.',[
+   D('Full A','전신 A',['ex_jacks','ex_goblet','ex_pushup','ex_dbrow','ex_dbpress','ex_plank','ex_hamstring']),
+   D('Full B','전신 B',['ex_armcircles','ex_lunge','ex_latpull','ex_hipthrust','ex_curl','ex_legraise','ex_childpose']),
+   D('Full A','전신 A',['ex_jacks','ex_goblet','ex_pushup','ex_dbrow','ex_dbpress','ex_plank','ex_hamstring'])]),
+ R('rt_home','Bodyweight at home','홈트 (맨몸)','3 days, no equipment. About 25 minutes each.','주 3일, 도구 없음. 하루 25분 내외.',[
+   D('Day 1','1일차',['ex_jacks','ex_pushup','ex_squat','ex_lunge','ex_plank','ex_hamstring']),
+   D('Day 2','2일차',['ex_highknees','ex_glutebridge','ex_benchdip','ex_crunch','ex_superman','ex_childpose']),
+   D('Day 3','3일차',['ex_inchworm','ex_burpee','ex_sumo','ex_mountain','ex_bicycle','ex_forwardfold'])]),
+ R('rt_db','Dumbbell only','덤벨 전신','3 days with one pair of dumbbells. Full body each day.','덤벨 한 쌍으로 주 3일. 매일 전신.',[
+   D('Day 1','1일차',['ex_armcircles','ex_goblet','ex_dbbench','ex_dbrow','ex_lateral','ex_curl','ex_cheststretch']),
+   D('Day 2','2일차',['ex_hipcircles','ex_lunge','ex_dbpress','ex_fly','ex_reardelt','ex_kickback','ex_quad']),
+   D('Day 3','3일차',['ex_jacks','ex_sumo','ex_incline','ex_upright','ex_hammer','ex_ohtri','ex_shoulderstretch'])]),
+ R('rt_cardio','Cardio + core','유산소 + 코어','3 days. 20 minutes of cardio then a short core circuit.','주 3일. 유산소 20분 후 짧은 코어 서킷.',[
+   D('Run','러닝',['ex_legswings','ex_jog','ex_plank','ex_crunch','ex_legraise','ex_hamstring','ex_calfstretch']),
+   D('Bike','사이클',['ex_hipcircles','ex_cycling','ex_sideplank','ex_russian','ex_deadbug','ex_quad']),
+   D('Intervals','인터벌',['ex_jacks','ex_highknees','ex_burpee','ex_mountain','ex_bicycle','ex_deadbug','ex_breathing'])])
+];}
+
+// ---------- state ----------
+const S={exercises:[],routines:[],settings:{lang:'en',weeklyGoal:3,unit:'kg',restSec:60,mode:'preset',smartAlternate:true,smartSplit:'auto',smartProgress:true,weightStep:2.5},plans:{},logs:{},tab:'dash',sub:null,
+  weekStart:null,month:null,selDay:null,backend:'local',canWrite:true,libFilter:'all',libMuscle:'all',libQuery:'',pickMuscle:'all'};
+let DB=null;
+const uid=()=> 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+// ---------- dates ----------
+const pad=n=>String(n).padStart(2,'0');
+const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseKey=k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d);};
+const todayKey=()=>keyOf(new Date());
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const startOfWeek=d=>{const x=new Date(d);x.setHours(0,0,0,0);const w=(x.getDay()+6)%7;return addDays(x,-w);};
+const locale=()=>S.settings.lang==='ko'?'ko-KR':'en-US';
+const fmtMD=d=>new Intl.DateTimeFormat(locale(),{month:'short',day:'numeric'}).format(d);
+const fmtLong=d=>new Intl.DateTimeFormat(locale(),{month:'long',day:'numeric',weekday:'short'}).format(d);
+const fmtMonth=d=>new Intl.DateTimeFormat(locale(),{year:'numeric',month:'long'}).format(d);
+const t=k=>{const L=I18N[S.settings.lang]||I18N.en;return (k in L)?L[k]:(I18N.en[k]??k);};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mmss=s=>{s=Math.max(0,Math.round(s));return pad(Math.floor(s/60))+':'+pad(s%60);};
+
+// ---------- storage ----------
+function loadLocal(){
+  try{const raw=localStorage.getItem(LS_KEY);if(raw){const o=JSON.parse(raw);Object.assign(S,{exercises:o.exercises||[],routines:o.routines||[],settings:Object.assign(S.settings,o.settings||{}),plans:o.plans||{},logs:o.logs||{}});}}catch(e){}
+  if(!S.exercises.length)S.exercises=DEFAULT_EXERCISES();
+  if(mergeDefaults())saveLocal();
+}
+function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify({exercises:S.exercises,routines:S.routines,settings:S.settings,plans:S.plans,logs:S.logs}));}catch(e){}}
+async function dbWrite(fn){ if(!DB)return; try{await fn();}catch(e){ if(e&&e.code==='invalid_argument'){S.canWrite=false;renderStatus();} } }
+const persist={
+  exercises(){saveLocal();dbWrite(()=>DB.doc('app/exercises').set({items:S.exercises}));},
+  settings(){saveLocal();dbWrite(()=>DB.doc('app/settings').set(S.settings));},
+  routines(){saveLocal();dbWrite(()=>DB.doc('app/routines').set({items:S.routines}));},
+  plan(date){saveLocal();const p=S.plans[date];dbWrite(()=>p&&p.items.length?DB.doc('plans/'+date).set({date,items:p.items}):DB.doc('plans/'+date).delete());},
+  log(date){saveLocal();const l=S.logs[date];dbWrite(()=>l&&l.entries.length?DB.doc('logs/'+date).set({date,entries:l.entries}):DB.doc('logs/'+date).delete());}
+};
+async function connectDb(){
+  let db=null;
+  try{ db=await window.claude?.use?.('db'); }catch(e){ db=null; }
+  if(!db)return;
+  DB=db;S.backend='db';
+  try{ const u=await window.claude.use('user'); if(u){const w=await u.can('data.write'); if(w===false)S.canWrite=false;} }catch(e){}
+  db.doc('app/exercises').onSnapshot(snap=>{
+    if(snap.exists){S.exercises=(snap.data().items||[]).map(x=>Object.assign({},x)); if(mergeDefaults()&&S.canWrite&&!snap.metadata.hasPendingWrites)dbWrite(()=>DB.doc('app/exercises').set({items:S.exercises}));}
+    else if(S.canWrite){ dbWrite(()=>DB.doc('app/exercises').set({items:S.exercises})); }
+    saveLocal();render();
+  },()=>{});
+  db.doc('app/settings').onSnapshot(snap=>{
+    if(snap.exists){S.settings=Object.assign({},S.settings,snap.data());}
+    else if(S.canWrite){ dbWrite(()=>DB.doc('app/settings').set(S.settings)); }
+    saveLocal();render();
+  },()=>{});
+  db.doc('app/routines').onSnapshot(snap=>{ if(snap.exists){S.routines=(snap.data().items||[]).map(x=>Object.assign({},x));saveLocal();render();} },()=>{});
+  db.collection('plans').onSnapshot(q=>{const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={items:(b.items||[]).map(x=>Object.assign({},x))};});S.plans=o;saveLocal();render();},()=>{});
+  db.collection('logs').onSnapshot(q=>{const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={entries:(b.entries||[]).map(x=>Object.assign({},x))};});S.logs=o;saveLocal();render();},()=>{});
+  renderStatus();
+  setTimeout(()=>makeBackup(false),6000);
+}
+
+// ---------- model helpers ----------
+const exById=id=>S.exercises.find(e=>e.id===id);
+const exName=e=>!e?'?':(S.settings.lang==='ko'?(e.nameKo||e.nameEn):(e.nameEn||e.nameKo));
+const typeName=ty=>(TYPE_META[ty]||{})[S.settings.lang]||ty;
+const muscleName=m=>(MUSCLE_META[m]||{})[S.settings.lang]||'';
+const equipName=q=>(EQUIP_META[q]||{})[S.settings.lang]||'';
+const exMeta=e=>[typeName(e.type),muscleName(e.muscle),equipName(e.equip)].filter(Boolean).join(' · ');
+function mergeDefaults(){ const defs=DEFAULT_EXERCISES(); let changed=false; const have=new Set(S.exercises.map(e=>e.id));
+  defs.forEach(d=>{ if(!have.has(d.id)){S.exercises.push(d);changed=true;} else { const e=S.exercises.find(x=>x.id===d.id); if(!e.muscle){e.muscle=d.muscle;changed=true;} if(!e.equip){e.equip=d.equip;changed=true;} } });
+  S.exercises.forEach(e=>{ if(!e.muscle){e.muscle='full';changed=true;} if(!e.equip){e.equip='bodyweight';changed=true;} });
+  return changed; }
+const planOf=date=>(S.plans[date]&&S.plans[date].items)||[];
+const logOf=date=>(S.logs[date]&&S.logs[date].entries)||[];
+function targetText(it){ if(it.mode==='time')return it.minutes+' '+t('min'); const w=it.weight>0?it.weight+S.settings.unit+' × ':''; return w+it.reps+' × '+it.sets; }
+function estMin(it){ return it.mode==='time'?it.minutes:Math.max(1,Math.round(it.sets*(it.reps*3+(it.rest||0))/60)); }
+function lastEntry(exId,beforeDate){ const keys=Object.keys(S.logs).filter(k=>!beforeDate||k<=beforeDate).sort().reverse(); for(const k of keys){const e=logOf(k).slice().reverse().find(x=>x.exId===exId);if(e)return e;} return null; }
+function entrySummary(e){ if(!e)return t('no_record'); if(e.mode==='time')return mmss(e.duration); const done=e.sets.filter(s=>s.done); if(!done.length)return mmss(e.duration); const w=Math.max(...done.map(s=>s.weight||0)); const reps=Math.round(done.reduce((a,s)=>a+s.reps,0)/done.length); return (w>0?w+S.settings.unit+' × ':'')+reps+' × '+done.length; }
+function entryScore(e){ if(!e)return null; if(e.mode==='time')return e.duration; const done=e.sets.filter(s=>s.done); const anyW=done.some(s=>s.weight>0); return done.reduce((a,s)=>a+s.reps*(anyW?(s.weight||0):1),0); }
+const allRoutines=()=>[...BUILTIN_ROUTINES(),...S.routines];
+const rtName=r=>S.settings.lang==='ko'?(r.nameKo||r.nameEn):(r.nameEn||r.nameKo);
+const rtDesc=r=>S.settings.lang==='ko'?(r.descKo||r.descEn||''):(r.descEn||r.descKo||'');
+const dayLabel=d=>S.settings.lang==='ko'?(d.labelKo||d.labelEn):(d.labelEn||d.labelKo);
+const DEFAULT_WD={1:[0],2:[0,3],3:[0,2,4],4:[0,1,3,4],5:[0,1,2,3,4],6:[0,1,2,3,4,5],7:[0,1,2,3,4,5,6]};
+function clearWeek(ws){ for(let i=0;i<7;i++){const k=keyOf(addDays(ws,i)); if(planOf(k).length){S.plans[k]={items:[]};persist.plan(k);}} }
+function applyRoutine(r,wdMap,replace){ const ws=parseKey(S.weekStart); if(replace)clearWeek(ws);
+  r.days.forEach((d,i)=>{ const wd=wdMap[i]; if(wd==null)return; const k=keyOf(addDays(ws,wd)); d.exIds.forEach(id=>{const ex=exById(id); if(ex&&!ex.hidden)addPlanItem(k,ex);}); });
+  toast(t('applied')); render(); }
+function addPlanItem(date,ex){ const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'}; S.plans[date]=S.plans[date]||{items:[]}; S.plans[date].items.push(it); persist.plan(date); }
+function doneDays(from,to){ const s=new Set(); Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to&&logOf(k).length)s.add(k); }); return s.size; }
+function plannedDays(from,to){ const s=new Set(); Object.keys(S.plans).forEach(k=>{ if(k>=from&&k<=to&&planOf(k).length)s.add(k); }); return s.size; }
+function totalSec(from,to){ let s=0; Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to)logOf(k).forEach(e=>s+=e.duration||0); }); return s; }
+function streak(){ let n=0; let d=new Date(); if(!logOf(keyOf(d)).length)d=addDays(d,-1); while(logOf(keyOf(d)).length){n++;d=addDays(d,-1);} return n; }
+
+// ---------- UI shell ----------
+const $=(s,r)=> (r||document).querySelector(s);
+const view=$('#view');
+const ICO={dash:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+ week:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ month:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"/></svg>',
+ settings:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+ back:'<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',close:'<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+ check:'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',chev:'<svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><path d="M9 6l6 6-6 6"/></svg>',
+ left:'<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',right:'<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'};
+function renderTabs(){ const tabs=[['dash','tab_dash'],['week','tab_week'],['month','tab_month'],['settings','tab_settings']];
+  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button data-tab="${k}" class="${S.tab===k?'on':''}">${ICO[k]}<span>${esc(t(l))}</span></button>`).join('');
+  $('#lang').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.settings.lang)); }
+function toast(msg){ const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),1600); }
+function renderStatus(){ const el=$('#status'); if(!el)return; el.textContent=!S.canWrite?t('cannot_write'):(S.backend==='db'?t('synced'):t('local_only')); }
+function render(){ renderTabs();
+  const title={dash:'tab_dash',week:'tab_week',month:'tab_month',settings:'tab_settings'}[S.tab];
+  $('#title').textContent=S.sub==='library'?t('library'):S.sub==='edit'?(S.editEx&&S.editEx.id?exName(S.editEx):t('new')):t(title);
+  if(S.tab==='dash')renderDash(); else if(S.tab==='week')renderWeek(); else if(S.tab==='month')renderMonth(); else renderSettings();
+  if(P.active)renderPerform(true); }
+
+// ---------- Dashboard ----------
+function renderDash(){
+  const today=todayKey(); const ws=startOfWeek(new Date()); const wsK=keyOf(ws),weK=keyOf(addDays(ws,6));
+  const now=new Date(); const ms=keyOf(new Date(now.getFullYear(),now.getMonth(),1)), me=keyOf(new Date(now.getFullYear(),now.getMonth()+1,0));
+  const wDone=doneDays(wsK,weK), goal=S.settings.weeklyGoal||3; const pct=Math.min(100,Math.round(wDone/goal*100));
+  const mDone=doneDays(ms,me), mPlan=Math.max(plannedDays(ms,me),mDone); const tot=Math.round(totalSec(ms,me)/60);
+  const items=planOf(today); const todo=items.filter(i=>i.status==='planned'); const est=todo.reduce((a,i)=>a+estMin(i),0);
+  const tomorrow=planOf(keyOf(addDays(new Date(),1)));
+  let html=`<div class="stack">
+   <div class="tiles">
+    <div class="tile"><div class="cap">${esc(t('this_week'))}</div><div class="v num">${wDone}<small> / ${goal} ${esc(t('days'))}</small></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="tile"><div class="cap">${esc(t('workout_days'))}</div><div class="v num">${mDone}<small> / ${mPlan} ${esc(t('planned'))}</small></div></div>
+    <div class="tile"><div class="cap">${esc(t('total_time'))}</div><div class="v num">${tot}<small> ${esc(t('min'))}</small></div></div>
+    <div class="tile"><div class="cap">${esc(t('streak'))}</div><div class="v num">${streak()}<small> ${esc(t('days'))}</small></div></div>
+   </div>
+   <div class="sec-h"><h2>${esc(t('today'))} <span class="muted" style="font-weight:400;font-size:13px">${esc(fmtMD(new Date()))}</span></h2>
+     ${todo.length?`<span class="cap num">${esc(t('est'))} ${est} ${esc(t('min'))}</span>`:''}</div>`;
+  if(!items.length){ html+=`<div class="empty"><div style="font-weight:600;color:var(--fg)">${esc(t('rest_day'))}</div><div class="cap">${esc(t('rest_day_sub'))}</div></div>`;
+    if(tomorrow.length){ html+=`<div class="cap">${esc(t('tomorrow'))} · ${tomorrow.length} ${esc(t('items'))}</div><div class="stack" style="gap:8px">${tomorrow.map(i=>cardHtml(i,false)).join('')}</div>`; }
+    html+=`<button class="btn sec" data-act="go-week">${esc(t('add_exercise'))}</button>`;
+  } else {
+    html+=`<div class="stack" style="gap:8px">${items.map(i=>cardHtml(i,true)).join('')}</div>`;
+    html+= todo.length?`<button class="btn pri" data-act="start-today">${esc(t('start_today'))}</button>`:`<div class="empty" style="color:var(--good);font-weight:600">${esc(t('all_done'))}</div>`;
+  }
+  html+=`<div class="statusline" id="status"></div></div>`;
+  view.innerHTML=html; renderStatus();
+}
+function cardHtml(it,clickable){ const ex=exById(it.exId); const ic=ex?ex.icon:'🏋️'; const name=ex?exName(ex):'(deleted)';
+  const sub=`<span class="dot b-${ex?ex.type:'strength'}"></span> ${esc(typeName(ex?ex.type:'strength'))} · ${esc(targetText(it))}`;
+  const chk=it.status==='done'?`<span class="chk on">${ICO.check}</span>`:it.status==='skipped'?`<span class="cap">${esc(t('status_skipped'))}</span>`:`<span class="chk"></span>`;
+  return `<button class="card ${it.status==='done'?'done':''}" ${clickable?`data-act="open-item" data-id="${it.id}"`:'disabled'}><span class="ic">${ic}</span><span class="grow"><div class="nm">${esc(name)}</div><div class="sub row" style="gap:6px">${sub}</div></span>${chk}</button>`; }
+
+// ---------- Weekly ----------
+function smartDays(ws,n){ if(S.settings.smartAlternate!==false&&n<=4){ let start=0; if(planOf(keyOf(addDays(ws,-1))).length)start=1; const days=[]; for(let d=start;d<7&&days.length<n;d+=2)days.push(d); if(days.length===n)return {days,alt:true}; if(start===1){const d2=[];for(let d=0;d<7&&d2.length<n;d+=2)d2.push(d); if(d2.length===n)return {days:d2,alt:true};} }
+  return {days:DEFAULT_WD[n],alt:false}; }
+const SPLIT_ROUTINE={full:'rt_full3',ul:'rt_ul',ppl:'rt_ppl',home:'rt_home',db:'rt_db'};
+function smartPlan(ws){ const n=Math.min(7,Math.max(1,S.settings.weeklyGoal||3)); const dd=smartDays(ws,n); const wd=dd.days;
+  const since=keyOf(addDays(new Date(),-28)); const hist=Object.keys(S.logs).filter(k=>k>=since).flatMap(k=>logOf(k)); const used=new Set(hist.map(e=>e.exId));
+  const cands=allRoutines(); let routine,starter=!used.size; const split=S.settings.smartSplit||'auto';
+  if(split!=='auto'&&SPLIT_ROUTINE[split]) routine=cands.find(r=>r.id===SPLIT_ROUTINE[split]);
+  else if(used.size){ const best=cands.map(r=>({r,score:r.days.flatMap(d=>d.exIds).filter(id=>used.has(id)).length})).sort((a,b)=>b.score-a.score)[0]; routine=best.score>0?best.r:null; }
+  if(!routine) routine=cands.find(r=>r.id===(n<=3?'rt_full3':n===4?'rt_ul':'rt_ppl'))||cands[0];
+  const prog=S.settings.smartProgress!==false; const step=S.settings.weightStep||(S.settings.unit==='lb'?5:2.5);
+  const changes=[]; const plan={};
+  for(let i=0;i<n;i++){ const d=routine.days[i%routine.days.length]; const date=keyOf(addDays(ws,wd[i])); plan[date]=plan[date]||[];
+    d.exIds.forEach(id=>{ const ex=exById(id); if(!ex||ex.hidden)return; const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'};
+      const last=prog?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
+        if(last.mode==='sets'&&it.mode==='sets'){ const done=last.sets.filter(x=>x.done); if(done.length&&done.length>=last.sets.length){ const w=Math.max(...done.map(x=>x.weight||0)); const r=Math.round(done.reduce((a,x)=>a+x.reps,0)/done.length);
+            if(w>0){ it.weight=Math.round((w+step)*10)/10; it.reps=r; changes.push(exName(ex)+' +'+step+S.settings.unit); } else if(r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } else it.reps=r; } }
+        else if(last.mode==='time'&&it.mode==='time'){ if(last.duration>=it.minutes*60*0.9&&it.minutes<ex.minutes*2){ it.minutes=Math.min(ex.minutes*2,(last.duration>=it.minutes*60?it.minutes+1:it.minutes)); if(it.minutes>ex.minutes)changes.push(exName(ex)+' +1 '+t('min')); } } }
+      plan[date].push(it); }); }
+  return {plan,routine,starter,changes:[...new Set(changes)],n,alt:dd.alt}; }
+function applySmart(){ const ws=parseKey(S.weekStart); const r=smartPlan(ws); clearWeek(ws); Object.keys(r.plan).forEach(k=>{S.plans[k]={items:r.plan[k]};persist.plan(k);}); r.week=S.weekStart; S.smartInfo=r; toast(t('applied')); render(); }
+function renderWeek(){
+  if(!S.weekStart)S.weekStart=keyOf(startOfWeek(new Date()));
+  const ws=parseKey(S.weekStart); const today=todayKey(); const wd=t('week_days'); const smart=S.settings.mode==='smart';
+  let cols='';
+  for(let i=0;i<7;i++){ const d=addDays(ws,i),k=keyOf(d); const items=planOf(k);
+    cols+=`<div class="col ${k===today?'sel today':''}"><span class="wd">${esc(wd[i])}</span><span class="d num">${d.getDate()}</span>
+      ${items.map(it=>{const ex=exById(it.exId);return `<button class="mini ${it.status==='done'?'done':''}" data-act="edit-item" data-k="${k}" data-id="${it.id}" title="${esc(ex?exName(ex):'')}"><i class="b-${ex?ex.type:'strength'}"></i>${ex?ex.icon:'🏋️'}<span class="mn">${esc(ex?exName(ex):'?')}</span></button>`;}).join('')}
+      <button class="add" data-act="add-day" data-k="${k}" aria-label="add">+</button></div>`; }
+  const weekEmpty=[0,1,2,3,4,5,6].every(i=>!planOf(keyOf(addDays(ws,i))).length);
+  const total=[0,1,2,3,4,5,6].reduce((a,i)=>a+planOf(keyOf(addDays(ws,i))).reduce((b,it)=>b+estMin(it),0),0);
+  let smartHtml='';
+  if(smart){ const info=S.smartInfo&&S.smartInfo.week===S.weekStart?S.smartInfo:Object.assign(smartPlan(ws),{week:S.weekStart,preview:true});
+    smartHtml=`<div class="smart"><div class="k">${esc(t('smart_title'))}</div><div><b>${info.n} ${esc(t('days_week'))}</b> · ${esc(rtName(info.routine))} · ${esc(info.alt?t('alternate_label'):t('rest_rule'))}</div>
+      <div class="cap">${esc(info.starter?t('smart_starter'):t('smart_based'))}</div>
+      <div class="cap"><b>${esc(t('progression'))}:</b> ${info.changes.length?esc(info.changes.slice(0,6).join(', '))+(info.changes.length>6?' …':''):esc(t('no_progress'))}</div>
+      <button class="btn pri" data-act="${weekEmpty?'smart-apply':'smart-regen'}">${esc(weekEmpty?t('generate'):t('regenerate'))}</button></div>`; }
+  view.innerHTML=`<div class="stack">
+    <div class="row between"><button class="icon-btn" data-act="week-prev" aria-label="previous">${ICO.left}</button>
+      <div style="text-align:center"><div style="font-weight:600" class="num">${esc(fmtMD(ws))} – ${esc(fmtMD(addDays(ws,6)))}</div><div class="cap num">${total?esc(t('est'))+' '+total+' '+esc(t('min')):''}</div></div>
+      <button class="icon-btn" data-act="week-next" aria-label="next">${ICO.right}</button></div>
+    <div class="seg wide"><button data-mode-set="preset" class="${!smart?'on':''}">${esc(t('mode_preset'))}</button><button data-mode-set="smart" class="${smart?'on':''}">${esc(t('mode_smart'))}</button></div>
+    ${smartHtml}
+    <div class="board">${cols}</div>
+    ${smart?'':`<div class="row" style="gap:8px"><button class="btn sec" data-act="open-routines">${esc(t('apply_routine'))}</button>${weekEmpty?`<button class="btn sec" data-act="copy-week">${esc(t('copy_last_week'))}</button>`:`<button class="btn sec" data-act="save-routine">${esc(t('save_week_routine'))}</button>`}</div>`}
+  </div>`;
+}
+function openPicker(date){
+  S.pickMuscle='all'; S.pickQ='';
+  showSheet(`<h2 style="margin-bottom:10px">${esc(t('pick'))}</h2><input id="pickq" placeholder="${esc(t('search'))}" style="margin-bottom:10px"><div class="chips" id="pickchips" style="margin-bottom:10px"></div><div id="picklist"></div>`);
+  const draw=()=>{ $('#pickchips').innerHTML=['all',...MUSCLES].map(m=>`<button class="chip ${S.pickMuscle===m?'on':''}" data-pm="${m}">${m==='all'?esc(t('all')):esc(muscleName(m))}</button>`).join(''); $('#picklist').innerHTML=pickRows(); };
+  draw();
+  $('#pickq').addEventListener('input',e=>{S.pickQ=e.target.value.toLowerCase();$('#picklist').innerHTML=pickRows();});
+  $('#pickchips').addEventListener('click',e=>{const b=e.target.closest('[data-pm]');if(!b)return;S.pickMuscle=b.dataset.pm;draw();});
+  $('#picklist').addEventListener('click',e=>{const b=e.target.closest('[data-ex]');if(!b)return;addPlanItem(date,exById(b.dataset.ex));closeSheet();render();});
+}
+function pickRows(){ const q=S.pickQ||''; const list=S.exercises.filter(e=>!e.hidden&&(S.pickMuscle==='all'||e.muscle===S.pickMuscle)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
+  const row=e=>`<button class="li" data-ex="${e.id}"><span style="font-size:20px;width:36px;text-align:center">${e.icon}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span></button>`;
+  if(!list.length)return `<div class="empty">—</div>`;
+  if(S.pickMuscle!=='all'||q)return `<div class="list">${list.map(row).join('')}</div>`;
+  return MUSCLES.map(m=>{const g=list.filter(e=>e.muscle===m); return g.length?`<div class="cap" style="margin:12px 0 6px">${esc(muscleName(m))}</div><div class="list">${g.map(row).join('')}</div>`:'';}).join(''); }
+function openItemEditor(date,itemId){
+  const it=planOf(date).find(x=>x.id===itemId); if(!it)return; const ex=exById(it.exId);
+  const num=(k,label,step,unit)=>`<div class="field"><label>${esc(label)}</label><div class="step"><button data-st="${k}" data-d="-${step}">−</button><span class="sv num" id="sv-${k}">${it[k]}${unit?' '+unit:''}</span><button data-st="${k}" data-d="${step}">+</button></div></div>`;
+  showSheet(`<div class="row" style="margin-bottom:12px"><span class="ic" style="font-size:22px">${ex?ex.icon:'🏋️'}</span><div><h2>${esc(ex?exName(ex):'?')}</h2><div class="cap">${esc(t('target'))}</div></div></div>
+   <div class="stack" style="gap:12px">
+   ${it.mode==='time'?num('minutes',t('minutes'),1,t('min')):num('sets',t('sets'),1,'')+num('reps',t('reps'),1,'')+num('weight',t('weight'),2.5,S.settings.unit)+num('rest',t('rest'),15,t('sec'))}
+   ${it.status!=='planned'?`<button class="btn sec" data-act="reset-item">${esc(t('status_planned'))}</button>`:''}
+   <button class="btn pri" data-act="save-item">${esc(t('save'))}</button>
+   <button class="btn ghost danger" data-act="remove-item">${esc(t('remove'))}</button></div>`);
+  $('#sheet').addEventListener('click',e=>{ const st=e.target.closest('[data-st]'); if(st){const k=st.dataset.st;const d=Number(st.dataset.d);it[k]=Math.max(k==='weight'||k==='rest'?0:1,Math.round((it[k]+d)*10)/10);$('#sv-'+k).textContent=it[k]+(k==='minutes'?' '+t('min'):k==='weight'?' '+S.settings.unit:k==='rest'?' '+t('sec'):'');return;}
+    const a=e.target.closest('[data-act]'); if(!a)return;
+    if(a.dataset.act==='save-item'){persist.plan(date);closeSheet();render();}
+    if(a.dataset.act==='reset-item'){it.status='planned';persist.plan(date);closeSheet();render();}
+    if(a.dataset.act==='remove-item'){S.plans[date].items=planOf(date).filter(x=>x.id!==itemId);persist.plan(date);closeSheet();render();} });
+}
+function copyLastWeek(){ const ws=parseKey(S.weekStart); for(let i=0;i<7;i++){const src=keyOf(addDays(ws,i-7)),dst=keyOf(addDays(ws,i)); const items=planOf(src); if(!items.length)continue; S.plans[dst]={items:items.map(it=>Object.assign({},it,{id:uid(),status:'planned'}))}; persist.plan(dst);} render(); }
+
+// ---------- Monthly ----------
+function renderMonth(){
+  if(!S.month){const n=new Date();S.month=keyOf(new Date(n.getFullYear(),n.getMonth(),1));}
+  const m=parseKey(S.month); const first=startOfWeek(m); const today=todayKey(); const wd=t('week_days');
+  const ms=S.month, me=keyOf(new Date(m.getFullYear(),m.getMonth()+1,0));
+  let cells=''; for(let i=0;i<42;i++){ const d=addDays(first,i),k=keyOf(d); const other=d.getMonth()!==m.getMonth(); const items=planOf(k); const logged=logOf(k).length>0;
+    cells+=`<button class="cell ${other?'other':''} ${k===today?'today':''}" data-act="day-detail" data-k="${k}"><span class="d num">${d.getDate()}</span><span class="bars">${items.slice(0,3).map(it=>{const ex=exById(it.exId);return `<i class="b-${ex?ex.type:'strength'} ${it.status==='done'?'done':''}"></i>`;}).join('')}${!items.length&&logged?'<i class="b-strength done"></i>':''}</span></button>`;
+    if(i===41&&false)break; }
+  view.innerHTML=`<div class="stack">
+   <div class="row between"><button class="icon-btn" data-act="month-prev" aria-label="previous">${ICO.left}</button><div style="font-weight:600">${esc(fmtMonth(m))}</div><button class="icon-btn" data-act="month-next" aria-label="next">${ICO.right}</button></div>
+   <div class="tiles"><div class="tile"><div class="cap">${esc(t('workout_days'))}</div><div class="v num">${doneDays(ms,me)}<small> / ${Math.max(plannedDays(ms,me),doneDays(ms,me))}</small></div></div>
+     <div class="tile"><div class="cap">${esc(t('total_time'))}</div><div class="v num">${Math.round(totalSec(ms,me)/60)}<small> ${esc(t('min'))}</small></div></div></div>
+   <div class="cal">${wd.map(w=>`<div class="wd">${esc(w)}</div>`).join('')}${cells}</div>
+  </div>`;
+}
+function openDayDetail(k){ const items=planOf(k); const entries=logOf(k);
+  const rows=items.map(it=>{const ex=exById(it.exId);const e=entries.find(x=>x.planItemId===it.id);return `<div class="li"><span style="font-size:20px">${ex?ex.icon:'🏋️'}</span><span class="grow"><div class="nm">${esc(ex?exName(ex):'(deleted)')}</div><div class="sub">${esc(targetText(it))}${e?' → '+esc(entrySummary(e))+(e.memo?' · '+esc(e.memo):''):''}</div></span><span class="cap">${esc(t('status_'+it.status))}</span></div>`;}).join('');
+  showSheet(`<h2 style="margin-bottom:10px">${esc(fmtLong(parseKey(k)))}</h2>${rows?`<div class="list">${rows}</div>`:`<div class="empty">${esc(t('nothing_logged'))}</div>`}
+   <button class="btn sec" style="margin-top:12px" data-act="go-day" data-k="${k}">${esc(t('tab_week'))} ${ICO.chev}</button>`);
+}
+
+// ---------- Version notes ----------
+function openChangelog(){ const ko=S.settings.lang==='ko'; showSheet(`<h2 style="margin-bottom:12px">${esc(t('whats_new'))}</h2><div class="stack" style="gap:14px">${CHANGELOG.map((c,i)=>`<div><div class="row between"><b class="num">v${esc(c.v)}${i===0?` <span class="chip on" style="margin-left:6px">${esc(t('updated_to'))}</span>`:''}</b><span class="cap num">${esc(c.date)}</span></div><ul style="margin:6px 0 0;padding-left:18px">${(ko?c.ko:c.en).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div>`); }
+function checkWhatsNew(){ let seen=null; try{seen=localStorage.getItem('wwt.seenVersion');}catch(e){} if(seen===APP_VERSION)return; try{localStorage.setItem('wwt.seenVersion',APP_VERSION);}catch(e){} if(seen){ toast(t('updated_to')+' v'+APP_VERSION); setTimeout(openChangelog,900); } }
+
+// ---------- Backups (db only) ----------
+async function makeBackup(force){ if(!DB||!S.canWrite)return false; const k=todayKey();
+  try{ if(!force){ const snap=await DB.doc('backups/'+k).get(); if(snap.exists)return false; }
+    await DB.doc('backups/'+k).set({kind:'data',date:k,at:Date.now(),settings:S.settings,routines:S.routines,plans:S.plans,logs:S.logs,planDays:Object.keys(S.plans).length,logDays:Object.keys(S.logs).length});
+    await DB.doc('backups/'+k+'-lib').set({kind:'lib',date:k,exercises:S.exercises});
+    const cutoff=keyOf(addDays(new Date(),-14)); const old=await DB.collection('backups').where('date','<',cutoff).get();
+    for(const d of old.docs){ try{await DB.doc('backups/'+d.id).delete();}catch(e){} }
+    return true; }catch(e){ return false; } }
+async function openBackups(){ showSheet(`<h2 style="margin-bottom:4px">${esc(t('backups'))}</h2><div class="cap" style="margin-bottom:12px">${esc(t('auto_backup_note'))}</div><div id="bklist"><div class="empty">…</div></div>${DB&&S.canWrite?`<button class="btn sec" style="margin-top:12px" id="bknow">${esc(t('backup_now'))}</button>`:''}`);
+  $('#bknow')?.addEventListener('click',async()=>{ const ok=await makeBackup(true); toast(ok?t('backed_up'):t('local_only')); fill(); });
+  async function fill(){ if(!DB){$('#bklist').innerHTML=`<div class="empty">${esc(t('local_only'))}</div>`;return;}
+    let docs=[]; try{ const q=await DB.collection('backups').where('kind','==','data').orderBy('date','desc').limit(30).get(); docs=q.docs; }catch(e){}
+    if(!docs.length){$('#bklist').innerHTML=`<div class="empty">${esc(t('no_backups'))}</div>`;return;}
+    $('#bklist').innerHTML=`<div class="list">${docs.map(d=>{const b=d.data();return `<button class="li" data-bk="${d.id}"><span class="grow"><div class="nm num">${esc(b.date)}</div><div class="sub">${b.planDays??0} ${esc(t('planned'))} · ${b.logDays??0} ${esc(t('workout_days'))}</div></span><span class="cap">${esc(t('restore'))}</span></button>`;}).join('')}</div>`;
+    $('#bklist').querySelectorAll('[data-bk]').forEach(b=>b.addEventListener('click',()=>confirmSheet(t('confirm_restore'),t('restore'),()=>restoreBackup(b.dataset.bk),true))); }
+  fill(); }
+async function restoreBackup(id){ try{ const d=await DB.doc('backups/'+id).get(); const l=await DB.doc('backups/'+id+'-lib').get(); if(!d.exists)return; const b=d.data();
+    const oldPlans=Object.keys(S.plans), oldLogs=Object.keys(S.logs);
+    S.settings=Object.assign({},S.settings,b.settings||{}); S.routines=(b.routines||[]).map(x=>Object.assign({},x)); S.plans=JSON.parse(JSON.stringify(b.plans||{})); S.logs=JSON.parse(JSON.stringify(b.logs||{}));
+    if(l.exists&&Array.isArray(l.data().exercises)){S.exercises=l.data().exercises.map(x=>Object.assign({},x));mergeDefaults();}
+    persist.settings();persist.routines();persist.exercises(); new Set([...oldPlans,...Object.keys(S.plans)]).forEach(k=>persist.plan(k)); new Set([...oldLogs,...Object.keys(S.logs)]).forEach(k=>persist.log(k));
+    toast(t('restored')); render(); }catch(e){ toast(t('import_fail')); } }
+
+// ---------- Routines ----------
+function openRoutineList(){ const b=BUILTIN_ROUTINES(), m=S.routines;
+  const row=r=>`<button class="li" data-rt="${r.id}"><span class="grow"><div class="nm">${esc(rtName(r))}</div><div class="sub">${r.days.length} ${esc(t('days_week'))} · ${esc(r.days.map(dayLabel).join(' / '))}</div></span>${ICO.chev}</button>`;
+  showSheet(`<h2 style="margin-bottom:10px">${esc(t('pick_routine'))}</h2>${m.length?`<div class="cap" style="margin-bottom:6px">${esc(t('mine'))}</div><div class="list" style="margin-bottom:12px">${m.map(row).join('')}</div>`:''}<div class="cap" style="margin-bottom:6px">${esc(t('builtin_l'))}</div><div class="list">${b.map(row).join('')}</div>`);
+  $('#sheet').addEventListener('click',e=>{const x=e.target.closest('[data-rt]');if(!x)return;openRoutine(x.dataset.rt);}); }
+function openRoutine(id){ const r=allRoutines().find(x=>x.id===id); if(!r)return; const wd=t('week_days'); const map=(DEFAULT_WD[r.days.length]||DEFAULT_WD[7]).slice(0,r.days.length);
+  const ws=S.weekStart?parseKey(S.weekStart):startOfWeek(new Date()); if(!S.weekStart)S.weekStart=keyOf(ws);
+  const hasItems=[0,1,2,3,4,5,6].some(i=>planOf(keyOf(addDays(ws,i))).length);
+  const dayHtml=(d,i)=>`<div class="tile stack" style="gap:8px"><div class="row between"><b>${esc(dayLabel(d))}</b><div class="seg" data-day="${i}">${wd.map((w,j)=>`<button data-wd="${j}" class="${map[i]===j?'on':''}" style="padding:4px 7px">${esc(w)}</button>`).join('')}</div></div><div class="cap">${esc(d.exIds.map(x=>{const e=exById(x);return e?e.icon+' '+exName(e):'';}).filter(Boolean).join(' · '))}</div></div>`;
+  showSheet(`<h2>${esc(rtName(r))}</h2><div class="cap" style="margin:4px 0 12px">${esc(rtDesc(r))}</div><div class="stack" style="gap:8px">${r.days.map(dayHtml).join('')}</div>
+    <div class="cap num" style="margin:12px 0 4px">${esc(fmtMD(ws))} – ${esc(fmtMD(addDays(ws,6)))}</div>
+    ${hasItems?`<div class="cap" style="margin-bottom:8px">${esc(t('replace_week'))}</div><div class="row" style="gap:8px"><button class="btn sec" id="rt-add">${esc(t('add_on'))}</button><button class="btn pri" id="rt-replace">${esc(t('replace'))}</button></div>`:`<button class="btn pri" id="rt-apply">${esc(t('apply_week'))}</button>`}
+    ${r.builtin?'':`<button class="btn ghost danger" id="rt-del" style="margin-top:8px">${esc(t('delete_routine'))}</button>`}`);
+  $('#sheet').addEventListener('click',e=>{ const w=e.target.closest('[data-wd]'); if(w){const di=+w.closest('[data-day]').dataset.day; map[di]=+w.dataset.wd; w.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===w)); return;}
+    if(e.target.id==='rt-apply'||e.target.id==='rt-add'){closeSheet();S.tab='week';applyRoutine(r,map,false);} 
+    if(e.target.id==='rt-replace'){closeSheet();S.tab='week';applyRoutine(r,map,true);}
+    if(e.target.id==='rt-del'){S.routines=S.routines.filter(x=>x.id!==r.id);persist.routines();closeSheet();render();} }); }
+function saveWeekAsRoutine(){ const ws=parseKey(S.weekStart); const wd=t('week_days'); const days=[]; for(let i=0;i<7;i++){const items=planOf(keyOf(addDays(ws,i))); if(items.length)days.push({labelEn:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i],labelKo:wd[i],exIds:items.map(it=>it.exId)});}
+  if(!days.length){toast(t('week_empty_save'));return;}
+  showSheet(`<h2 style="margin-bottom:10px">${esc(t('save_week_routine'))}</h2><div class="field"><label>${esc(t('routine_name'))}</label><input id="rtname" value="${esc(t('mine'))} ${S.routines.length+1}"></div><button class="btn pri" style="margin-top:12px" id="rtsave">${esc(t('save'))}</button>`);
+  $('#rtsave').addEventListener('click',()=>{const n=$('#rtname').value.trim()||'Routine'; S.routines.push({id:'rt_'+uid(),builtin:false,nameEn:n,nameKo:n,descEn:'',descKo:'',days}); persist.routines(); closeSheet(); toast(t('saved')); render();}); }
+
+// ---------- Settings ----------
+function renderSettings(){
+  if(S.sub==='library')return renderLibrary(); if(S.sub==='edit')return renderEdit();
+  const s=S.settings;
+  view.innerHTML=`<div class="stack">
+   <div class="list"><button class="li" data-act="open-lib"><span class="grow"><div class="nm">${esc(t('library'))}</div><div class="sub">${S.exercises.filter(e=>!e.hidden).length} ${esc(t('exercises'))}</div></span>${ICO.chev}</button>
+   <button class="li" data-act="open-routines"><span class="grow"><div class="nm">${esc(t('routines'))}</div><div class="sub">${BUILTIN_ROUTINES().length+S.routines.length}</div></span>${ICO.chev}</button></div>
+   <div><div class="cap" style="margin-bottom:6px">${esc(t('goals'))}</div><div class="list">
+    <div class="li"><span class="grow nm">${esc(t('weekly_goal'))}</span><div class="step"><button data-set="weeklyGoal" data-d="-1">−</button><span class="sv num">${s.weeklyGoal}</span><button data-set="weeklyGoal" data-d="1">+</button></div></div>
+    <div class="li"><span class="grow nm">${esc(t('default_rest'))}</span><div class="step"><button data-set="restSec" data-d="-15">−</button><span class="sv num">${s.restSec}${esc(t('sec'))}</span><button data-set="restSec" data-d="15">+</button></div></div>
+   </div></div>
+   <div><div class="cap" style="margin-bottom:6px">${esc(t('smart_section'))}</div><div class="list">
+    <div class="li"><span class="grow nm">${esc(t('alternate'))}</span><div class="onoff"><button data-sset="smartAlternate" data-v="1" class="${s.smartAlternate!==false?'on':''}">${esc(t('on'))}</button><button data-sset="smartAlternate" data-v="0" class="${s.smartAlternate===false?'on':''}">${esc(t('off'))}</button></div></div>
+    <div class="li" style="flex-direction:column;align-items:stretch;gap:8px"><span class="nm">${esc(t('split'))}</span><div class="chips">${[['auto','split_auto'],['full','split_full'],['ul','split_ul'],['ppl','split_ppl'],['home','split_home'],['db','split_db']].map(([k,l])=>`<button class="chip ${(s.smartSplit||'auto')===k?'on':''}" data-split="${k}">${esc(t(l))}</button>`).join('')}</div></div>
+    <div class="li"><span class="grow nm">${esc(t('progression_on'))}</span><div class="onoff"><button data-sset="smartProgress" data-v="1" class="${s.smartProgress!==false?'on':''}">${esc(t('on'))}</button><button data-sset="smartProgress" data-v="0" class="${s.smartProgress===false?'on':''}">${esc(t('off'))}</button></div></div>
+    <div class="li"><span class="grow nm">${esc(t('weight_step'))}</span><div class="seg">${[1,2.5,5].map(v=>`<button data-wstep="${v}" class="${(s.weightStep||2.5)===v?'on':''}">${v}${esc(s.unit)}</button>`).join('')}</div></div>
+   </div></div>
+   <div class="list">
+    <div class="li"><span class="grow nm">${esc(t('language'))}</span><div class="seg"><button data-lang="en" class="${s.lang==='en'?'on':''}">EN</button><button data-lang="ko" class="${s.lang==='ko'?'on':''}">KO</button></div></div>
+    <div class="li"><span class="grow nm">${esc(t('unit'))}</span><div class="seg"><button data-unit="kg" class="${s.unit==='kg'?'on':''}">kg</button><button data-unit="lb" class="${s.unit==='lb'?'on':''}">lb</button></div></div>
+   </div>
+   <div><div class="cap" style="margin-bottom:6px">${esc(t('data'))}</div><div class="list">
+    <button class="li" data-act="export"><span class="grow nm">${esc(t('export'))}</span>${ICO.chev}</button>
+    <button class="li" data-act="import"><span class="grow nm">${esc(t('import'))}</span>${ICO.chev}</button>
+    <button class="li" data-act="backups"><span class="grow nm">${esc(t('backups'))}</span>${ICO.chev}</button>
+    <button class="li" data-act="reset"><span class="grow nm" style="color:#d9403c">${esc(t('reset'))}</span></button>
+   </div></div>
+   <div class="list"><button class="li" data-act="changelog"><span class="grow"><div class="nm">${esc(t('version'))} ${APP_VERSION}</div><div class="sub">${esc(t('whats_new'))} · ${CHANGELOG[0].date}</div></span>${ICO.chev}</button></div>
+   <div class="statusline" id="status"></div></div>`;
+  renderStatus();
+}
+function renderLibrary(){
+  const q=S.libQuery.toLowerCase(); const f=S.libFilter;
+  const m=S.libMuscle; const all=S.exercises.filter(e=>(f==='all'||e.type===f)&&(m==='all'||e.muscle===m)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
+  const vis=all.filter(e=>!e.hidden), hid=all.filter(e=>e.hidden);
+  const row=e=>`<button class="li" data-act="edit-ex" data-id="${e.id}"><span style="font-size:22px;width:32px;text-align:center">${e.icon}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span>${ICO.chev}</button>`;
+  view.innerHTML=`<div class="stack">
+   <div class="row"><button class="icon-btn" data-act="back">${ICO.back}</button><input id="libq" class="grow" placeholder="${esc(t('search'))}" value="${esc(S.libQuery)}"><button class="btn sm pri" style="width:auto" data-act="new-ex">+ ${esc(t('new'))}</button></div>
+   <div class="chips">${['all',...TYPES].map(ty=>`<button class="chip ${f===ty?'on':''}" data-filter="${ty}">${ty==='all'?esc(t('all')):esc(typeName(ty))}</button>`).join('')}</div>
+   <div class="chips">${['all',...MUSCLES].map(mm=>`<button class="chip ${m===mm?'on':''}" data-mfilter="${mm}">${mm==='all'?esc(t('all')):esc(muscleName(mm))}</button>`).join('')}</div>
+   <div class="cap">${vis.length} ${esc(t('exercises'))}</div>
+   <div class="list">${vis.map(row).join('')||`<div class="empty">—</div>`}</div>
+   ${hid.length?`<details><summary class="cap" style="cursor:pointer">${esc(t('hidden'))} (${hid.length})</summary><div class="list" style="margin-top:8px;opacity:.7">${hid.map(row).join('')}</div></details>`:''}
+  </div>`;
+  $('#libq').addEventListener('input',e=>{S.libQuery=e.target.value;const sc=view.scrollTop;renderLibrary();$('#libq').focus();$('#libq').setSelectionRange(99,99);view.scrollTop=sc;});
+}
+function blankExercise(){ return {id:'',nameEn:'',nameKo:'',icon:ICONS[0],type:'strength',muscle:'full',equip:'bodyweight',mode:'sets',sets:3,reps:10,weight:0,rest:S.settings.restSec,minutes:5,steps:stepsOf([['','','','','',''],['','','','','',''],['','','','','','']])}; }
+function renderEdit(){
+  const e=S.editEx; const ko=S.settings.lang==='ko';
+  const num=(k,label,step,unit)=>`<div class="field"><label>${esc(label)}</label><div class="step"><button data-st="${k}" data-d="-${step}">−</button><span class="sv num" id="sv-${k}">${e[k]}${unit?' '+unit:''}</span><button data-st="${k}" data-d="${step}">+</button></div></div>`;
+  const stepCard=(s,i)=>`<div class="tile stack" style="gap:8px"><div class="cap">${esc(t('step'))} ${i+1}</div>
+    <div class="row"><input data-f="steps.${i}.titleEn" value="${esc(s.titleEn)}" placeholder="${esc(t('title'))} EN"><input data-f="steps.${i}.titleKo" value="${esc(s.titleKo)}" placeholder="${esc(t('title'))} KO"></div>
+    <input data-f="steps.${i}.cueEn" value="${esc(s.cueEn)}" placeholder="${esc(t('cue'))} EN"><input data-f="steps.${i}.cueKo" value="${esc(s.cueKo)}" placeholder="${esc(t('cue'))} KO">
+    <input data-f="steps.${i}.mistakeEn" value="${esc(s.mistakeEn)}" placeholder="${esc(t('mistake'))} EN"><input data-f="steps.${i}.mistakeKo" value="${esc(s.mistakeKo)}" placeholder="${esc(t('mistake'))} KO"></div>`;
+  view.innerHTML=`<div class="stack">
+   <div class="row between"><button class="icon-btn" data-act="back-edit">${ICO.back}</button><button class="btn sm pri" style="width:auto" data-act="save-ex">${esc(t('save'))}</button></div>
+   <div class="field"><label>${esc(t('icon'))}</label><div class="icons">${ICONS.map(ic=>`<button data-icon="${ic}" class="${e.icon===ic?'on':''}">${ic}</button>`).join('')}</div></div>
+   <div class="field"><label>${esc(t('name_en'))}</label><input data-f="nameEn" value="${esc(e.nameEn)}"></div>
+   <div class="field"><label>${esc(t('name_ko'))}</label><input data-f="nameKo" value="${esc(e.nameKo)}"></div>
+   <div class="field"><label>${esc(t('type'))}</label><div class="chips">${TYPES.map(ty=>`<button class="chip ${e.type===ty?'on':''}" data-type="${ty}">${esc(typeName(ty))}</button>`).join('')}</div></div>
+   <div class="field"><label>${esc(t('muscle'))}</label><div class="chips">${MUSCLES.map(m=>`<button class="chip ${e.muscle===m?'on':''}" data-muscle="${m}">${esc(muscleName(m))}</button>`).join('')}</div></div>
+   <div class="field"><label>${esc(t('equipment'))}</label><div class="chips">${EQUIPS.map(q=>`<button class="chip ${e.equip===q?'on':''}" data-equip="${q}">${esc(equipName(q))}</button>`).join('')}</div></div>
+   <div class="field"><label>${esc(t('measure'))}</label><div class="seg wide"><button data-mode="time" class="${e.mode==='time'?'on':''}">${esc(t('time'))}</button><button data-mode="sets" class="${e.mode==='sets'?'on':''}">${esc(t('sets_mode'))}</button></div></div>
+   <div class="tiles">${e.mode==='time'?num('minutes',t('minutes'),1,t('min')):num('sets',t('sets'),1,'')+num('reps',t('reps'),1,'')+num('weight',t('weight'),2.5,S.settings.unit)+num('rest',t('rest'),15,t('sec'))}</div>
+   <div class="sec-h"><h2>${esc(t('howto'))}</h2><span class="cap">${e.steps.length} ${esc(t('step'))}</span></div>
+   <div class="stack" style="gap:8px">${e.steps.map(stepCard).join('')}</div>
+   <div class="row">${e.steps.length<4?`<button class="btn sec" data-act="add-step">+ ${esc(t('add_step'))}</button>`:''}${e.steps.length>2?`<button class="btn sec" data-act="rm-step">− ${esc(t('remove_step'))}</button>`:''}</div>
+   ${e.id?(e.builtin?`<div class="cap" style="text-align:center">${esc(t('hide_builtin'))}</div><button class="btn sec" data-act="toggle-hide">${esc(e.hidden?t('unhide'):t('hide'))}</button>`:`<button class="btn ghost danger" data-act="del-ex">${esc(t('delete_exercise'))}</button>`):''}
+  </div>`;
+  view.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('input',ev=>{ const path=ev.target.dataset.f.split('.'); let o=e; for(let i=0;i<path.length-1;i++)o=o[path[i]]; o[path[path.length-1]]=ev.target.value; S.editDirty=true; }));
+}
+function saveExercise(){ const e=S.editEx; if(!e.nameEn.trim()&&!e.nameKo.trim()){toast(t('name_en'));return;} if(!e.nameEn.trim())e.nameEn=e.nameKo; if(!e.nameKo.trim())e.nameKo=e.nameEn;
+  e.steps=e.steps.map(s=>({titleEn:s.titleEn||s.titleKo,titleKo:s.titleKo||s.titleEn,cueEn:s.cueEn||s.cueKo,cueKo:s.cueKo||s.cueEn,mistakeEn:s.mistakeEn||s.mistakeKo||'',mistakeKo:s.mistakeKo||s.mistakeEn||''}));
+  if(e.id){const i=S.exercises.findIndex(x=>x.id===e.id);S.exercises[i]=e;}else{e.id='ex_'+uid();S.exercises.push(e);}
+  persist.exercises(); S.editDirty=false; S.sub='library'; toast(t('saved')); render(); }
+
+// ---------- sheets ----------
+function showSheet(html){ closeSheet(); $('#layer').innerHTML=`<div class="backdrop" data-act="close-sheet"></div><div class="sheet" id="sheet" role="dialog"><div class="grip"></div>${html}</div>`; }
+function closeSheet(){ $('#layer').innerHTML=''; }
+function confirmSheet(msg,okLabel,onOk,danger){ showSheet(`<p style="margin:4px 0 16px;font-weight:600">${esc(msg)}</p><div class="stack" style="gap:8px"><button class="btn ${danger?'sec danger':'pri'}" id="ok">${esc(okLabel)}</button><button class="btn ghost" data-act="close-sheet">${esc(t('cancel'))}</button></div>`); $('#ok').addEventListener('click',()=>{closeSheet();onOk();}); }
+
+// ---------- Perform flow ----------
+const P={active:false,queue:[],idx:0,stage:'prepare',timer:null};
+function startQueue(q){ if(!q.length)return; Object.assign(P,{active:true,queue:q,idx:0}); enterPrepare(); }
+function curItem(){ const q=P.queue[P.idx]; const it=planOf(q.date).find(x=>x.id===q.id); return {date:q.date,it,ex:it?exById(it.exId):null}; }
+function enterPrepare(){ stopTimers(); P.stage='prepare'; P.howtoIdx=0; renderPerform(); }
+function enterHowto(){ P.stage='howto'; renderPerform(); }
+function enterPerform(){ const {it,ex,date}=curItem(); stopTimers(); P.stage='perform'; P.startedAt=Date.now(); P.paused=false; P.memo='';
+  if(it.mode==='time'){ P.remaining=it.minutes*60; P.total=P.remaining; P.timer=setInterval(tick,1000); }
+  else { const last=lastEntry(it.exId,date); P.sets=[]; for(let i=0;i<it.sets;i++){ const ls=last&&last.mode==='sets'&&last.sets[i]&&last.sets[i].done?last.sets[i]:null; P.sets.push({reps:ls?ls.reps:it.reps,weight:ls?ls.weight:it.weight,done:false}); } P.restRemaining=0; }
+  renderPerform(); }
+function tick(){ if(P.paused)return; P.remaining--; const el=$('#big'); if(el){el.textContent=mmss(P.remaining);} const r=$('#ring'); if(r)r.style.setProperty('--p',(100-P.remaining/P.total*100)+'%'); if(P.remaining<=0){ stopTimers(); finishPerform(); } }
+function restTick(){ P.restRemaining--; const el=$('#restt'); if(el)el.textContent=mmss(P.restRemaining); if(P.restRemaining<=0){ clearInterval(P.restTimer);P.restTimer=null; const box=$('#restbox'); if(box)box.hidden=true; } }
+function stopTimers(){ if(P.timer){clearInterval(P.timer);P.timer=null;} if(P.restTimer){clearInterval(P.restTimer);P.restTimer=null;} }
+function finishPerform(){ const {it,date}=curItem(); stopTimers(); const dur=Math.round((Date.now()-P.startedAt)/1000);
+  P.result={id:uid(),planItemId:it.id,exId:it.exId,mode:it.mode,startedAt:P.startedAt,endedAt:Date.now(),duration:it.mode==='time'?Math.min(dur,it.minutes*60+600):dur,sets:it.mode==='sets'?P.sets.map(s=>Object.assign({},s)):[],memo:P.memo||'',condition:0};
+  P.prev=lastEntry(it.exId,date); P.stage='complete'; renderPerform(); }
+function commitResult(){ const {it,date}=curItem(); const r=P.result; S.logs[date]=S.logs[date]||{entries:[]}; S.logs[date].entries=S.logs[date].entries.filter(e=>e.planItemId!==it.id); S.logs[date].entries.push(r); it.status='done'; persist.plan(date); persist.log(date); }
+function skipItem(){ const {it,date}=curItem(); it.status='skipped'; persist.plan(date); nextItem(); }
+function nextItem(){ stopTimers(); P.idx++; if(P.idx>=P.queue.length){ P.active=false; $('#perf')?.remove(); render(); } else enterPrepare(); }
+function exitPerform(){ stopTimers(); P.active=false; $('#perf')?.remove(); render(); }
+function renderPerform(keep){
+  if(keep&&$('#perf'))return;
+  const c=curItem(); if(!c.it||!c.ex){exitPerform();return;} const {it,ex,date}=c; const ko=S.settings.lang==='ko';
+  const n=P.queue.length>1?`<span class="cap num">${P.idx+1} / ${P.queue.length}</span>`:'<span></span>';
+  let body='',foot='';
+  if(P.stage==='prepare'){ const last=lastEntry(ex.id,date);
+    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div style="font-size:64px;line-height:1">${ex.icon}</div><h1 style="margin-top:8px">${esc(exName(ex))}</h1><div class="cap" style="margin-top:4px"><span class="dot b-${ex.type}"></span> ${esc(typeName(ex.type))}</div></div>
+      <div class="tiles"><div class="tile"><div class="cap">${esc(t('target'))}</div><div class="v num" style="font-size:18px">${esc(targetText(it))}</div></div><div class="tile"><div class="cap">${esc(t('last'))}</div><div class="v num" style="font-size:18px">${esc(entrySummary(last))}</div></div></div>
+      <button class="btn sec" data-p="howto">${esc(t('view_howto'))}</button></div>`;
+    foot=`<button class="btn pri" data-p="start">${esc(t('start'))}</button><button class="btn ghost" data-p="skip">${esc(t('skip'))}</button>`; }
+  else if(P.stage==='howto'){ const steps=ex.steps||[];
+    body=`<h2 style="margin:4px 0 12px">${esc(exName(ex))}</h2><div class="howto" id="howto">${steps.map((s,i)=>`<div class="hc"><div class="fig">${ex.icon}</div><div class="k">${esc(t('step'))} ${i+1} · ${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="cue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div>${(ko?s.mistakeKo:s.mistakeEn)?`<div class="mis">✕ ${esc(ko?s.mistakeKo:s.mistakeEn)}</div>`:''}</div>`).join('')||`<div class="empty grow">—</div>`}</div><div class="dots" id="dots">${steps.map((s,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>`;
+    foot=`<button class="btn pri" data-p="start">${esc(t('begin'))}</button>`; }
+  else if(P.stage==='perform'){
+    if(it.mode==='time'){ body=`<div class="timer"><div class="cap" style="margin-bottom:16px">${esc(exName(ex))} · ${it.minutes} ${esc(t('min'))}</div><div class="ring" id="ring" style="--p:${(100-P.remaining/P.total*100)}%"><div><div class="big num" id="big">${mmss(P.remaining)}</div></div></div></div>
+        <div class="row" style="gap:8px"><button class="btn sec" data-p="pause" id="pausebtn">${esc(P.paused?t('resume'):t('pause'))}</button><button class="btn sec" data-p="plus30">${esc(t('plus30'))}</button></div>
+        <div class="field" style="margin-top:16px"><label>${esc(t('memo'))}</label><textarea id="memo" rows="2">${esc(P.memo)}</textarea></div>`;
+      foot=`<button class="btn pri" data-p="finish">${esc(t('done'))}</button>`; }
+    else { body=`<div class="cap" style="margin-bottom:8px">${esc(exName(ex))} · ${esc(targetText(it))}</div>
+        <div class="restbox" id="restbox" ${P.restRemaining>0?'':'hidden'}><span>${esc(t('rest'))} <b class="num" id="restt">${mmss(P.restRemaining)}</b></span><button class="btn sm sec" data-p="skiprest">${esc(t('skip_rest'))}</button></div>
+        <div class="setrow" style="border:0;padding-bottom:0"><span class="cap">${esc(t('set_n'))}</span><span class="cap" style="text-align:center">${esc(t('reps'))}</span><span class="cap" style="text-align:center">${esc(t('weight'))} (${esc(S.settings.unit)})</span><span></span></div>
+        ${P.sets.map((s,i)=>`<div class="setrow ${s.done?'done':''}"><span class="n num">${i+1}</span><input type="number" inputmode="decimal" data-set="${i}" data-k="reps" value="${s.reps}"><input type="number" inputmode="decimal" step="0.5" data-set="${i}" data-k="weight" value="${s.weight}"><button class="chk ${s.done?'on':''}" data-p="setdone" data-i="${i}" aria-label="done">${ICO.check}</button></div>`).join('')}
+        <div class="field" style="margin-top:16px"><label>${esc(t('memo'))}</label><textarea id="memo" rows="2">${esc(P.memo)}</textarea></div>`;
+      foot=`<button class="btn pri" data-p="finish">${esc(t('finish'))}</button>`; } }
+  else if(P.stage==='complete'){ const r=P.result; const prevS=entryScore(P.prev), curS=entryScore(r); let delta='';
+    if(prevS!=null&&curS!=null){ const d=curS-prevS; const cls=d>0?'up':d<0?'down':''; delta=`<span class="delta ${cls}">${d>0?'↑':d<0?'↓':'='} ${r.mode==='time'?mmss(Math.abs(d)):Math.abs(Math.round(d*10)/10)}</span> <span class="cap">${esc(t('vs_last'))} ${esc(entrySummary(P.prev))}</span>`; }
+    const doneSets=r.sets.filter(s=>s.done);
+    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div style="font-size:48px">✅</div><h1>${esc(exName(ex))}</h1><div class="cap">${esc(t('complete'))}</div></div>
+      <div class="tiles"><div class="tile"><div class="cap">${esc(t('duration'))}</div><div class="v num">${mmss(r.duration)}</div></div>
+      <div class="tile"><div class="cap">${esc(r.mode==='time'?t('target'):t('volume'))}</div><div class="v num" style="font-size:18px">${esc(r.mode==='time'?it.minutes+' '+t('min'):entrySummary(r))}</div></div></div>
+      ${delta?`<div style="text-align:center">${delta}</div>`:''}
+      ${r.mode==='sets'?`<div class="cap" style="text-align:center">${doneSets.length} / ${r.sets.length} ${esc(t('total_sets'))}</div>`:''}
+      <div class="field"><label>${esc(t('condition'))}</label><div class="cond" id="cond">${[1,2,3,4,5].map(v=>`<button data-c="${v}" class="${r.condition===v?'on':''}">${v}</button>`).join('')}</div></div></div>`;
+    foot=`<button class="btn pri" data-p="next">${esc(P.idx+1<P.queue.length?t('next_ex'):t('finish'))}</button>`; }
+  let el=$('#perf'); if(!el){el=document.createElement('div');el.className='full';el.id='perf';document.body.appendChild(el);el.addEventListener('click',onPerfClick);el.addEventListener('input',onPerfInput);el.addEventListener('scroll',onHowtoScroll,true);}
+  el.innerHTML=`<div class="bar-top"><button class="icon-btn" data-p="exit" aria-label="close">${ICO.close}</button>${n}<span style="width:40px"></span></div><div class="body">${body}</div><div class="foot">${foot}</div>`;
+}
+function onHowtoScroll(e){ if(e.target.id!=='howto')return; const h=e.target; const i=Math.round(h.scrollLeft/(h.clientWidth+12)); h.parentElement.querySelectorAll('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); }
+function onPerfInput(e){ const x=e.target; if(x.id==='memo'){P.memo=x.value;return;} if(x.dataset.set!=null){const s=P.sets[+x.dataset.set]; s[x.dataset.k]=Number(x.value)||0;} }
+function onPerfClick(e){ const b=e.target.closest('[data-p],[data-c]'); if(!b)return;
+  if(b.dataset.c){ P.result.condition=+b.dataset.c; $('#cond').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); return; }
+  const a=b.dataset.p; const {it}=curItem();
+  if(a==='exit')exitPerform(); else if(a==='howto')enterHowto(); else if(a==='start')enterPerform(); else if(a==='skip')skipItem();
+  else if(a==='pause'){P.paused=!P.paused;b.textContent=P.paused?t('resume'):t('pause');}
+  else if(a==='plus30'){P.remaining+=30;P.total+=30;$('#big').textContent=mmss(P.remaining);}
+  else if(a==='setdone'){ const i=+b.dataset.i; const s=P.sets[i]; s.done=!s.done; if(s.done&&it.rest>0&&i<P.sets.length-1){ P.restRemaining=it.rest; if(P.restTimer)clearInterval(P.restTimer); P.restTimer=setInterval(restTick,1000); } const memo=P.memo; renderPerform(); if(memo!==undefined)P.memo=memo; }
+  else if(a==='skiprest'){ P.restRemaining=0; if(P.restTimer){clearInterval(P.restTimer);P.restTimer=null;} $('#restbox').hidden=true; }
+  else if(a==='finish')finishPerform();
+  else if(a==='next'){ commitResult(); nextItem(); } }
+
+// ---------- global events ----------
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;S.tab=b.dataset.tab;S.sub=null;render();view.scrollTop=0;});
+$('#lang').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;S.settings.lang=b.dataset.l;persist.settings();render();});
+$('#layer').addEventListener('click',e=>{ const a=e.target.closest('[data-act]'); if(!a)return; if(a.dataset.act==='close-sheet'&&e.target===a)closeSheet(); if(a.dataset.act==='go-day'){S.tab='week';S.selDay=a.dataset.k;S.weekStart=keyOf(startOfWeek(parseKey(a.dataset.k)));closeSheet();render();} });
+view.addEventListener('click',e=>{
+  const st=e.target.closest('[data-st]'); if(st&&S.sub==='edit'){const k=st.dataset.st,d=Number(st.dataset.d);const ex=S.editEx;ex[k]=Math.max(k==='weight'||k==='rest'?0:1,Math.round((ex[k]+d)*10)/10);S.editDirty=true;$('#sv-'+k).textContent=ex[k]+(k==='minutes'?' '+t('min'):k==='weight'?' '+S.settings.unit:k==='rest'?' '+t('sec'):'');return;}
+  const ss=e.target.closest('[data-set]'); if(ss&&S.tab==='settings'&&!S.sub){const k=ss.dataset.set;S.settings[k]=Math.max(k==='restSec'?0:1,S.settings[k]+Number(ss.dataset.d));persist.settings();render();return;}
+  const so=e.target.closest('[data-sset]'); if(so){S.settings[so.dataset.sset]=so.dataset.v==='1';persist.settings();S.smartInfo=null;render();return;}
+  const sp=e.target.closest('[data-split]'); if(sp){S.settings.smartSplit=sp.dataset.split;persist.settings();S.smartInfo=null;render();return;}
+  const wsb=e.target.closest('[data-wstep]'); if(wsb){S.settings.weightStep=Number(wsb.dataset.wstep);persist.settings();S.smartInfo=null;render();return;}
+  const lg=e.target.closest('[data-lang]'); if(lg){S.settings.lang=lg.dataset.lang;persist.settings();render();return;}
+  const un=e.target.closest('[data-unit]'); if(un){S.settings.unit=un.dataset.unit;persist.settings();render();return;}
+  const ic=e.target.closest('[data-icon]'); if(ic&&S.sub==='edit'){S.editEx.icon=ic.dataset.icon;S.editDirty=true;view.querySelectorAll('[data-icon]').forEach(x=>x.classList.toggle('on',x===ic));return;}
+  const ty=e.target.closest('[data-type]'); if(ty&&S.sub==='edit'){S.editEx.type=ty.dataset.type;S.editDirty=true;view.querySelectorAll('[data-type]').forEach(x=>x.classList.toggle('on',x===ty));return;}
+  const ms=e.target.closest('[data-mode-set]'); if(ms){S.settings.mode=ms.dataset.modeSet;persist.settings();S.smartInfo=null;render();return;}
+  const md=e.target.closest('[data-mode]'); if(md&&S.sub==='edit'){S.editEx.mode=md.dataset.mode;S.editDirty=true;renderEdit();return;}
+  const mu=e.target.closest('[data-muscle]'); if(mu&&S.sub==='edit'){S.editEx.muscle=mu.dataset.muscle;S.editDirty=true;view.querySelectorAll('[data-muscle]').forEach(x=>x.classList.toggle('on',x===mu));return;}
+  const eq=e.target.closest('[data-equip]'); if(eq&&S.sub==='edit'){S.editEx.equip=eq.dataset.equip;S.editDirty=true;view.querySelectorAll('[data-equip]').forEach(x=>x.classList.toggle('on',x===eq));return;}
+  const fl=e.target.closest('[data-filter]'); if(fl){S.libFilter=fl.dataset.filter;renderLibrary();return;}
+  const mf=e.target.closest('[data-mfilter]'); if(mf){S.libMuscle=mf.dataset.mfilter;renderLibrary();return;}
+  const a=e.target.closest('[data-act]'); if(!a)return; const act=a.dataset.act;
+  switch(act){
+    case 'go-week': S.tab='week'; S.selDay=todayKey(); S.weekStart=keyOf(startOfWeek(new Date())); render(); break;
+    case 'start-today': { const d=todayKey(); startQueue(planOf(d).filter(i=>i.status==='planned').map(i=>({date:d,id:i.id}))); break; }
+    case 'open-item': { const d=todayKey(); const it=planOf(d).find(x=>x.id===a.dataset.id); if(it&&it.status==='done'){openItemEditor(d,it.id);} else startQueue([{date:d,id:a.dataset.id}]); break; }
+    case 'add-day': S.selDay=a.dataset.k; openPicker(a.dataset.k); break;
+    case 'smart-apply': applySmart(); break;
+    case 'smart-regen': confirmSheet(t('confirm_regen'),t('regenerate'),()=>applySmart(),true); break;
+    case 'week-prev': S.weekStart=keyOf(addDays(parseKey(S.weekStart),-7)); S.selDay=S.weekStart; S.smartInfo=null; render(); break;
+    case 'week-next': S.weekStart=keyOf(addDays(parseKey(S.weekStart),7)); S.selDay=S.weekStart; S.smartInfo=null; render(); break;
+    case 'copy-week': copyLastWeek(); break;
+    case 'open-routines': openRoutineList(); break;
+    case 'backups': openBackups(); break;
+    case 'changelog': openChangelog(); break;
+    case 'save-routine': saveWeekAsRoutine(); break;
+    case 'pick-ex': openPicker(S.selDay); break;
+    case 'edit-item': openItemEditor(a.dataset.k||S.selDay,a.dataset.id); break;
+    case 'month-prev': { const m=parseKey(S.month); S.month=keyOf(new Date(m.getFullYear(),m.getMonth()-1,1)); render(); break; }
+    case 'month-next': { const m=parseKey(S.month); S.month=keyOf(new Date(m.getFullYear(),m.getMonth()+1,1)); render(); break; }
+    case 'day-detail': openDayDetail(a.dataset.k); break;
+    case 'open-lib': S.sub='library'; render(); break;
+    case 'back': S.sub=null; render(); break;
+    case 'new-ex': S.editEx=blankExercise(); S.editDirty=false; S.sub='edit'; render(); break;
+    case 'edit-ex': S.editEx=JSON.parse(JSON.stringify(exById(a.dataset.id))); S.editDirty=false; S.sub='edit'; render(); break;
+    case 'back-edit': if(S.editDirty){confirmSheet(t('discard'),t('discard_btn'),()=>{S.sub='library';render();},true);} else {S.sub='library';render();} break;
+    case 'save-ex': saveExercise(); break;
+    case 'add-step': S.editEx.steps.push({titleEn:'',titleKo:'',cueEn:'',cueKo:'',mistakeEn:'',mistakeKo:''}); renderEdit(); break;
+    case 'rm-step': S.editEx.steps.pop(); renderEdit(); break;
+    case 'toggle-hide': S.editEx.hidden=!S.editEx.hidden; saveExercise(); break;
+    case 'del-ex': confirmSheet(t('confirm_delete_ex'),t('delete'),()=>{S.exercises=S.exercises.filter(x=>x.id!==S.editEx.id);persist.exercises();S.sub='library';render();},true); break;
+    case 'export': { const json=JSON.stringify({exercises:S.exercises,settings:S.settings,plans:S.plans,logs:S.logs},null,1); showSheet(`<h2 style="margin-bottom:10px">${esc(t('export'))}</h2><textarea id="exp" rows="8" readonly>${esc(json)}</textarea><button class="btn pri" style="margin-top:10px" id="cp">${esc(t('copy'))}</button>`);
+      $('#cp').addEventListener('click',()=>{navigator.clipboard.writeText(json).then(()=>toast(t('copied'))).catch(()=>{$('#exp').select();});}); break; }
+    case 'import': { showSheet(`<h2 style="margin-bottom:10px">${esc(t('import'))}</h2><textarea id="imp" rows="8" placeholder="{...}"></textarea><button class="btn pri" style="margin-top:10px" id="ib">${esc(t('import_btn'))}</button>`);
+      $('#ib').addEventListener('click',()=>{ try{ const o=JSON.parse($('#imp').value); if(!o||typeof o!=='object')throw 0; if(Array.isArray(o.exercises))S.exercises=o.exercises; if(o.settings)S.settings=Object.assign(S.settings,o.settings); if(o.plans)S.plans=o.plans; if(o.logs)S.logs=o.logs; persist.exercises();persist.settings();Object.keys(S.plans).forEach(k=>persist.plan(k));Object.keys(S.logs).forEach(k=>persist.log(k)); closeSheet(); toast(t('imported')); render(); }catch(err){ toast(t('import_fail')); } }); break; }
+    case 'reset': confirmSheet(t('confirm_reset'),t('delete'),()=>{ const pk=Object.keys(S.plans),lk=Object.keys(S.logs); S.plans={};S.logs={}; S.exercises=DEFAULT_EXERCISES(); pk.forEach(k=>persist.plan(k)); lk.forEach(k=>persist.log(k)); persist.exercises(); render(); },true); break;
+  }
+});
+
+// ---------- boot ----------
+loadLocal(); render(); connectDb(); checkWhatsNew();
+})();
+</script>
+
+</body>
+</html>
