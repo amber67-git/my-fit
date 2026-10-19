@@ -61,8 +61,9 @@ nav.tabs button.on{color:var(--accent)}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
 
 .card{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:12px;display:flex;align-items:center;gap:12px;width:100%;text-align:left}
-.card .ic,.ic{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;flex:none;background:var(--soft);color:var(--fg)}
-.ic.sm{width:44px;height:44px;border-radius:11px}
+.card .ic,.ic{width:64px;height:64px;border-radius:14px;display:grid;place-items:center;flex:none;background:var(--soft);color:var(--fg)}
+.ic.sm{width:52px;height:52px;border-radius:11px}
+.ic .pf{width:88%;height:88%}
 .bodymap .sk{fill:var(--line)}
 .bodymap path,.bodymap circle{fill:var(--line)}
 .bodymap .hl{fill:var(--hl)}
@@ -109,6 +110,7 @@ nav.tabs button.on{color:var(--accent)}
 .board .col.today .d{color:var(--accent)}
 .board .wd{font-size:11px;color:var(--muted)} .board .d{font-size:13px;font-weight:600}
 .board .mini{width:26px;height:26px;border-radius:7px;background:var(--soft);display:grid;place-items:center;font-size:14px;position:relative}
+.board .mini .pf{width:100%;height:100%}
 .board .mini.done::after{content:"";position:absolute;right:-2px;bottom:-2px;width:9px;height:9px;border-radius:50%;background:var(--good);border:2px solid var(--bg)}
 .board .mini i{position:absolute;left:3px;top:3px;width:5px;height:5px;border-radius:50%}
 
@@ -157,9 +159,13 @@ nav.tabs button.on{color:var(--accent)}
 .howto{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;scrollbar-width:none;margin:0 -16px;padding:0 16px}
 .howto::-webkit-scrollbar{display:none}
 .howto .hc{flex:0 0 100%;scroll-snap-align:center;border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px;min-height:340px}
-.howto .hc .fig{min-height:200px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;position:relative;flex-wrap:wrap}
-.howto .hc .fig .pf{width:min(150px,38vw);height:auto}
-.howto .hc .fig .bodymap{height:auto;width:min(120px,30vw)}
+.howto .hc .fig{min-height:240px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;position:relative;flex-wrap:wrap}
+.howto .hc .fig .pf{width:min(320px,82vw);height:auto;max-height:46vh}
+.howto .hc .fig .bodymap{position:absolute;right:10px;top:10px;height:auto;width:min(84px,22vw);opacity:.9}
+.howto.v{flex-direction:column;overflow:visible;scroll-snap-type:none;margin:0;padding:0}
+.howto.v .hc{flex:none;min-height:0}
+.card .ic[data-howto],.li .ic[data-howto]{cursor:pointer}
+.card .ic[data-howto]:active,.li .ic[data-howto]:active{transform:scale(.96)}
 .howto .hc .fig .phase{position:absolute;left:12px;top:12px}
 .howto .hc .k{font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .howto .hc .cue{font-size:17px;font-weight:600}
@@ -203,8 +209,8 @@ nav.tabs button.on{color:var(--accent)}
   header.top h1{font-size:22px}
   .card{padding:14px}
   .card .nm{font-size:18px} .card .sub{font-size:13px}
-  .card .ic,.ic{width:64px;height:64px;border-radius:16px}
-  .ic.sm{width:52px;height:52px}
+  .card .ic,.ic{width:72px;height:72px;border-radius:16px}
+  .ic.sm{width:58px;height:58px}
   .tile .v{font-size:28px} .tile .cap{font-size:13px}
   .btn{height:56px;font-size:17px;border-radius:14px}
   .btn.sm{height:40px;font-size:14px}
@@ -278,8 +284,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.10.0';
+const APP_VERSION='0.11.0';
 const CHANGELOG=[
+ {v:'0.11.0',date:'2026-10-19',en:['Figures auto-frame: nothing is cut off, every pose fills its box, and shared framing keeps steps aligned','Floor-contact poses redrawn with real joint geometry (push-up, plank, bridge, crunch, leg raise, kneeling and seated stretches, downward dog...)','Floor line only where the body or equipment touches it; far-side limbs in light grey','How-to popup: tap any exercise picture (or double-tap a card) on Dashboard, Weekly, day detail, library and editor','Much bigger pictures everywhere: how-to steps fill the card, thumbnails enlarged'],ko:['그림 자동 프레이밍: 잘림 없이 박스를 꽉 채우고, 단계 간 위치가 흔들리지 않음','바닥에 닿는 자세를 관절 기하로 다시 그림(푸시업, 플랭크, 브릿지, 크런치, 레그레이즈, 무릎·앉은 스트레칭, 다운독 등)','바닥선은 몸이나 기구가 닿는 곳에만, 반대쪽 팔다리는 연한 회색','운동 방법 팝업: 대시보드·주간·날짜 상세·라이브러리·편집에서 그림을 누르거나 카드를 두 번 누르면 열림','그림을 훨씬 크게: 운동 방법 카드를 꽉 채우고 썸네일도 확대']},
  {v:'0.10.0',date:'2026-10-19',en:['Outline-style figures: one black outline, dark-grey equipment with detail, only the working muscle in red, thinner arrows behind the body, hands that grip or press','Phone-first workout screen: big set cards, change reps/weight on the spot (later sets follow), add/remove sets, +15s rest, add or skip exercises mid-workout','Leave a workout safely: save-or-discard sheet, and resume after closing the app','Mark an exercise done without the timer; type numbers directly in the item editor','Smart mode keeps finished days when re-applied mid-week; progression only after a completed target','Smaller, faster sync: library stores only your changes; backups trim to fit; backup errors shown','Local plans and logs merge into your account on first sign-in; sign-out clears the device'],ko:['아웃라인 스타일 인체: 검정 외곽선 통일, 진한 회색 기구 디테일, 자극 부위만 빨강, 몸을 가리지 않는 얇은 화살표, 잡기/짚기 손','폰 우선 운동 화면: 큰 세트 카드, 횟수·무게 즉시 수정(뒤 세트 따라감), 세트 추가/삭제, 휴식 +15초, 운동 중 추가·건너뛰기','안전한 나가기: 저장/버리기 선택, 앱을 닫아도 이어서 하기','타이머 없이 완료 표시, 편집창에서 숫자 직접 입력','스마트 모드: 주중 재적용 시 완료한 날 유지, 목표 달성 후에만 증량','가볍고 빠른 동기화: 라이브러리는 변경분만 저장, 백업 자동 축소, 백업 오류 표시','첫 로그인 때 기기 데이터를 계정으로 합치고, 로그아웃 시 기기 데이터 정리']},
  {v:'0.9.0',date:'2026-10-19',en:['New pose figures drawn by the app itself: proportional line figures, equipment and motion arrows','Every how-to step shows its own frame (start, down, up) of the movement','No more third-party icon set'],ko:['앱이 직접 그리는 자세 그림: 비율 맞춘 선 인체, 도구, 동작 화살표','운동 방법 단계마다 그 동작의 프레임(준비·내리기·올리기)을 표시','외부 아이콘 세트 제거']},
  {v:'0.8.0',date:'2026-10-19',en:['Detailed pictograms from game-icons.net (CC BY 3.0), bigger everywhere','Body map that highlights the muscle group in red on the prepare screen and each how-to step','Phase badge on each step (set up, down, up, hold, switch)','Simpler edit screen: only the current language, bigger icon picker'],ko:['game-icons.net의 세밀한 그림(CC BY 3.0), 전체적으로 크게','준비 화면과 각 운동 단계에 자극 부위를 빨간색으로 표시하는 바디맵','단계마다 동작 구분 배지(준비·내리기·올리기·유지·교대)','편집 화면 단순화: 현재 언어만, 아이콘 선택 확대']},
@@ -353,9 +360,9 @@ function _figurePaths(pose,opts){
   const headIn=simple?'':`<circle cx="${_n(hc[0])}" cy="${_n(hc[1])}" r="${FIG.head-0.2}" class="fillp" stroke="none"/>`;
   const dots=()=>{ let x=''; if(hk.has('hip')) x+=(pose.v==='f'?L.hips:[pose.hip]).map(p=>`<circle cx="${_n(p[0])}" cy="${_n(p[1])}" r="${simple?3:4.5}" class="hlf"/>`).join(''); if(hk.has('shoulder')) x+=(pose.v==='f'?L.sh:[L.sh]).map(p=>`<circle cx="${_n(p[0])}" cy="${_n(p[1])}" r="${simple?3:4.5}" class="hlf"/>`).join(''); return x; };
   const hands=L.arms.map(a=>a.hd);
-  const handsOut=(far)=>simple?'':hands.slice(far?1:0,far?2:1).map(h=>`<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="3.6" fill="currentColor" stroke="none"/>`).join('');
+  const handsOut=(far)=>hands.slice(far?1:0,far?2:1).map(h=>`<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="${simple?2.6:3.6}" fill="currentColor" stroke="none"/>`).join('');
   const handsIn=(far)=>simple?'':hands.slice(far?1:0,far?2:1).map(h=>`<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="2" class="fillp" stroke="none"/>`).join('');
-  const render=(list,withHead)=>{ if(simple) return list.map(simpleSeg).join('')+(withHead?headOut+dots():''); const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(pass1).join('')+(hasArm?handsOut(far):'')+(withHead?headOut:'')+list.map(pass2).join('')+(hasArm?handsIn(far):'')+(withHead?headIn+dots():''); };
+  const render=(list,withHead)=>{ if(simple){ const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(simpleSeg).join('')+(hasArm?handsOut(far):'')+(withHead?headOut+dots():''); } const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(pass1).join('')+(hasArm?handsOut(far):'')+(withHead?headOut:'')+list.map(pass2).join('')+(hasArm?handsIn(far):'')+(withHead?headIn+dots():''); };
   const farSegs=segs.filter(x=>x.far), nearSegs=segs.filter(x=>!x.far);
   let out=''; if(farSegs.length) out+=`<g opacity=".5" style="color:#8a8d93" transform="translate(1.5 0)">${render(farSegs,false).replace(/class="hls"/g,'class=""')}</g>`;
   const legsOut=[]; const rest=[]; nearSegs.forEach(sg=>((sg.k==='thigh'||sg.k==='shin'||sg.k==='foot')&&pose.tilt?legsOut:rest).push(sg));
@@ -377,7 +384,8 @@ function _prop(sp,L){
     case 'kb': {const p=at(sp[1]); return `<circle class="p" cx="${_n(p[0])}" cy="${_n(p[1]+7.5)}" r="5" fill="var(--soft,#f5f6f8)"/><path class="p" d="M${_n(p[0]-3.5)} ${_n(p[1]+3)}a3.5 3.5 0 0 1 7 0"/>`;}
     case 'band': {const a=at(sp[1]),b=at(sp[2]); const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2; return `<path class="p band" d="M${_n(a[0])} ${_n(a[1])}Q${_n(mx+4)} ${_n(my)} ${_n(b[0])} ${_n(b[1])}"/>`;}
     case 'ball': {const p=at(sp[1]); const r=sp[2]||11; return `<circle class="p" cx="${_n(p[0])}" cy="${_n(p[1])}" r="${r}"/><path class="p" d="M${_n(p[0]-r*0.55)} ${_n(p[1]-r*0.45)}a${r*0.7} ${r*0.7} 0 0 1 ${r*0.5} ${-r*0.35}" opacity=".6"/>`;}
-    case 'bench': {const p=sp[1],w=sp[2]||34; return `<rect class="p" x="${p[0]-w/2}" y="${p[1]-1}" width="${w}" height="4" rx="1.5"/><path class="p" d="M${p[0]-w/2+5} ${p[1]+3}v9M${p[0]+w/2-5} ${p[1]+3}v9M${p[0]-w/2+1} ${p[1]+12}h8M${p[0]+w/2-9} ${p[1]+12}h8"/>`;}
+    case 'bench': {const p=sp[1],w=sp[2]||34; const fy=L.floorY!=null?Math.max(p[1]+12,L.floorY-1):p[1]+12; return `<rect class="p" x="${p[0]-w/2}" y="${p[1]-1}" width="${w}" height="4" rx="1.5"/><path class="p" d="M${p[0]-w/2+5} ${p[1]+3}V${_n(fy)}M${p[0]+w/2-5} ${p[1]+3}V${_n(fy)}M${p[0]-w/2+1} ${_n(fy)}h8M${p[0]+w/2-9} ${_n(fy)}h8"/>`;}
+    case 'benchv': {const p=sp[1],w=sp[2]||16,h=sp[3]||60; return `<rect class="p" x="${p[0]-w/2}" y="${p[1]}" width="${w}" height="${h}" rx="4" fill="var(--soft,#f5f6f8)"/>`;}
     case 'pullbar': return `<path class="p" d="M${sp[2]||20} ${sp[1]}H${sp[3]||80}M${(sp[2]||20)+4} ${sp[1]}V2M${(sp[3]||80)-4} ${sp[1]}V2"/>`;
     case 'box': {const p=sp[1]; return `<rect class="p" x="${p[0]}" y="${p[1]}" width="${sp[2]}" height="${sp[3]}" rx="1.5" fill="var(--soft,#f5f6f8)"/><path class="p" d="M${p[0]} ${p[1]+4}h${sp[2]}"/>`;}
     case 'wall': return `<path class="p" d="M${sp[1]} 6V94"/>`;
@@ -400,14 +408,78 @@ function _arrow(sp){
   if(sp[0]==='arc'){const [c,r,a0,a1]=[sp[1],sp[2],sp[3],sp[4]]; const p0=_pt(c,a0,r),p1=_pt(c,a1,r); const sweep=a1>a0?1:0; const large=Math.abs(a1-a0)>180?1:0; const tang=a1+(sweep?90:-90); const u=_dir(tang); const h=[p1[0]-u[0]*5,p1[1]-u[1]*5]; return `<path class="ar" stroke-width="${AW}" d="M${_n(p0[0])} ${_n(p0[1])}A${r} ${r} 0 ${large} ${sweep} ${_n(p1[0])} ${_n(p1[1])}"/><path class="ah" d="${_poly([p1,[h[0]-u[1]*2.4,h[1]+u[0]*2.4],[h[0]+u[1]*2.4,h[1]-u[0]*2.4]])}Z"/>`;}
   return '';
 }
-function figFrameSvg(frame,size,opts){ const s=size||100; const pose=frame.pose; opts=opts||{}; const {svg,L}=_figurePaths(pose,{simple:opts.simple||s<40,muscle:opts.muscle});
-  const propsAll=(frame.props||[]); const hasEquip=propsAll.some(p=>p[0]!=='floor'); frame=Object.assign({},frame,{props:hasEquip?propsAll:propsAll.filter(p=>p[0]!=='floor')});
-  const behind=(frame.props||[]).filter(p=>['bench','ball','box','wall','bike','stairs','rower','treadmill','step','machine','floor','door','pullbar'].includes(p[0])).map(p=>_prop(p,L)).join('');
-  const front=(frame.props||[]).filter(p=>!['bench','ball','box','wall','bike','stairs','rower','treadmill','step','machine','floor','door','pullbar'].includes(p[0])).map(p=>_prop(p,L)).join('');
+function _rotP(p,c,deg){ if(!deg)return p; const r=deg*Math.PI/180,co=Math.cos(r),si=Math.sin(r),dx=p[0]-c[0],dy=p[1]-c[1]; return [c[0]+dx*co-dy*si,c[1]+dx*si+dy*co]; }
+// body points [x,y,radius] in frame coordinates (after tilt/rot, before flip)
+function _bodyPts(pose,L){ const pts=[]; const hip=pose.hip; const tilt=pose.tilt||0, rot=pose.rot||0;
+  const push=(p,r,inTilt)=>{ let q=inTilt?_rotP(p,hip,tilt):p; q=_rotP(q,hip,rot); pts.push([q[0],q[1],r||4.5]); };
+  L.legs.forEach(l=>{push(l.h,5.5);push(l.kn,4.5);push(l.an,4.5);push(l.toe,3.5);});
+  L.arms.forEach(a=>{push(a.s,5.5,true);push(a.el,4.5,true);push(a.hd,4,true);});
+  const hc=[L.headC[0]+(pose.headTilt||0)*0.25,L.headC[1]+Math.abs(pose.headTilt||0)*0.05]; push(hc,FIG.head+2,true);
+  if(pose.v==='f'){L.hips.forEach(h=>push(h,6));L.sh.forEach(h=>push(h,6,true));}
+  return pts; }
+function _propBox(sp,L){
+  const h=(i)=>L.arms[i]?L.arms[i].hd:[50,50];
+  const at=(v)=>typeof v==='string'?(v==='h0'?h(0):v==='h1'?h(1):v==='mid'?[(h(0)[0]+h(1)[0])/2,(h(0)[1]+h(1)[1])/2]:v==='sh'?(L.sh.length===2&&typeof L.sh[0]==='number'?L.sh:L.shC):v==='a0'?L.legs[0].an:v==='a1'?L.legs[1].an:[50,50]):v;
+  const B=(x0,y0,x1,y1)=>[x0,y0,x1,y1]; let p;
+  switch(sp[0]){
+    case 'floor': return null;
+    case 'plate': p=at(sp[1]); return B(p[0]-8,p[1]-8,p[0]+8,p[1]+8);
+    case 'bar': {p=at(sp[1]); const w=sp[2]||30; return B(p[0]-w-2,p[1]-7,p[0]+w+2,p[1]+7);}
+    case 'db': p=at(sp[1]); return B(p[0]-6,p[1]-6,p[0]+6,p[1]+6);
+    case 'kb': p=at(sp[1]); return B(p[0]-6.5,p[1]-1,p[0]+6.5,p[1]+14);
+    case 'band': {const a=at(sp[1]),b=at(sp[2]); return B(Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0])+4,Math.max(a[1],b[1]));}
+    case 'ball': {p=at(sp[1]); const r=(sp[2]||11)+2; return B(p[0]-r,p[1]-r,p[0]+r,p[1]+r);}
+    case 'bench': {p=sp[1]; const w=sp[2]||34; return B(p[0]-w/2-2,p[1]-3,p[0]+w/2+2,Math.max(p[1]+14,(L.floorY||0)+1));}
+    case 'benchv': {p=sp[1]; return B(p[0]-(sp[2]||16)/2-1,p[1]-1,p[0]+(sp[2]||16)/2+1,p[1]+(sp[3]||60)+1);}
+    case 'pullbar': return B((sp[2]||20)-2,2,(sp[3]||80)+2,sp[1]+2);
+    case 'box': p=sp[1]; return B(p[0]-2,p[1]-2,p[0]+sp[2]+2,p[1]+sp[3]+2);
+    case 'wall': return B(sp[1]-2,6,sp[1]+2,94);
+    case 'bike': return B(13,48,87,93);
+    case 'rope': p=sp[1]; return B(p[0]-18,p[1]-2,p[0]+18,p[1]+(sp[2]||40)/2+2);
+    case 'stairs': p=sp[1]; return B(p[0]-2,p[1]-32,p[0]+50,p[1]+2);
+    case 'rower': p=sp[1]; return B(p[0]-32,p[1]-16,p[0]+32,p[1]+2);
+    case 'treadmill': return B(12,58,88,94);
+    case 'step': p=sp[1]; return B(p[0]-2,p[1]-2,p[0]+(sp[2]||24)+2,p[1]+8);
+    case 'machine': p=sp[1]; return B(p[0]-12,p[1]-44,p[0]+20,p[1]+2);
+    case 'line': {const a=at(sp[1]),b=at(sp[2]); return B(Math.min(a[0],b[0])-2,Math.min(a[1],b[1])-2,Math.max(a[0],b[0])+2,Math.max(a[1],b[1])+2);}
+    case 'door': return B(sp[1]-2,6,sp[1]+12,94);
+  }
+  return null; }
+function _arrowBox(sp){ if(sp[0]==='line'){const a=sp[1],b=sp[2]; return [Math.min(a[0],b[0])-3,Math.min(a[1],b[1])-3,Math.max(a[0],b[0])+3,Math.max(a[1],b[1])+3];} if(sp[0]==='arc'){const c=sp[1],r=sp[2]; const p0=_pt(c,sp[3],r),p1=_pt(c,sp[4],r); const xs=[p0[0],p1[0]],ys=[p0[1],p1[1]]; for(let a=Math.min(sp[3],sp[4]);a<=Math.max(sp[3],sp[4]);a+=15){const q=_pt(c,a,r);xs.push(q[0]);ys.push(q[1]);} return [Math.min(...xs)-3,Math.min(...ys)-3,Math.max(...xs)+3,Math.max(...ys)+3];} return null; }
+function _isLying(pose){ if(pose.v==='f')return false; const t=((((pose.torso==null?180:pose.torso)+(pose.tilt||0)+(pose.rot||0))%360)+360)%360; return Math.abs(t-180)>50; }
+// bounding box of one frame: [x0,y0,x1,y1] (before flip), plus whether a floor line is wanted
+const ON_FLOOR=['bench','box','step','machine','bike','stairs','rower','treadmill','wall','door','pullbar'];
+function floorInfo(frame,L){ const pose=frame.pose; const props=frame.props||[]; const fl=props.find(p=>p[0]==='floor'); if(!fl||frame.nofloor)return {floor:false,floorY:93};
+  const pts=_bodyPts(pose,L); const low=Math.max(...pts.map(p=>p[1]))+3; const hasEquip=props.some(p=>p[0]!=='floor'); const stands=props.some(p=>ON_FLOOR.includes(p[0]));
+  const handsLow=L.arms.some(a=>a.hd[1]>=low-10); const show=hasEquip||_isLying(pose)||handsLow||pose.v==='s'&&L.legs.some(l=>l.kn[1]>=low-8);
+  const floorY=stands?Math.max(fl[1],low):low; return {floor:show,floorY}; }
+function figFrameBox(frame,opts){ const pose=frame.pose; const L=_limbs(pose); let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  const add=(b)=>{ if(!b)return; x0=Math.min(x0,b[0]);y0=Math.min(y0,b[1]);x1=Math.max(x1,b[2]);y1=Math.max(y1,b[3]); };
+  const fi=floorInfo(frame,L); L.floorY=fi.floor?fi.floorY:null;
+  _bodyPts(pose,L).forEach(p=>add([p[0]-p[2],p[1]-p[2],p[0]+p[2],p[1]+p[2]]));
+  (frame.props||[]).forEach(p=>add(_propBox(p,L)));
+  if(!(opts&&opts.noArrows))(frame.arrows||[]).forEach(a=>add(_arrowBox(a)));
+  if(fi.floor)add([x0,fi.floorY-2,x1,fi.floorY+2]);
+  if(pose.flip){const nx0=100-x1,nx1=100-x0;x0=nx0;x1=nx1;}
+  return {x0,y0,x1,y1,floor:fi.floor,floorY:fi.floorY}; }
+function figFitBox(frames,opts){ let b=null; frames.forEach(f=>{ const c=figFrameBox(f,opts); if(!b)b=Object.assign({},c); else { b.x0=Math.min(b.x0,c.x0);b.y0=Math.min(b.y0,c.y0);b.x1=Math.max(b.x1,c.x1);b.y1=Math.max(b.y1,c.y1); } }); return b; }
+function figFrameSvg(frame,size,opts){ const s=size||100; const pose=frame.pose; opts=opts||{}; const simple=opts.simple||s<40; const {svg,L}=_figurePaths(pose,{simple,muscle:opts.muscle});
+  const own=figFrameBox(frame,opts); const fit=opts.fit||own; L.floorY=own.floor?own.floorY:null;
+  const propsAll=(frame.props||[]).filter(p=>p[0]!=='floor');
+  const BEHIND=['bench','benchv','ball','box','wall','bike','stairs','rower','treadmill','step','machine','floor','door','pullbar'];
+  const behind=propsAll.filter(p=>BEHIND.includes(p[0])).map(p=>_prop(p,L)).join('');
+  const front=propsAll.filter(p=>!BEHIND.includes(p[0])).map(p=>_prop(p,L)).join('');
   const arrows=(opts&&opts.noArrows)?'':(frame.arrows||[]).map(_arrow).join('');
-  const inner=`${behind}${arrows}<g class="fg">${svg}</g>${front}`;
+  // floor: only with equipment, lying or hands-on-floor poses; spans the figure width (+margin)
+  let floorSvg=''; if(own.floor){ const m=6; const fx0=pose.flip?100-fit.x1:fit.x0, fx1=pose.flip?100-fit.x0:fit.x1; floorSvg=`<path class="p" d="M${_n(fx0-m)} ${own.floorY}H${_n(fx1+m)}"/>`; }
+  const inner=`${floorSvg}${behind}${arrows}<g class="fg">${svg}</g>${front}`;
   const flip=pose.flip?`<g transform="translate(100 0) scale(-1 1)">${inner}</g>`:inner;
-  return `<svg class="pf" viewBox="0 0 100 100" width="${s}" height="${s}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="${FIG.sw}" stroke-linecap="round" stroke-linejoin="round">${flip}</g></svg>`; }
+  // auto-fit: scale and centre the (shared) box into the 100x100 view with padding
+  const pad=opts.pad==null?4:opts.pad; const w=Math.max(10,fit.x1-fit.x0+(own.floor?12:0)), h=Math.max(10,fit.y1-fit.y0);
+  let k=Math.min((100-pad*2)/w,(100-pad*2)/h); k=Math.max(0.7,Math.min(opts.maxScale||1.45,k));
+  const cx=(fit.x0+fit.x1)/2, cy=(fit.y0+fit.y1)/2; const tx=50-cx*k, ty=50-cy*k;
+  const fitted=`<g transform="translate(${_n(tx)} ${_n(ty)}) scale(${_n(k)})">${flip}</g>`;
+  return `<svg class="pf" viewBox="0 0 100 100" width="${s}" height="${s}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="${FIG.sw}" stroke-linecap="round" stroke-linejoin="round">${fitted}</g></svg>`; }
 const FIG_CSS='.pf .fill{stroke:var(--card,#fff)}.pf .fillp{fill:var(--card,#fff)}.pf .hls{stroke:var(--hl,#e5484d)}.pf .hlf{fill:var(--hl,#e5484d);stroke:none}.pf .p{stroke:var(--equip,#555);stroke-width:3}.pf .ar{stroke:var(--accent,#2f6bff);opacity:.9}.pf .ah{fill:var(--accent,#2f6bff);stroke:none}.pf .band{stroke-dasharray:3 2}';
 // ---------- Pose templates per exercise ----------
 const FL=93;
@@ -415,6 +487,17 @@ const s=(hip,torso,arms,legs,x)=>Object.assign({v:'s',hip,torso,arms,legs},x||{}
 const f=(hip,arms,legs,x)=>Object.assign({v:'f',hip,arms,legs},x||{});
 const fr=(pose,props,arrows)=>({pose,props:props||[],arrows:arrows||[]});
 const FLOOR=['floor',FL];
+const R_=Math.PI/180,D_=180/Math.PI;
+// 2-segment inverse kinematics: origin o, target t, lengths l1,l2, bend sign (+1 rotates the first segment clockwise = toward +x when pointing down)
+function ik2(o,t,l1,l2,bend){ const dx=t[0]-o[0],dy=t[1]-o[1]; let d=Math.hypot(dx,dy); const mx=l1+l2-0.3; if(d>mx)d=mx; if(d<1)d=1; const at=Math.atan2(dx,dy)*D_; const c=Math.max(-1,Math.min(1,(l1*l1+d*d-l2*l2)/(2*l1*d))); const al=Math.acos(c)*D_; const a1=at+(bend==null?1:bend)*al; const e=[o[0]+Math.sin(a1*R_)*l1,o[1]+Math.cos(a1*R_)*l1]; const a2=Math.atan2(t[0]-e[0],t[1]-e[1])*D_; return [Math.round(a1*10)/10,Math.round(a2*10)/10]; }
+const shS=(hip,t)=>[hip[0]+Math.sin(t*R_)*24,hip[1]+Math.cos(t*R_)*24];
+const armTo=(sh,hand,bend)=>ik2(sh,hand,14,13,bend==null?-1:bend);
+const legTo=(hip,ankle,bend,foot)=>ik2(hip,ankle,20,19,bend==null?1:bend).concat([foot==null?90:foot]);
+// side pose by joint targets: sp(hip,torso,{h:hand|[h0,h1], hb:bend|[b0,b1], a:ankle|[a0,a1], ab:bend|[b0,b1], foot:f|[f0,f1], arms:[raw], legs:[raw], head, flip, tilt, rot})
+function sp(hip,torso,c){ c=c||{}; const sh=shS(hip,torso); const two=(v)=>v==null?[null,null]:(Array.isArray(v)&&Array.isArray(v[0]))?v:[v,v]; const tw=(v)=>Array.isArray(v)?v:[v,v];
+  const H=two(c.h),A=two(c.a),hb=tw(c.hb),ab=tw(c.ab),ft=tw(c.foot);
+  const arms=c.arms||H.map((p,i)=>p?armTo(sh,p,hb[i]):(c.legs&&c.legs[i])?[0,0]:[5,5]); const legs=c.legs||A.map((p,i)=>p?legTo(hip,p,ab[i],ft[i]):[0,0,90]);
+  const x={}; ['head','headTilt','flip','tilt','rot'].forEach(k=>{if(c[k]!=null)x[k]=c[k];}); return s(hip,torso,arms,legs,x); }
 // hand props by equipment
 function handProp(eq,view,ang){ if(eq==='barbell')return view==='f'?[['bar','mid',30]]:[['plate','h0']]; if(eq==='dumbbell')return view==='f'?[['db','h0',ang==null?90:ang],['db','h1',ang==null?90:ang]]:[['db','h0',ang==null?0:ang]]; if(eq==='kettlebell')return [['kb','h0']]; if(eq==='band')return view==='f'?[['band','a0','h0'],['band','a1','h1']]:[['band','a0','h0']]; if(eq==='cable'||eq==='machine')return [['line',[50,4],'h0']]; return []; }
 const STAND_S=s([48,52],180,[[0,0],[0,0]],[[0,0,90],[0,0,90]]);
@@ -422,31 +505,28 @@ const STAND_F=f([50,52],[[10,10],[10,10]],[[5,0,90],[5,0,90]]);
 // --- template library: key -> (eq)=>{frames,hero}
 const FT={
  stand:()=>({frames:[fr(STAND_S,[FLOOR])],hero:0}),
- pushup:(eq,o)=>{o=o||{}; const hi=o.pike; // side, facing right, hands at right
-   const up=s([34,70],80,[[25,-5],[25,-5]],[[-100,-100,-100],[-100,-100,-100]]); const dn=s([34,78],82,[[70,-50],[70,-50]],[[-100,-100,-100],[-100,-100,-100]]);
-   if(o.incline){const u=s([30,70],120,[[40,0],[40,0]],[[-120,-110,-100],[-120,-110,-100]]); const d=s([34,76],120,[[85,-30],[85,-30]],[[-120,-110,-100],[-120,-110,-100]]); return {frames:[fr(u,[FLOOR,['ball',[78,82],11]]),fr(d,[FLOOR,['ball',[78,82],11]],[['line',[60,40],[60,52]]]),fr(u,[FLOOR,['ball',[78,82],11]],[['line',[60,52],[60,40]]])],hero:1};}
-   if(o.decline){const u=s([34,62],92,[[20,0],[20,0]],[[-95,-100,-100],[-95,-100,-100]]); const d=s([34,68],92,[[60,-20],[60,-20]],[[-95,-100,-100],[-95,-100,-100]]); return {frames:[fr(u,[FLOOR,['ball',[16,82],11]]),fr(d,[FLOOR,['ball',[16,82],11]],[['line',[66,34],[66,48]]]),fr(u,[FLOOR,['ball',[16,82],11]],[['line',[66,48],[66,34]]])],hero:1};}
-   if(hi){const u=s([48,44],130,[[55,55],[55,55]],[[-40,-20,-100],[-40,-20,-100]]); const d=s([48,46],135,[[80,10],[80,10]],[[-40,-20,-100],[-40,-20,-100]]); return {frames:[fr(u,[FLOOR]),fr(d,[FLOOR],[['line',[70,40],[70,56]]]),fr(u,[FLOOR],[['line',[70,56],[70,40]]])],hero:1};}
-   return {frames:[fr(up,[FLOOR]),fr(dn,[FLOOR],[['line',[70,50],[70,64]]]),fr(up,[FLOOR],[['line',[70,64],[70,50]]])],hero:1};},
- plank:(eq,o)=>{o=o||{}; const p=o.high?s([36,70],95,[[10,-10],[10,-10]],[[-95,-95,-100],[-95,-95,-100]]):s([36,74],95,[[30,-80],[30,-80]],[[-95,-95,-100],[-95,-95,-100]]); const props=[FLOOR]; if(o.ball)props.push(['ball',[70,82],11]); return {frames:[fr(p,props),fr(p,props,[['line',[30,60],[70,52]]])],hero:1};},
+ pushup:(eq,o)=>{o=o||{};
+   const F=[6,82]; const up=sp([40,66],100,{h:[66,89],a:F,foot:0}); const dn=sp([40,78],100,{h:[66,89],hb:-1,a:[6,84],foot:0});
+   if(o.incline){const B=['ball',[80,82],11]; const u=sp([36,62],115,{h:[78,70],a:[4,80],foot:0}); const d=sp([38,70],115,{h:[78,70],hb:-1,a:[4,82],foot:0}); return {frames:[fr(u,[FLOOR,B]),fr(d,[FLOOR,B],[['line',[60,40],[60,52]]]),fr(u,[FLOOR,B],[['line',[60,52],[60,40]]])],hero:1};}
+   if(o.decline){const B=['ball',[14,82],11]; const u=sp([40,62],95,{h:[66,89],a:[14,70],foot:-60}); const d=sp([40,70],95,{h:[66,89],hb:-1,a:[14,70],foot:-60}); return {frames:[fr(u,[FLOOR,B]),fr(d,[FLOOR,B],[['line',[66,34],[66,48]]]),fr(u,[FLOOR,B],[['line',[66,48],[66,34]]])],hero:1};}
+   if(o.pike){const u=sp([42,54],120,{h:[64,89.5],hb:-1,a:[16,83],foot:0}); const d=sp([42,58],120,{h:[64,89.5],hb:-1,a:[16,83],foot:0}); return {frames:[fr(u,[FLOOR]),fr(d,[FLOOR],[['line',[72,40],[72,56]]]),fr(u,[FLOOR],[['line',[72,56],[72,40]]])],hero:1};}
+   return {frames:[fr(up,[FLOOR]),fr(dn,[FLOOR],[['line',[74,50],[74,64]]]),fr(up,[FLOOR],[['line',[74,64],[74,50]]])],hero:1};},
+ plank:(eq,o)=>{o=o||{}; const p=o.high?sp([40,66],95,{h:[66,89],a:[6,82],foot:0}):sp([40,72],95,{h:[77,88],hb:-1,a:[4,84],foot:0}); const props=[FLOOR]; if(o.ball)props.push(['ball',[72,82],11]); return {frames:[fr(p,props),fr(p,props,[['line',[30,56],[70,48]]])],hero:1};},
  sideplank:(eq,o)=>{const p=f([46,70],[[170,170],[-95,10]],[[8,0,90],[8,0,90]],{rot:-80}); const props=[FLOOR]; if(o&&o.ball)props.push(['ball',[20,82],11]); return {frames:[fr(p,props),fr(p,props,[['line',[46,80],[46,62]]])],hero:1};},
- mountain:(eq,o)=>{const a=s([36,70],95,[[10,-10],[10,-10]],[[-95,-95,-100],[30,-70,-100]]); const b=s([36,70],95,[[10,-10],[10,-10]],[[30,-70,-100],[-95,-95,-100]]); const props=[FLOOR]; if(o&&o.ball)props.push(['ball',[76,82],11]); return {frames:[fr(a,props),fr(b,props,[['arc',[38,74],14,-100,30]]),fr(a,props,[['arc',[38,74],14,-100,30]])],hero:1};},
- inchworm:()=>{const a=s([48,60],110,[[75,75],[75,75]],[[-30,-10,-100],[-30,-10,-100]]); const b=s([38,74],95,[[20,0],[20,0]],[[-95,-95,-100],[-95,-95,-100]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[52,84],[72,84]]]),fr(a,[FLOOR],[['line',[40,84],[22,84]]])],hero:1};},
- rollout:(eq,o)=>{const a=s([36,74],150,[[80,80],[80,80]],[[-150,-100,-100],[-150,-100,-100]]); const b=s([40,70],100,[[95,95],[95,95]],[[-150,-100,-100],[-150,-100,-100]]); const pr=o&&o.ball?['ball',[76,80],11]:['plate',[72,88]]; return {frames:[fr(a,[FLOOR,pr]),fr(b,[FLOOR,o&&o.ball?['ball',[82,80],11]:['plate',[86,88]]],[['line',[60,86],[80,86]]]),fr(a,[FLOOR,pr],[['line',[80,86],[60,86]]])],hero:1};},
- pike:(eq,o)=>{const a=s([38,70],95,[[20,0],[20,0]],[[-95,-95,-100],[-95,-95,-100]]); const b=s([44,46],130,[[55,55],[55,55]],[[-40,-20,-100],[-40,-20,-100]]); return {frames:[fr(a,[FLOOR,['ball',[16,82],11]]),fr(b,[FLOOR,['ball',[30,82],11]],[['arc',[60,70],22,-60,-150]])],hero:1};},
- jackknife:()=>{const a=s([38,70],95,[[20,0],[20,0]],[[-95,-95,-100],[-95,-95,-100]]); const b=s([44,64],100,[[30,0],[30,0]],[[-20,-100,-100],[-20,-100,-100]]); return {frames:[fr(a,[FLOOR,['ball',[16,82],11]]),fr(b,[FLOOR,['ball',[34,82],11]],[['line',[18,80],[36,80]]])],hero:1};},
- // lying presses: on bench (eq barbell/dumbbell) or floor (kettlebell) or ball
- press_lying:(eq,o)=>{o=o||{}; const y=o.floor?82:72; const hip=[40,y]; const legs=o.floor?[[-40,10,90],[-40,10,90]]:[[-70,0,90],[-70,0,90]];
-   const dn=s(hip,90,[[0,180],[0,180]],legs); const up=s(hip,90,[[180,180],[180,180]],legs);
-   const props=[FLOOR]; if(o.ball)props.push(['ball',[50,86],11]); else if(!o.floor)props.push(['bench',[50,y+1],40]);
+ mountain:(eq,o)=>{const a=sp([40,66],95,{h:[66,89],a:[[6,82],[44,80]],foot:[0,90]}); const b=sp([40,66],95,{h:[66,89],a:[[44,80],[6,82]],foot:[90,0]}); const props=[FLOOR]; if(o&&o.ball)props.push(['ball',[76,82],11]); return {frames:[fr(a,props),fr(b,props,[['arc',[40,66],16,-100,30]]),fr(a,props,[['arc',[40,66],16,-100,30]])],hero:1};},
+ inchworm:()=>{const a=sp([46,54],60,{h:[70,89.5],a:[46,90]}); const b=sp([40,66],95,{h:[66,89],a:[6,82],foot:0}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[52,84],[72,84]]]),fr(a,[FLOOR],[['line',[40,84],[22,84]]])],hero:1};},
+ rollout:(eq,o)=>{const ball=o&&o.ball; const a=sp([36,72],120,{h:[66,86],a:[17,91],ab:1,foot:-100}); const b=sp([44,66],105,{h:[88,86],a:[19,91],ab:1,foot:-100}); const pr=(x)=>ball?['ball',[x+2,78],11]:['plate',[x,86]]; return {frames:[fr(a,[FLOOR,pr(66)]),fr(b,[FLOOR,pr(88)],[['line',[60,74],[80,74]]]),fr(a,[FLOOR,pr(66)],[['line',[80,74],[60,74]]])],hero:1};},
+ pike:(eq,o)=>{const a=sp([40,66],95,{h:[66,89],a:[14,70],foot:-60}); const b=sp([44,46],125,{h:[66,89],a:[30,70],ab:1,foot:-60}); return {frames:[fr(a,[FLOOR,['ball',[14,82],11]]),fr(b,[FLOOR,['ball',[30,82],11]],[['arc',[60,70],22,-60,-150]])],hero:1};},
+ jackknife:()=>{const a=sp([40,66],95,{h:[66,89],a:[14,70],foot:-60}); const b=sp([44,62],100,{h:[66,89],a:[34,70],ab:-1,foot:-60}); return {frames:[fr(a,[FLOOR,['ball',[14,82],11]]),fr(b,[FLOOR,['ball',[34,82],11]],[['line',[18,80],[36,80]]])],hero:1};},
+ press_lying:(eq,o)=>{o=o||{}; const y=o.floor?84:70; const hip=[40,y]; const A={a:[22,90],ab:-1,foot:-90};
+   const dn=sp(hip,90,Object.assign({h:[64,y-12],hb:1},A)); const up=sp(hip,90,Object.assign({h:[64,y-26.7]},A));
+   const props=[FLOOR]; if(o.ball)props.push(['ball',[52,86],11]); else if(!o.floor)props.push(['bench',[52,75],44]);
    const hp=(eq==='barbell')?[['plate','h0']]:eq==='dumbbell'?[['db','h0',90]]:eq==='kettlebell'?[['kb','h0']]:[];
-   return {frames:[fr(dn,props.concat(hp)),fr(up,props.concat(hp),[['line',[64,66],[64,46]]]),fr(dn,props.concat(hp),[['line',[64,46],[64,66]]])],hero:1};},
- fly_lying:(eq,o)=>{const y=o&&o.ball?72:72; const hip=[40,y]; const legs=[[-70,0,90],[-70,0,90]]; const open=f([50,80],[[90,80],[90,80]],[[0,0,90],[0,0,90]]); // front view simplified: lying shown as front
-   const closed=f([50,80],[[150,170],[150,170]],[[0,0,90],[0,0,90]]); const hp=eq==='dumbbell'?[['db','h0',0],['db','h1',0]]:[];
-   const props=[FLOOR];
-   return {frames:[fr(open,props.concat(hp)),fr(closed,props.concat(hp),[['arc',[42,56],18,-80,-150],['arc',[58,56],18,80,150]]),fr(open,props.concat(hp),[['arc',[42,56],18,-150,-80],['arc',[58,56],18,150,80]])],hero:1};},
- pullover:(eq,o)=>{const hip=[40,72]; const legs=[[-70,0,90],[-70,0,90]]; const a=s(hip,90,[[180,180],[180,180]],legs); const b=s(hip,90,[[120,110],[120,110]],legs); const props=o&&o.ball?[FLOOR,['ball',[50,86],11]]:[FLOOR,['bench',[50,73],40]]; const hp=eq==='barbell'?[['plate','h0']]:[['db','h0',90]]; return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['arc',[64,70],24,180,110]]),fr(a,props.concat(hp),[['arc',[64,70],24,110,180]])],hero:1};},
- // overhead press (front)
+   return {frames:[fr(dn,props.concat(hp)),fr(up,props.concat(hp),[['line',[74,y-6],[74,y-24]]]),fr(dn,props.concat(hp),[['line',[74,y-24],[74,y-6]]])],hero:1};},
+ fly_lying:(eq,o)=>{const open=f([50,78],[[95,85],[95,85]],[[0,0,90],[0,0,90]]); const closed=f([50,78],[[150,170],[150,170]],[[0,0,90],[0,0,90]]); const hp=eq==='dumbbell'?[['db','h0',0],['db','h1',0]]:[];
+   const props=[['benchv',[50,24],16,74]];
+   return {frames:[fr(open,props.concat(hp)),fr(closed,props.concat(hp),[['arc',[42,54],18,-80,-150],['arc',[58,54],18,80,150]]),fr(open,props.concat(hp),[['arc',[42,54],18,-150,-80],['arc',[58,54],18,150,80]])],hero:1};},
+ pullover:(eq,o)=>{const hip=[40,70]; const A={a:[22,90],ab:-1,foot:-90}; const a=sp(hip,90,Object.assign({h:[64,43.3]},A)); const b=sp(hip,90,Object.assign({h:[40,48]},A)); const props=o&&o.ball?[FLOOR,['ball',[52,86],11]]:[FLOOR,['bench',[52,75],44]]; const hp=eq==='barbell'?[['plate','h0']]:[['db','h0',90]]; return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['arc',[64,70],24,180,110]]),fr(a,props.concat(hp),[['arc',[64,70],24,110,180]])],hero:1};},
  press_overhead:(eq,o)=>{const dn=f([50,52],[[100,170],[100,170]],[[5,0,90],[5,0,90]]); const up=f([50,52],[[170,175],[170,175]],[[5,0,90],[5,0,90]]); const hp=handProp(eq,'f',90); const props=[FLOOR]; if(o&&o.seated){props.push(['ball',[50,76],11]);}
    if(o&&o.push){const dip=f([50,58],[[100,170],[100,170]],[[12,-12,90],[12,-12,90]]); return {frames:[fr(dn,props.concat(hp)),fr(dip,props.concat(hp),[['line',[50,22],[50,34]]]),fr(up,props.concat(hp),[['line',[50,34],[50,10]]])],hero:2};}
    return {frames:[fr(dn,props.concat(hp)),fr(up,props.concat(hp),[['line',[72,32],[72,12]]]),fr(dn,props.concat(hp),[['line',[72,12],[72,32]]])],hero:1};},
@@ -463,8 +543,8 @@ const FT={
  pushdown:(eq)=>{const a=s([48,52],180,[[5,90],[5,90]],[[0,0,90],[0,0,90]]); const b=s([48,52],180,[[5,20],[5,20]],[[0,0,90],[0,0,90]]); const hp=eq==='band'?[['line',[58,4],'h0']]:[['line',[58,4],'h0']]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[48,42],16,100,30]]),fr(a,[FLOOR].concat(hp),[['arc',[48,42],16,30,100]])],hero:1};},
  tri_overhead:(eq)=>{const a=s([48,52],180,[[170,-20],[170,-20]],[[0,0,90],[0,0,90]]); const b=s([48,52],180,[[170,175],[170,175]],[[0,0,90],[0,0,90]]); const hp=eq==='kettlebell'?[['kb','h0']]:eq==='band'?[['band','a0','h0']]:[['db','h0',90]]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[50,14],12,-60,20]]),fr(a,[FLOOR].concat(hp),[['arc',[50,14],12,20,-60]])],hero:1};},
  kickback:(eq)=>{const a=s([44,58],125,[[-30,80],[-30,80]],[[-10,0,90],[-10,0,90]]); const b=s([44,58],125,[[-30,-30],[-30,-30]],[[-10,0,90],[-10,0,90]]); const hp=eq==='barbell'?[['plate','h0']]:[['db','h0',0]]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[46,50],14,80,-20]]),fr(a,[FLOOR].concat(hp),[['arc',[46,50],14,-20,80]])],hero:1};},
- skull:()=>{const hip=[40,72]; const legs=[[-70,0,90],[-70,0,90]]; const a=s(hip,90,[[180,180],[180,180]],legs); const b=s(hip,90,[[180,100],[180,100]],legs); const props=[FLOOR,['bench',[50,73],40],['plate','h0']]; return {frames:[fr(a,props),fr(b,props,[['arc',[64,46],12,180,100]]),fr(a,props,[['arc',[64,46],12,100,180]])],hero:1};},
- dip:(eq,o)=>{o=o||{}; if(o.bench){const a=s([36,64],180,[[-30,0],[-30,0]],[[60,20,90],[60,20,90]]); const b=s([36,72],180,[[-80,0],[-80,0]],[[60,20,90],[60,20,90]]); const props=[FLOOR,['bench',[18,66],28]]; return {frames:[fr(a,props),fr(b,props,[['line',[46,50],[46,62]]]),fr(a,props,[['line',[46,62],[46,50]]])],hero:1};}
+ skull:()=>{const hip=[40,70]; const A={a:[22,90],ab:-1,foot:-90}; const a=sp(hip,90,Object.assign({h:[64,43.3]},A)); const b=sp(hip,90,Object.assign({h:[72,54],hb:1},A)); const props=[FLOOR,['bench',[52,75],44],['plate','h0']]; return {frames:[fr(a,props),fr(b,props,[['arc',[64,46],12,180,100]]),fr(a,props,[['arc',[64,46],12,100,180]])],hero:1};},
+ dip:(eq,o)=>{o=o||{}; if(o.bench){const a=sp([40,66],180,{h:[30,64],a:[72,90]}); const b=sp([40,76],180,{h:[30,64],a:[72,90]}); const props=[FLOOR,['bench',[18,66],28]]; return {frames:[fr(a,props),fr(b,props,[['line',[52,50],[52,62]]]),fr(a,props,[['line',[52,62],[52,50]]])],hero:1};}
    const a=f([50,50],[[10,0],[10,0]],[[5,-60,90],[5,-60,90]]); const b=f([50,56],[[60,-100],[60,-100]],[[5,-60,90],[5,-60,90]]); const props=o.ball?[['ball',[50,30],9]]:[['pullbar',48,22,78]]; return {frames:[fr(a,props),fr(b,props,[['line',[76,30],[76,42]]]),fr(a,props,[['line',[76,42],[76,30]]])],hero:1};},
  pullup:(eq,o)=>{const a=f([50,54],[[172,178],[172,178]],[[5,-60,90],[5,-60,90]]); const b=f([50,36],[[110,-170],[110,-170]],[[5,-60,90],[5,-60,90]]); const props=[['pullbar',10,22,78]]; if(o&&o.knee){const c=f([50,54],[[172,178],[172,178]],[[80,-80,90],[80,-80,90]]); return {frames:[fr(a,props),fr(c,props,[['arc',[50,54],22,20,80]]),fr(a,props,[['arc',[50,54],22,80,20]])],hero:1};} return {frames:[fr(a,props),fr(b,props,[['line',[72,50],[72,32]]]),fr(a,props,[['line',[72,32],[72,50]]])],hero:1};},
  pulldown:(eq)=>{const a=f([50,60],[[165,175],[165,175]],[[10,-90,90],[10,-90,90]]); const b=f([50,60],[[100,-170],[100,-170]],[[10,-90,90],[10,-90,90]]); const props=eq==='band'?[['line',[50,2],'h0'],['line',[50,2],'h1'],['bench',[50,64],20]]:[['line',[50,2],'h0'],['line',[50,2],'h1'],['bench',[50,64],20]]; return {frames:[fr(a,props),fr(b,props,[['line',[76,20],[76,34]]]),fr(a,props,[['line',[76,34],[76,20]]])],hero:1};},
@@ -474,10 +554,10 @@ const FT={
  inverted_row:()=>{const a=s([40,68],95,[[150,160],[150,160]],[[-85,-85,-100],[-85,-85,-100]]); const b=s([40,56],95,[[100,-140],[100,-140]],[[-85,-85,-100],[-85,-85,-100]]); const props=[FLOOR,['pullbar',30,40,88]]; return {frames:[fr(a,props),fr(b,props,[['line',[30,62],[30,48]]]),fr(a,props,[['line',[30,48],[30,62]]])],hero:1};},
  facepull:(eq)=>{const a=s([48,52],180,[[90,90],[90,90]],[[0,0,90],[0,0,90]]); const b=s([48,52],180,[[70,-140],[70,-140]],[[0,0,90],[0,0,90]]); const hp=eq==='band'?[['line',[96,28],'h0']]:[['line',[96,28],'h0']]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['line',[74,30],[60,30]]]),fr(a,[FLOOR].concat(hp),[['line',[60,30],[74,30]]])],hero:1};},
  // hinges
- deadlift:(eq,o)=>{o=o||{}; const dn=s([40,70],120,[[55,50],[55,50]],[[40,-15,90],[40,-15,90]]); const up=s([48,52],180,[[5,5],[5,5]],[[0,0,90],[0,0,90]]); const hp=eq==='barbell'?[['plate','h0']]:eq==='kettlebell'?[['kb','h0']]:eq==='band'?[['band','a0','h0']]:[['db','h0',0]];
-   if(o.single){const a=s([48,52],180,[[5,5],[5,5]],[[0,0,90],[0,0,90]]); const b=s([44,56],100,[[70,70],[70,70]],[[0,0,90],[-100,-100,-100]]); return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[44,56],26,-20,-100]]),fr(a,[FLOOR].concat(hp),[['arc',[44,56],26,-100,-20]])],hero:1};}
-   if(o.rdl){const b=s([42,56],105,[[70,70],[70,70]],[[-5,5,90],[-5,5,90]]); return {frames:[fr(up,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[42,56],28,170,100]]),fr(up,[FLOOR].concat(hp),[['arc',[42,56],28,100,170]])],hero:1};}
-   return {frames:[fr(dn,[FLOOR].concat(hp)),fr(up,[FLOOR].concat(hp),[['line',[62,62],[62,46]]]),fr(dn,[FLOOR].concat(hp),[['line',[62,46],[62,62]]])],hero:1};},
+ deadlift:(eq,o)=>{o=o||{}; const dn=sp([40,66],110,{h:[62,86],a:[44,90]}); const up=sp([48,52],180,{h:[52,78],a:[48,91]}); const hp=eq==='barbell'?[['plate','h0']]:eq==='kettlebell'?[['kb','h0']]:eq==='band'?[['band','a0','h0']]:[['db','h0',0]];
+   if(o.single){const b=sp([44,60],95,{h:[66,84],a:[[46,91],[8,56]],foot:[90,-30]}); return {frames:[fr(up,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[44,60],26,-20,-100]]),fr(up,[FLOOR].concat(hp),[['arc',[44,60],26,-100,-20]])],hero:1};}
+   if(o.rdl){const b=sp([42,58],100,{h:[62,80],a:[44,91]}); return {frames:[fr(up,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[42,58],28,170,100]]),fr(up,[FLOOR].concat(hp),[['arc',[42,58],28,100,170]])],hero:1};}
+   return {frames:[fr(dn,[FLOOR].concat(hp)),fr(up,[FLOOR].concat(hp),[['line',[70,62],[70,46]]]),fr(dn,[FLOOR].concat(hp),[['line',[70,46],[70,62]]])],hero:1};},
  sumo_deadlift:()=>{const dn=f([50,66],[[12,8],[12,8]],[[50,-40,90],[50,-40,90]]); const up=f([50,52],[[8,8],[8,8]],[[20,-15,90],[20,-15,90]]); const hp=[['bar','mid',30]]; return {frames:[fr(dn,[FLOOR].concat(hp)),fr(up,[FLOOR].concat(hp),[['line',[50,82],[50,66]]]),fr(dn,[FLOOR].concat(hp),[['line',[50,66],[50,82]]])],hero:1};},
  good_morning:()=>{const a=s([48,52],180,[[-120,70],[-120,70]],[[0,0,90],[0,0,90]]); const b=s([42,56],100,[[-150,-170],[-150,-170]],[[-5,5,90],[-5,5,90]]); const hp=[['plate',[48,30]]]; const hp2=[['plate',[62,34]]]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp2),[['arc',[42,56],28,170,100]]),fr(a,[FLOOR].concat(hp),[['arc',[42,56],28,100,170]])],hero:1};},
  kb_swing:()=>{const a=s([42,58],115,[[85,80],[85,80]],[[15,-10,90],[15,-10,90]]); const b=s([48,52],178,[[95,95],[95,95]],[[0,0,90],[0,0,90]]); const hp=[['kb','h0']]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[48,30],26,150,90]]),fr(a,[FLOOR].concat(hp),[['arc',[48,30],26,90,150]])],hero:1};},
@@ -507,41 +587,42 @@ const FT={
    if(o.hold)return {frames:[fr(bb,props.concat(hp)),fr(bb,props.concat(hp),[['line',[70,60],[70,74]]])],hero:1};
    return {frames:[fr(a,props.concat(hp)),fr(bb,props.concat(hp),[['line',[70,60],[70,74]]]),fr(a,props.concat(hp),[['line',[70,74],[70,60]]])],hero:1};},
  side_lunge:(eq)=>{const a=f([50,52],[[10,10],[10,10]],[[10,0,90],[10,0,90]]); const b=f([42,62],[[60,150],[60,150]],[[70,-50,90],[-60,-60,90]]); const hp=eq==='kettlebell'?[['kb','mid']]:eq==='band'?[['band','a1','mid']]:[]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['line',[64,70],[76,70]]]),fr(a,[FLOOR].concat(hp),[['line',[76,70],[64,70]]])],hero:1};},
- step_up:(eq)=>{const hp=eq==='barbell'?[['plate',[42,26]]]:eq==='kettlebell'?[['kb','h0']]:eq==='dumbbell'?[['db','h0',0]]:[]; const arms=eq==='barbell'?[[-120,80],[-120,80]]:[[5,5],[5,5]]; const a=s([40,52],178,arms,[[70,-20,90],[0,0,90]]); const b=s([52,40],178,arms,[[0,0,90],[-20,40,90]]); const props=[FLOOR,['box',[52,78],30,15]]; return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['line',[70,66],[70,50]]]),fr(a,props.concat(hp),[['line',[70,50],[70,66]]])],hero:1};},
+ step_up:(eq)=>{const hp=eq==='barbell'?[['plate',[42,26]]]:eq==='kettlebell'?[['kb','h0']]:eq==='dumbbell'?[['db','h0',0]]:[]; const arms=eq==='barbell'?[[-120,80],[-120,80]]:[[5,5],[5,5]]; const a=sp([40,52],178,{arms,a:[[66,76],[40,91]]}); const b=sp([66,38],178,{arms,a:[[66,76],[52,76]]}); const props=[FLOOR,['box',[52,78],30,15]]; return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['line',[80,66],[80,50]]]),fr(a,props.concat(hp),[['line',[80,50],[80,66]]])],hero:1};},
  box_jump:()=>{const a=s([44,62],150,[[-60,-60],[-60,-60]],[[60,-10,90],[60,-10,90]]); const b=s([60,40],178,[[150,160],[150,160]],[[50,-30,90],[50,-30,90]]); const props=[FLOOR,['box',[60,70],28,23]]; return {frames:[fr(a,props),fr(b,props,[['arc',[52,70],30,-120,-180]])],hero:1};},
  calf_raise:(eq)=>{const a=s([48,52],180,[[5,5],[5,5]],[[0,0,90],[0,0,90]]); const b=s([48,48],180,[[5,5],[5,5]],[[0,0,110],[0,0,110]]); const hp=eq==='barbell'?[['plate',[42,26]]]:eq==='dumbbell'?[['db','h0',0]]:[]; const arms=eq==='barbell'?[[-120,80],[-120,80]]:[[5,5],[5,5]]; const aa=Object.assign({},a,{arms}),bb=Object.assign({},b,{arms}); const props=[FLOOR,['step',[36,88],20]]; return {frames:[fr(aa,props.concat(hp)),fr(bb,props.concat(hp),[['line',[70,80],[70,68]]]),fr(aa,props.concat(hp),[['line',[70,68],[70,80]]])],hero:1};},
- leg_press:()=>{const a=s([30,62],140,[[-20,-20],[-20,-20]],[[90,20,90],[90,20,90]]); const b=s([30,62],140,[[-20,-20],[-20,-20]],[[110,100,90],[110,100,90]]); const props=[FLOOR,['machine',[18,88]],['line',[70,30],[88,70]]]; return {frames:[fr(a,props),fr(b,props,[['line',[66,56],[80,46]]]),fr(a,props,[['line',[80,46],[66,56]]])],hero:1};},
- leg_ext:()=>{const a=s([40,62],175,[[10,10],[10,10]],[[90,10,90],[90,10,90]]); const b=s([40,62],175,[[10,10],[10,10]],[[90,90,90],[90,90,90]]); const props=[FLOOR,['bench',[44,64],24]]; return {frames:[fr(a,props),fr(b,props,[['arc',[60,62],22,20,85]]),fr(a,props,[['arc',[60,62],22,85,20]])],hero:1};},
- leg_curl:(eq,o)=>{const a=s([44,76],90,[[90,60],[90,60]],[[-90,-90,-100],[-90,-90,-100]],{head:10}); const b=s([44,76],90,[[90,60],[90,60]],[[-90,-175,-100],[-90,-175,-100]],{head:10}); const props=[FLOOR]; if(o&&o.band)props.push(['band',[96,90],'a0']); else if(!o||!o.prone)props.push(['bench',[50,78],44]); return {frames:[fr(a,props),fr(b,props,[['arc',[24,76],20,-80,-160]]),fr(a,props,[['arc',[24,76],20,-160,-80]])],hero:1};},
- ham_curl_ball:()=>{const a=s([40,80],95,[[-10,-10],[-10,-10]],[[100,95,90],[100,95,90]]); const b=s([40,72],100,[[-10,-10],[-10,-10]],[[60,-20,90],[60,-20,90]]); return {frames:[fr(a,[FLOOR,['ball',[80,84],10]]),fr(b,[FLOOR,['ball',[60,84],10]],[['line',[82,74],[64,74]]]),fr(a,[FLOOR,['ball',[80,84],10]],[['line',[64,74],[82,74]]])],hero:1};},
- // glutes
- bridge:(eq,o)=>{o=o||{}; const y=o.thrust?74:84; const a=o.thrust?s([36,78],130,[[-40,-40],[-40,-40]],[[40,-15,90],[40,-15,90]]):s([40,y],90,[[60,60],[60,60]],[[-40,10,90],[-40,10,90]]); const b=o.thrust?s([42,66],95,[[-60,-60],[-60,-60]],[[40,-15,90],[40,-15,90]]):s([44,70],100,[[60,60],[60,60]],[[-40,10,90],[-40,10,90]]);
-   const props=[FLOOR]; if(o.thrust)props.push(['bench',[14,66],20]); if(o.ball)props.push(['ball',[72,84],9]); const hp=eq==='barbell'?[['plate',[48,56]]]:eq==='dumbbell'?[['db',[48,56],90]]:eq==='band'?[['band','a0',[44,62]]]:[]; const hp0=eq==='barbell'?[['plate',[40,66]]]:eq==='dumbbell'?[['db',[40,66],90]]:eq==='band'?[['band','a0',[40,74]]]:[];
+ leg_press:()=>{const a=sp([30,62],140,{arms:[[-20,-20],[-20,-20]],a:[56,46],ab:-1}); const b=sp([30,62],140,{arms:[[-20,-20],[-20,-20]],a:[66,30]}); const base=[FLOOR,['machine',[18,88]]]; return {frames:[fr(a,base.concat([['line',[56,30],[72,66]]])),fr(b,base.concat([['line',[66,14],[82,50]]]),[['line',[60,52],[72,40]]]),fr(a,base.concat([['line',[56,30],[72,66]]]),[['line',[72,40],[60,52]]])],hero:1};},
+ leg_ext:()=>{const a=sp([40,62],175,{h:[48,66],a:[58,82]}); const b=sp([40,62],175,{h:[48,66],a:[78,60],foot:180}); const props=[FLOOR,['bench',[44,64],24]]; return {frames:[fr(a,props),fr(b,props,[['arc',[60,62],22,20,85]]),fr(a,props,[['arc',[60,62],22,85,20]])],hero:1};},
+ leg_curl:(eq,o)=>{const y=(o&&o.prone)||(o&&o.band)?84:72; const a=sp([44,y],90,{h:[84,y+4],a:[6,y+2],foot:-100,head:-10}); const b=sp([44,y],90,{h:[84,y+4],a:[26,y-18],ab:1,foot:-100,head:-10}); const props=[FLOOR]; if(o&&o.band)props.push(['band',[96,90],'a0']); else if(!o||!o.prone)props.push(['bench',[50,y+6],44]); return {frames:[fr(a,props),fr(b,props,[['arc',[24,y],20,-80,-160]]),fr(a,props,[['arc',[24,y],20,-160,-80]])],hero:1};},
+ ham_curl_ball:()=>{const a=sp([40,84],90,{h:[88,86],hb:1,a:[78,72]}); const b=sp([44,74],75,{h:[88,86],hb:1,a:[60,72],ab:1,head:15}); return {frames:[fr(a,[FLOOR,['ball',[80,84],10]]),fr(b,[FLOOR,['ball',[62,84],10]],[['line',[82,66],[64,66]]]),fr(a,[FLOOR,['ball',[80,84],10]],[['line',[64,66],[82,66]]])],hero:1};},
+ bridge:(eq,o)=>{o=o||{};
+   if(o.thrust){ const a=sp([40,82],-139,{h:[42,76],a:[60,90],head:45}); const b=sp([44,64],-84,{h:[46,58],a:[60,90],head:60}); const props=[FLOOR,['bench',[16,70],24]]; const hp=eq==='barbell'?[['plate','h0']]:eq==='dumbbell'?[['db','h0',90]]:[]; return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['line',[44,80],[44,64]]]),fr(a,props.concat(hp),[['line',[44,64],[44,80]]])],hero:1}; }
+   const A=o.ball?{a:[68,74]}:{a:[20,88],ab:-1,foot:-90}; const a=sp([40,84],90,Object.assign({h:[88,86]},A)); const b=sp([44,70],60,Object.assign({h:[88,86],head:30},A));
+   const props=[FLOOR]; if(o.ball)props.push(['ball',[76,84],9]); const hp=eq==='barbell'?[['plate',[46,64]]]:eq==='dumbbell'?[['db',[46,64],90]]:eq==='band'?[['band','a0',[44,62]]]:[]; const hp0=eq==='barbell'?[['plate',[42,78]]]:eq==='dumbbell'?[['db',[42,78],90]]:eq==='band'?[['band','a0',[40,78]]]:[];
    return {frames:[fr(a,props.concat(hp0)),fr(b,props.concat(hp),[['line',[44,80],[44,66]]]),fr(a,props.concat(hp0),[['line',[44,66],[44,80]]])],hero:1};},
- donkey:(eq)=>{const a=s([36,66],95,[[0,0],[0,0]],[[-20,-100,-100],[-20,-100,-100]]); const b=s([36,66],95,[[0,0],[0,0]],[[-20,-100,-100],[-120,-170,-100]]); const hp=eq==='band'?[['band','h0','a1']]:[]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[36,66],24,-60,-130]]),fr(a,[FLOOR].concat(hp),[['arc',[36,66],24,-130,-60]])],hero:1};},
- birddog:()=>{const a=s([36,66],95,[[0,0],[0,0]],[[-20,-100,-100],[-20,-100,-100]]); const b=s([36,66],95,[[0,0],[90,90]],[[-20,-100,-100],[-100,-100,-100]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[76,56],[92,56]],['line',[22,66],[8,66]]])],hero:1};},
+ donkey:(eq)=>{const Q={h:[66,92],a:[21,92],ab:1,foot:-100,head:-20}; const a=sp([40,73],106,Q); const b=sp([40,73],106,{h:[66,92],a:[[21,92],[14,56]],ab:[1,-1],foot:[-100,-120],head:-20}); const hp=eq==='band'?[['band','h0','a1']]:[]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[40,73],24,-60,-130]]),fr(a,[FLOOR].concat(hp),[['arc',[40,73],24,-130,-60]])],hero:1};},
+ birddog:()=>{const a=sp([40,73],106,{h:[66,92],a:[21,92],ab:1,foot:-100,head:-20}); const b=sp([40,73],106,{h:[[92,66],[66,92]],a:[[21,92],[10,72]],ab:1,foot:[-100,-100],head:-20}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[76,58],[92,58]],['line',[22,66],[8,66]]])],hero:1};},
  abduction:()=>{const a=f([50,52],[[10,10],[10,10]],[[5,0,90],[5,0,90]]); const b=f([50,52],[[10,10],[10,10]],[[45,45,90],[5,0,90]]); const hp=[['band','a0','a1']]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[55,52],30,10,45]]),fr(a,[FLOOR].concat(hp),[['arc',[55,52],30,45,10]])],hero:1};},
- hip_ext_ball:()=>{const a=s([40,78],100,[[-20,-20],[-20,-20]],[[-20,20,90],[-20,20,90]]); const b=s([44,68],100,[[-20,-20],[-20,-20]],[[-20,20,90],[-20,20,90]]); return {frames:[fr(a,[FLOOR,['ball',[66,82],11]]),fr(b,[FLOOR,['ball',[66,82],11]],[['line',[44,80],[44,66]]])],hero:1};},
- rev_hip_raise:()=>{const a=s([48,70],95,[[0,0],[0,0]],[[-20,-20,-100],[-20,-20,-100]]); const b=s([48,70],95,[[0,0],[0,0]],[[-95,-95,-100],[-95,-95,-100]]); return {frames:[fr(a,[FLOOR,['ball',[50,82],11]]),fr(b,[FLOOR,['ball',[50,82],11]],[['arc',[48,70],24,-30,-90]])],hero:1};},
- butt_blaster:()=>{const a=s([48,70],95,[[0,0],[0,0]],[[-20,-20,-100],[-20,-20,-100]]); const b=s([48,70],95,[[0,0],[0,0]],[[-20,-20,-100],[-130,-170,-100]]); return {frames:[fr(a,[FLOOR,['ball',[56,80],11]]),fr(b,[FLOOR,['ball',[56,80],11]],[['arc',[48,70],24,-70,-140]])],hero:1};},
- hip_raise_ball:()=>{const a=s([40,84],90,[[60,60],[60,60]],[[-70,-90,90],[-70,-90,90]]); const b=s([44,72],100,[[60,60],[60,60]],[[-70,-90,90],[-70,-90,90]]); return {frames:[fr(a,[FLOOR,['ball',[12,82],10]]),fr(b,[FLOOR,['ball',[12,82],10]],[['line',[44,80],[44,66]]])],hero:1};},
- // core
- crunch:(eq,o)=>{o=o||{}; const a=s([40,84],90,[[150,30],[150,30]],[[-40,10,90],[-40,10,90]]); const b=s([40,84],120,[[150,30],[150,30]],[[-40,10,90],[-40,10,90]]); const props=[FLOOR]; if(o.ball){props.push(['ball',[26,84],10]);} const hp=eq==='band'?[['band',[96,90],'h0']]:[]; if(o.situp){const c=s([40,84],160,[[90,90],[90,90]],[[-40,10,90],[-40,10,90]]); const aa=s([40,84],90,[[90,90],[90,90]],[[-40,10,90],[-40,10,90]]); return {frames:[fr(aa,props),fr(c,props,[['arc',[40,84],28,100,160]]),fr(aa,props,[['arc',[40,84],28,160,100]])],hero:1};} return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['arc',[40,84],28,95,125]]),fr(a,props.concat(hp),[['arc',[40,84],28,125,95]])],hero:1};},
- rev_crunch:(eq)=>{const a=s([40,84],90,[[60,60],[60,60]],[[-40,10,90],[-40,10,90]]); const b=s([40,80],90,[[60,60],[60,60]],[[-170,-100,90],[-170,-100,90]]); const hp=eq==='band'?[['band',[4,90],'a0']]:[]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[40,84],24,-40,-120]]),fr(a,[FLOOR].concat(hp),[['arc',[40,84],24,-120,-40]])],hero:1};},
- leg_raise:(eq,o)=>{o=o||{}; const a=s([40,84],90,[[60,60],[60,60]],[[-80,-80,-100],[-80,-80,-100]]); const b=s([40,84],90,[[60,60],[60,60]],[[-170,-170,-100],[-170,-170,-100]]); if(o.scissor){const c=s([40,84],90,[[60,60],[60,60]],[[-110,-110,-100],[-130,-130,-100]]); const d=s([40,84],90,[[60,60],[60,60]],[[-130,-130,-100],[-110,-110,-100]]); return {frames:[fr(c,[FLOOR]),fr(d,[FLOOR],[['arc',[40,84],30,-105,-135],['arc',[40,84],36,-135,-105]])],hero:1};} if(o.flutter){const c=s([40,84],90,[[60,60],[60,60]],[[-100,-100,-100],[-115,-115,-100]]); return {frames:[fr(c,[FLOOR]),fr(c,[FLOOR],[['arc',[40,84],30,-95,-120],['arc',[40,84],36,-120,-95]])],hero:1};} return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[40,84],30,-80,-160]]),fr(a,[FLOOR],[['arc',[40,84],30,-160,-80]])],hero:1};},
- vup:()=>{const a=s([44,84],90,[[180,180],[180,180]],[[-80,-80,-100],[-80,-80,-100]]); const b=s([44,84],140,[[150,150],[150,150]],[[-130,-130,-100],[-130,-130,-100]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[44,84],30,-90,-130],['arc',[44,84],30,100,140]]),fr(a,[FLOOR],[['arc',[44,84],30,-130,-90]])],hero:1};},
- vpass:()=>{const a=s([44,84],90,[[180,180],[180,180]],[[-80,-80,-100],[-80,-80,-100]]); const b=s([44,84],140,[[150,150],[150,150]],[[-130,-130,-100],[-130,-130,-100]]); return {frames:[fr(a,[FLOOR,['ball','h0',8]]),fr(b,[FLOOR,['ball','a0',8]],[['arc',[44,84],30,100,140],['arc',[44,84],30,-90,-130]]),fr(a,[FLOOR,['ball','a0',8]],[['arc',[44,84],30,-130,-90]])],hero:1};},
- bicycle:()=>{const a=s([40,84],100,[[150,30],[150,30]],[[-150,-100,-100],[-100,-100,-100]]); const b=s([40,84],100,[[150,30],[150,30]],[[-100,-100,-100],[-150,-100,-100]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[40,84],26,-100,-150]]),fr(a,[FLOOR],[['arc',[40,84],26,-150,-100]])],hero:1};},
- deadbug:()=>{const a=s([40,84],90,[[180,180],[180,180]],[[-170,-100,-100],[-170,-100,-100]]); const b=s([40,84],90,[[180,180],[120,120]],[[-170,-100,-100],[-110,-110,-100]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[64,84],26,180,120],['arc',[40,84],30,-160,-110]]),fr(a,[FLOOR],[['arc',[64,84],26,120,180]])],hero:1};},
- twist:(eq,o)=>{o=o||{}; const a=f([50,64],[[60,150],[60,150]],[[60,-70,90],[60,-70,90]]); const b=f([50,64],[[100,-170],[20,90]],[[60,-70,90],[60,-70,90]]); const hp=eq==='dumbbell'?[['db','mid',90]]:eq==='kettlebell'?[['kb','mid']]:eq==='band'?[['band',[96,60],'mid']]:[]; const props=[FLOOR]; if(o.ball)props.push(['ball',[50,76],10]); return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['arc',[50,40],22,110,70]]),fr(a,props.concat(hp),[['arc',[50,40],22,70,110]])],hero:1};},
+ hip_ext_ball:()=>{const a=sp([50,70],95,{h:[84,90],a:[16,88],foot:0}); const b=sp([50,70],95,{h:[84,90],a:[14,66],foot:-100}); const B=['ball',[50,82],11]; return {frames:[fr(a,[FLOOR,B]),fr(b,[FLOOR,B],[['arc',[50,70],28,-70,-100]])],hero:1};},
+ rev_hip_raise:()=>{const a=sp([50,70],95,{h:[84,90],a:[16,88],foot:0}); const b=sp([50,70],95,{h:[84,90],a:[14,66],foot:-100}); const B=['ball',[50,82],11]; return {frames:[fr(a,[FLOOR,B]),fr(b,[FLOOR,B],[['arc',[50,70],28,-60,-100]])],hero:1};},
+ butt_blaster:()=>{const a=sp([40,73],106,{h:[66,92],a:[21,92],ab:1,foot:-100,head:-20}); const b=sp([40,73],106,{h:[66,92],a:[[21,92],[14,56]],ab:[1,-1],foot:[-100,-120],head:-20}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[40,73],24,-70,-140]])],hero:1};},
+ hip_raise_ball:()=>{const a=sp([40,84],90,{h:[88,86],a:[78,74]}); const b=sp([44,72],70,{h:[88,86],a:[78,74],head:20}); return {frames:[fr(a,[FLOOR,['ball',[82,84],10]]),fr(b,[FLOOR,['ball',[82,84],10]],[['line',[44,80],[44,66]]])],hero:1};},
+ crunch:(eq,o)=>{o=o||{}; const L={a:[20,88],ab:-1,foot:-90}; const a=sp([40,84],90,Object.assign({h:[72,78],hb:1},L)); const b=sp([40,84],120,Object.assign({h:[66,66],hb:1},L)); const props=[FLOOR]; if(o.ball){props.push(['ball',[30,90],9]);} const hp=eq==='band'?[['band',[96,90],'h0']]:[];
+   if(o.situp){const aa=sp([40,84],90,Object.assign({h:[80,72],hb:1},L)); const c=sp([40,84],200,Object.assign({h:[24,72]},L)); return {frames:[fr(aa,props),fr(c,props,[['arc',[40,84],28,100,190]]),fr(aa,props,[['arc',[40,84],28,190,100]])],hero:1};}
+   return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['arc',[40,84],28,95,125]]),fr(a,props.concat(hp),[['arc',[40,84],28,125,95]])],hero:1};},
+ rev_crunch:(eq)=>{const a=sp([40,84],90,{h:[88,86],a:[26,70],ab:-1,foot:-100}); const b=sp([44,78],100,{h:[88,86],a:[44,52],ab:1,foot:-100}); const hp=eq==='band'?[['band',[4,90],'a0']]:[]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['arc',[40,84],24,-40,-120]]),fr(a,[FLOOR].concat(hp),[['arc',[40,84],24,-120,-40]])],hero:1};},
+ leg_raise:(eq,o)=>{o=o||{}; const H={h:[88,86]}; const a=sp([40,84],90,Object.assign({a:[2,80],foot:-110},H)); const b=sp([40,84],90,Object.assign({a:[40,46],foot:180},H)); if(o.scissor){const c=sp([40,84],90,Object.assign({a:[[20,52],[10,62]],foot:[-130,-120]},H)); const d=sp([40,84],90,Object.assign({a:[[10,62],[20,52]],foot:[-120,-130]},H)); return {frames:[fr(c,[FLOOR]),fr(d,[FLOOR],[['arc',[40,84],30,-105,-135],['arc',[40,84],36,-135,-105]])],hero:1};} if(o.flutter){const c=sp([40,84],90,Object.assign({a:[[10,62],[6,70]],foot:[-120,-115]},H)); return {frames:[fr(c,[FLOOR]),fr(c,[FLOOR],[['arc',[40,84],30,-95,-120],['arc',[40,84],36,-120,-95]])],hero:1};} return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[40,84],30,-80,-160]]),fr(a,[FLOOR],[['arc',[40,84],30,-160,-80]])],hero:1};},
+ vup:()=>{const a=sp([44,84],90,{h:[92,84],a:[2,82],foot:-110}); const b=sp([44,84],140,{h:[40,44],a:[16,54],foot:-130}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[44,84],30,-90,-130],['arc',[44,84],30,100,140]]),fr(a,[FLOOR],[['arc',[44,84],30,-130,-90]])],hero:1};},
+ vpass:()=>{const a=sp([44,84],90,{h:[92,84],a:[2,82],foot:-110}); const b=sp([44,84],140,{h:[40,44],a:[16,54],foot:-130}); return {frames:[fr(a,[FLOOR,['ball','h0',8]]),fr(b,[FLOOR,['ball','a0',8]],[['arc',[44,84],30,100,140],['arc',[44,84],30,-90,-130]]),fr(a,[FLOOR,['ball','a0',8]],[['arc',[44,84],30,-130,-90]])],hero:1};},
+ bicycle:()=>{const a=sp([40,84],100,{h:[70,70],hb:1,a:[[30,60],[2,76]],ab:[-1,1],foot:[-120,-110]}); const b=sp([40,84],100,{h:[70,70],hb:1,a:[[2,76],[30,60]],ab:[1,-1],foot:[-110,-120]}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[40,84],26,-100,-150]]),fr(a,[FLOOR],[['arc',[40,84],26,-150,-100]])],hero:1};},
+ deadbug:()=>{const a=sp([40,84],90,{h:[64,57.3],a:[21,64],ab:-1,foot:-100}); const b=sp([40,84],90,{h:[[90,80],[64,57.3]],a:[[2,78],[21,64]],ab:[1,-1],foot:[-110,-100]}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[64,84],26,180,120],['arc',[40,84],30,-160,-110]]),fr(a,[FLOOR],[['arc',[64,84],26,120,180]])],hero:1};},
+ twist:(eq,o)=>{o=o||{}; const hip=o.ball?[40,74]:[40,80]; const L=o.ball?{a:[62,90]}:{a:[72,76],ab:-1,foot:135}; const a=sp(hip,150,Object.assign({h:[68,66]},L)); const b=sp(hip,150,Object.assign({h:[56,70]},L)); const hp=eq==='dumbbell'?[['db','mid',90]]:eq==='kettlebell'?[['kb','mid']]:eq==='band'?[['band',[96,60],'mid']]:[]; const props=[FLOOR]; if(o.ball)props.push(['ball',[40,88],9]); return {frames:[fr(a,props.concat(hp)),fr(b,props.concat(hp),[['arc',[52,60],20,120,60]]),fr(a,props.concat(hp),[['arc',[52,60],20,60,120]])],hero:1};},
  wiper:()=>{const a=f([50,84],[[90,90],[90,90]],[[170,170,0],[170,170,0]]); const b=f([50,84],[[90,90],[90,90]],[[120,120,0],[-160,-160,0]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[50,84],30,-170,-120]]),fr(a,[FLOOR],[['arc',[50,84],30,-120,-170]])],hero:1};},
  side_bend:(eq)=>{const a=f([50,52],[[8,8],[8,8]],[[5,0,90],[5,0,90]]); const b=Object.assign({},f([50,52],[[8,8],[8,8]],[[5,0,90],[5,0,90]])); const hp=eq==='barbell'?[['bar',[50,26],22]]:[['db','h0',0]]; const arms=eq==='barbell'?[[-120,80],[-120,80]]:[[8,8],[8,8]]; const aa=f([50,52],arms,[[5,0,90],[5,0,90]]); return {frames:[fr(aa,[FLOOR].concat(hp)),fr(Object.assign({},aa,{tilt:22}),[FLOOR].concat(hp),[['arc',[50,52],34,180,150]])],hero:1};},
  woodchop:(eq)=>{const a=f([50,58],[[20,20],[20,20]],[[25,-10,90],[25,-10,90]]); const b=f([50,52],[[130,150],[130,150]],[[5,0,90],[5,0,90]]); const hp=eq==='band'?[['band',[4,90],'mid']]:[['db','mid',90]]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(b,[FLOOR].concat(hp),[['line',[40,66],[66,24]]]),fr(a,[FLOOR].concat(hp),[['line',[66,24],[40,66]]])],hero:1};},
  torso_rot:()=>{const a=f([50,52],[[-120,80],[-120,80]],[[10,0,90],[10,0,90]]); const hp=[['bar',[50,26],24]]; return {frames:[fr(a,[FLOOR].concat(hp)),fr(a,[FLOOR].concat(hp),[['arc',[50,26],30,70,110]]),fr(a,[FLOOR].concat(hp),[['arc',[50,26],30,-70,-110]])],hero:1};},
  oblique_ball:()=>{const a=f([44,74],[[150,30],[150,30]],[[8,0,90],[8,0,90]],{rot:-75}); return {frames:[fr(a,[FLOOR,['ball',[44,84],10]]),fr(a,[FLOOR,['ball',[44,84],10]],[['arc',[44,74],30,-60,-20]])],hero:1};},
  back_ext_ball:()=>{const a=s([44,72],120,[[30,-10],[30,-10]],[[-100,-100,-100],[-100,-100,-100]],{head:-10}); const b=s([44,72],85,[[20,-20],[20,-20]],[[-100,-100,-100],[-100,-100,-100]],{head:-10}); return {frames:[fr(a,[FLOOR,['ball',[44,82],10],['wall',8]]),fr(b,[FLOOR,['ball',[44,82],10],['wall',8]],[['arc',[44,72],28,115,85]])],hero:1};},
- superman:()=>{const a=s([44,84],90,[[90,90],[90,90]],[[-90,-90,-100],[-90,-90,-100]],{head:-10}); const b=s([44,82],80,[[80,80],[80,80]],[[-80,-80,-100],[-80,-80,-100]],{head:-15}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[80,74],[80,62]],['line',[14,74],[14,62]]])],hero:1};},
- // cardio
+ superman:()=>{const a=sp([44,84],90,{h:[92,84],a:[6,84],foot:-90,head:-10}); const b=sp([44,84],105,{h:[92,70],a:[6,76],foot:-100,head:-15}); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[84,78],[84,64]],['line',[12,84],[12,70]]])],hero:1};},
  run:(eq,o)=>{o=o||{}; const a=s([46,50],172,[[40,150],[-40,60]],[[50,-20,90],[-40,-110,-100]]); const b=s([46,50],172,[[-40,60],[40,150]],[[-40,-110,-100],[50,-20,90]]); const props=o.treadmill?[['treadmill']]:[FLOOR]; if(o.walk){const w=s([48,52],178,[[20,20],[-20,-20]],[[25,-10,90],[-20,0,90]]); return {frames:[fr(w,[FLOOR]),fr(w,[FLOOR],[['line',[70,62],[86,62]]])],hero:1};} if(o.highknees){const h=s([46,50],178,[[40,150],[-40,60]],[[95,-5,90],[-5,0,90]]); const h2=s([46,50],178,[[-40,60],[40,150]],[[-5,0,90],[95,-5,90]]); return {frames:[fr(h,[FLOOR]),fr(h2,[FLOOR],[['arc',[46,50],26,20,90]]),fr(h,[FLOOR],[['arc',[46,50],26,20,90]])],hero:1};} return {frames:[fr(a,props),fr(b,props,[['line',[64,30],[82,30]]]),fr(a,props,[['line',[64,30],[82,30]]])],hero:1};},
  cycling:()=>{const a=s([40,56],140,[[70,70],[70,70]],[[60,-20,90],[20,-30,90]]); return {frames:[fr(a,[['bike']]),fr(a,[['bike']],[['arc',[74,80],14,20,160]])],hero:1};},
  rowing:()=>{const a=s([36,72],150,[[95,95],[95,95]],[[70,10,90],[70,10,90]]); const b=s([44,72],200,[[20,100],[20,100]],[[90,90,90],[90,90,90]]); const props=[['rower',[52,78]]]; return {frames:[fr(a,props),fr(b,props,[['line',[66,56],[48,56]]]),fr(a,props,[['line',[48,56],[66,56]]])],hero:1};},
@@ -549,7 +630,7 @@ const FT={
  swim:()=>{const a=s([30,60],90,[[160,160],[60,20]],[[-85,-85,-100],[-100,-100,-100]],{head:-15}); return {frames:[fr(a,[['line',[4,72],[96,72]]]),fr(a,[['line',[4,72],[96,72]]],[['arc',[54,60],20,180,60]])],hero:1};},
  jacks:()=>{const a=f([50,52],[[10,10],[10,10]],[[5,0,90],[5,0,90]]); const b=f([50,50],[[150,170],[150,170]],[[25,25,90],[25,25,90]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['arc',[58,28],30,20,150],['arc',[42,28],30,-20,-150]]),fr(a,[FLOOR],[['arc',[58,28],30,150,20],['arc',[42,28],30,-150,-20]])],hero:1};},
  jump_rope:()=>{const a=f([50,50],[[40,80],[40,80]],[[5,0,90],[5,0,90]]); return {frames:[fr(a,[FLOOR,['rope',[50,18],78]]),fr(a,[FLOOR,['rope',[50,18],78]],[['line',[86,70],[86,56]]])],hero:1};},
- burpee:()=>{const a=s([48,52],178,[[5,5],[5,5]],[[0,0,90],[0,0,90]]); const b=s([38,74],95,[[20,0],[20,0]],[[-95,-95,-100],[-95,-95,-100]]); const c=f([50,44],[[165,170],[165,170]],[[15,0,90],[15,0,90]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[48,50],[42,70]]]),fr(c,[FLOOR],[['line',[76,40],[76,22]]])],hero:1};},
+ burpee:()=>{const a=s([48,52],178,[[5,5],[5,5]],[[0,0,90],[0,0,90]]); const b=sp([40,66],95,{h:[66,89],a:[6,82],foot:0}); const c=f([50,44],[[165,170],[165,170]],[[15,0,90],[15,0,90]]); return {frames:[fr(a,[FLOOR]),fr(b,[FLOOR],[['line',[48,50],[42,70]]]),fr(c,[],[['line',[76,40],[76,22]]])],hero:1};},
  arm_circles:()=>{const a=f([50,52],[[88,88],[88,88]],[[5,0,90],[5,0,90]]); return {frames:[fr(a,[FLOOR]),fr(a,[FLOOR],[['arc',[78,30],8,0,300],['arc',[22,30],8,0,-300]]),fr(a,[FLOOR],[['arc',[78,30],8,300,0],['arc',[22,30],8,-300,0]])],hero:1};},
  hip_circles:()=>{const a=f([50,52],[[60,-150],[60,-150]],[[8,0,90],[8,0,90]]); return {frames:[fr(a,[FLOOR]),fr(a,[FLOOR],[['arc',[50,52],12,0,300]]),fr(a,[FLOOR],[['arc',[50,52],12,300,0]])],hero:1};},
  leg_swings:()=>{const a=s([48,52],178,[[90,90],[5,5]],[[0,0,90],[0,0,90]]); const b=s([48,52],178,[[90,90],[5,5]],[[0,0,90],[70,70,90]]); const props=[FLOOR,['wall',90]]; return {frames:[fr(a,props),fr(b,props,[['arc',[48,52],30,-40,70]]),fr(a,props,[['arc',[48,52],30,70,-40]])],hero:1};},
@@ -559,33 +640,33 @@ const FT={
 };
 // static pose definitions
 const PZ={
- hamstring_seated:{frames:[{p:s([34,84],180,[[90,90],[90,90]],[[90,90,180],[90,90,180]])},{p:s([34,84],120,[[60,60],[60,60]],[[90,90,180],[90,90,180]]),ar:[['arc',[34,84],28,160,115]]}]},
+ hamstring_seated:{frames:[{p:sp([34,84],170,{h:[50,76],a:[72,88],foot:180})},{p:sp([34,84],110,{h:[70,86],a:[72,88],foot:180,head:-20}),ar:[['arc',[34,84],28,160,115]]}]},
  fold_standing:{frames:[{p:STAND_S},{p:s([44,56],95,[[30,10],[30,10]],[[-5,5,90],[-5,5,90]]),ar:[['arc',[44,56],28,170,100]]}]},
  quad_standing:{frames:[{p:s([48,52],180,[[90,90],[-30,-120]],[[0,0,90],[-60,-170,-100]]),props:[FLOOR,['wall',90]]},{p:s([48,52],180,[[90,90],[-30,-120]],[[0,0,90],[-60,-170,-100]]),props:[FLOOR,['wall',90]],ar:[['arc',[40,72],14,-100,-160]]}]},
- hip_flexor_kneel:{frames:[{p:s([44,72],180,[[0,0],[0,0]],[[90,0,90],[-100,-180,-100]])},{p:s([48,72],172,[[0,0],[0,0]],[[90,0,90],[-100,-180,-100]]),ar:[['line',[44,64],[58,64]]]}]},
+ hip_flexor_kneel:{frames:[{p:sp([40,70],182,{h:[[54,70],[54,70]],a:[66,90],legs:[legTo([40,70],[66,90],1),[-30,-92,-100]]})},{p:sp([46,70],178,{a:[66,90],legs:[legTo([46,70],[66,90],1),[-35,-95,-100]]}),ar:[['line',[40,62],[56,62]]]}]},
  chest_door:{frames:[{p:s([48,52],180,[[90,-180],[90,-180]],[[0,0,90],[0,0,90]]),props:[FLOOR,['door',64]]},{p:s([52,52],178,[[80,-170],[80,-170]],[[10,0,90],[0,0,90]]),props:[FLOOR,['door',64]],ar:[['line',[40,40],[54,40]]]}]},
  shoulder_cross:{frames:[{p:f([50,52],[[-80,-90],[100,180]],[[5,0,90],[5,0,90]])},{p:f([50,52],[[-80,-90],[100,180]],[[5,0,90],[5,0,90]]),ar:[['line',[40,44],[28,44]]]}]},
  triceps_stretch:{frames:[{p:f([50,52],[[170,-20],[120,-170]],[[5,0,90],[5,0,90]])},{p:f([50,52],[[170,-20],[120,-170]],[[5,0,90],[5,0,90]]),ar:[['line',[58,14],[48,14]]]}]},
  calf_wall:{frames:[{p:s([48,52],175,[[80,80],[80,80]],[[30,-10,90],[-25,-10,90]]),props:[FLOOR,['wall',82]]},{p:s([48,52],175,[[80,80],[80,80]],[[30,-10,90],[-25,-10,90]]),props:[FLOOR,['wall',82]],ar:[['line',[40,60],[52,60]]]}]},
- pigeon:{frames:[{p:s([44,84],170,[[60,60],[60,60]],[[90,-150,90],[-95,-95,-100]])},{p:s([44,84],120,[[70,70],[70,70]],[[90,-150,90],[-95,-95,-100]]),ar:[['arc',[44,84],28,160,115]]}]},
- butterfly:{frames:[{p:f([50,84],[[30,120],[30,120]],[[80,-150,0],[80,-150,0]])},{p:f([50,84],[[30,120],[30,120]],[[80,-150,0],[80,-150,0]]),ar:[['line',[28,72],[28,84]],['line',[72,72],[72,84]]]}]},
- figure4:{frames:[{p:s([40,84],90,[[60,100],[60,100]],[[-70,-150,90],[-110,-60,90]])},{p:s([40,84],90,[[60,100],[60,100]],[[-70,-150,90],[-110,-60,90]]),ar:[['line',[26,70],[22,80]]]}]},
+ pigeon:{frames:[{p:sp([44,80],170,{h:[56,88],legs:[[60,-90,-100],[-80,-85,-100]]})},{p:sp([44,80],110,{h:[86,90],legs:[[60,-90,-100],[-80,-85,-100]],head:-20}),ar:[['arc',[44,80],28,160,115]]}]},
+ butterfly:{frames:[{p:sp([40,84],175,{h:[48,82],hb:1,legs:[[70,-120,-100],[70,-120,-100]]})},{p:sp([40,84],175,{h:[48,82],hb:1,legs:[[70,-120,-100],[70,-120,-100]]}),ar:[['line',[60,74],[60,86]]]}]},
+ figure4:{frames:[{p:sp([40,84],90,{h:[44,70],hb:1,a:[[26,66],[13,76]],ab:[-1,-1],foot:[-100,-60],legs:[legTo([40,84],[26,66],-1,-100),[-150,-60,-100]]})},{p:sp([40,84],90,{h:[44,70],hb:1,legs:[legTo([40,84],[26,66],-1,-100),[-150,-60,-100]]}),ar:[['line',[26,60],[36,70]]]}]},
  spinal_twist:{frames:[{p:f([50,84],[[90,90],[90,90]],[[-160,-80,0],[-160,-80,0]])},{p:f([50,84],[[90,90],[90,90]],[[-120,-40,0],[-120,-40,0]]),ar:[['arc',[50,84],26,-160,-115]]}]},
- downdog:{frames:[{p:s([38,74],95,[[20,0],[20,0]],[[-95,-95,-100],[-95,-95,-100]])},{p:s([48,42],125,[[55,55],[55,55]],[[-35,-15,-100],[-35,-15,-100]]),ar:[['arc',[48,70],26,-60,-140]]}]},
- child:{frames:[{p:s([34,80],170,[[90,90],[90,90]],[[90,-170,-100],[90,-170,-100]])},{p:s([34,80],110,[[80,80],[80,80]],[[90,-170,-100],[90,-170,-100]]),ar:[['arc',[34,80],26,160,110]]}]},
- cat:{frames:[{p:s([36,66],95,[[0,0],[0,0]],[[-20,-100,-100],[-20,-100,-100]])},{p:s([36,64],80,[[0,0],[0,0]],[[-20,-100,-100],[-20,-100,-100]],{head:30}),ar:[['line',[56,50],[56,40]]]}]},
- cow:{frames:[{p:s([36,66],95,[[0,0],[0,0]],[[-20,-100,-100],[-20,-100,-100]])},{p:s([36,68],105,[[0,0],[0,0]],[[-20,-100,-100],[-20,-100,-100]],{head:-30}),ar:[['line',[56,56],[56,66]]]}]},
- plow:{frames:[{p:s([40,84],90,[[60,60],[60,60]],[[-80,-80,-100],[-80,-80,-100]])},{p:s([50,60],0,[[-60,-60],[-60,-60]],[[-100,-100,-100],[-100,-100,-100]],{head:0}),ar:[['arc',[50,70],28,-80,-170]]}]},
- shoulder_stand:{frames:[{p:s([40,84],90,[[60,60],[60,60]],[[-80,-80,-100],[-80,-80,-100]])},{p:s([48,54],0,[[-60,-120],[-60,-120]],[[180,180,-100],[180,180,-100]]),ar:[['line',[62,50],[62,34]]]}]},
- happy_baby:{frames:[{p:f([50,84],[[150,170],[150,170]],[[-170,-120,0],[-170,-120,0]])},{p:f([50,84],[[150,170],[150,170]],[[-170,-120,0],[-170,-120,0]]),ar:[['line',[34,52],[34,64]],['line',[66,52],[66,64]]]}]},
+ downdog:{frames:[{p:sp([40,66],95,{h:[66,89],a:[6,82],foot:0})},{p:sp([40,60],54,{h:[81,90],a:[15,90],foot:60}),ar:[['arc',[40,70],22,-60,-150]]}]},
+ child:{frames:[{p:sp([40,73],180,{h:[50,72],a:[21,92],ab:1,foot:-100})},{p:sp([34,82],100,{h:[84,90],a:[32,92],ab:1,foot:-100,head:-30}),ar:[['arc',[34,82],26,160,110]]}]},
+ cat:{frames:[{p:sp([40,73],106,{h:[66,92],a:[21,92],ab:1,foot:-100,head:-20})},{p:sp([40,73],106,{h:[66,92],a:[21,92],ab:1,foot:-100,head:-70}),ar:[['line',[54,52],[54,42]]]}]},
+ cow:{frames:[{p:sp([40,73],106,{h:[66,92],a:[21,92],ab:1,foot:-100,head:-20})},{p:sp([40,73],106,{h:[66,92],a:[21,92],ab:1,foot:-100,head:30}),ar:[['line',[54,56],[54,66]]]}]},
+ plow:{frames:[{p:sp([40,84],90,{h:[88,86],a:[2,82],foot:-110})},{p:sp([50,58],21,{h:[20,88],a:[84,78],foot:0,head:70}),ar:[['arc',[50,70],30,-80,-170]]}]},
+ shoulder_stand:{frames:[{p:sp([40,84],90,{h:[88,86],a:[2,82],foot:-110})},{p:sp([54,58],0,{h:[44,66],hb:1,a:[54,20],foot:180,head:80}),ar:[['line',[70,60],[70,40]]]}]},
+ happy_baby:{frames:[{p:sp([40,84],90,{h:[[48,60],[30,66]],hb:1,a:[[48,58],[30,64]],ab:[1,-1],foot:[180,180]})},{p:sp([40,84],90,{h:[[48,60],[30,66]],hb:1,a:[[48,58],[30,64]],ab:[1,-1],foot:[180,180]}),ar:[['line',[48,50],[48,60]],['line',[30,54],[30,64]]]}]},
  prayer:{frames:[{p:f([50,52],[[40,160],[40,160]],[[2,0,90],[2,0,90]])},{p:f([50,52],[[40,160],[40,160]],[[2,0,90],[2,0,90]])}],hero:0},
  garland:{frames:[{p:f([50,70],[[40,160],[40,160]],[[70,-70,90],[70,-70,90]])},{p:f([50,70],[[40,160],[40,160]],[[70,-70,90],[70,-70,90]]),ar:[['line',[30,70],[22,70]],['line',[70,70],[78,70]]]}]},
- half_lord:{frames:[{p:f([50,84],[[-60,180],[100,20]],[[-150,-60,0],[60,-100,0]])},{p:f([50,84],[[-60,180],[100,20]],[[-150,-60,0],[60,-100,0]]),ar:[['arc',[50,48],22,110,70]]}]},
- hero:{frames:[{p:s([40,80],180,[[20,100],[20,100]],[[-10,-180,-100],[-10,-180,-100]])},{p:s([40,80],180,[[20,100],[20,100]],[[-10,-180,-100],[-10,-180,-100]])}],hero:0},
- wide_angle:{frames:[{p:f([50,84],[[90,90],[90,90]],[[-100,-100,0],[-100,-100,0]])},{p:f([50,84],[[90,90],[90,90]],[[-100,-100,0],[-100,-100,0]]),ar:[['line',[50,48],[50,60]]]}]},
- low_lunge:{frames:[{p:s([44,72],175,[[170,180],[170,180]],[[85,0,90],[-100,-180,-100]])},{p:s([48,72],172,[[170,180],[170,180]],[[85,0,90],[-100,-180,-100]]),ar:[['line',[44,62],[58,62]]]}]},
+ half_lord:{frames:[{p:sp([40,84],185,{h:[[26,90],[66,66]],a:[[78,88],[58,90]],ab:[1,1],foot:[180,90]})},{p:sp([40,84],185,{h:[[26,90],[66,66]],a:[[78,88],[58,90]],ab:[1,1],foot:[180,90]}),ar:[['arc',[40,52],22,110,70]]}]},
+ hero:{frames:[{p:sp([36,80],180,{h:[48,76],legs:[[50,-90,-100],[50,-90,-100]]})},{p:sp([36,80],180,{h:[48,76],legs:[[50,-90,-100],[50,-90,-100]]})}],hero:0},
+ wide_angle:{frames:[{p:sp([34,84],170,{h:[50,76],a:[[76,88],[70,88]],foot:180})},{p:sp([34,84],115,{h:[70,86],a:[[76,88],[70,88]],foot:180,head:-20}),ar:[['arc',[34,84],28,160,120]]}]},
+ low_lunge:{frames:[{p:sp([40,70],182,{arms:[[170,170],[170,170]],legs:[legTo([40,70],[66,90],1),[-30,-92,-100]]})},{p:sp([44,70],180,{arms:[[172,172],[172,172]],legs:[legTo([44,70],[66,90],1),[-32,-95,-100]]}),ar:[['line',[40,62],[54,62]]]}]},
  frog:{frames:[{p:s([44,80],95,[[60,0],[60,0]],[[-100,-180,-100],[-100,-180,-100]])},{p:s([40,80],95,[[60,0],[60,0]],[[-100,-180,-100],[-100,-180,-100]]),ar:[['line',[46,72],[32,72]]]}]},
- fish:{frames:[{p:s([40,84],90,[[0,0],[0,0]],[[-90,-90,-100],[-90,-90,-100]])},{p:s([40,84],70,[[0,0],[0,0]],[[-90,-90,-100],[-90,-90,-100]],{head:60}),ar:[['line',[56,70],[56,58]]]}]},
+ fish:{frames:[{p:sp([40,84],90,{h:[88,86],a:[2,82],foot:-110})},{p:sp([40,84],113,{h:[48,90],a:[2,82],foot:-110,head:-53}),ar:[['line',[60,70],[60,58]]]}]},
  pyramid:{frames:[{p:s([44,52],180,[[5,5],[5,5]],[[-25,-5,90],[30,-10,90]])},{p:s([40,56],95,[[60,60],[60,60]],[[-25,-5,90],[30,-10,90]]),ar:[['arc',[40,56],28,170,100]]}]},
  wide_leg_fold:{frames:[{p:s([48,52],180,[[5,5],[5,5]],[[35,-5,90],[-35,5,90]])},{p:s([48,54],100,[[60,60],[60,60]],[[35,-5,90],[-35,5,90]]),ar:[['arc',[48,54],28,170,100]]}]},
  tree:{frames:[{p:f([50,52],[[150,175],[150,175]],[[5,0,90],[80,-150,90]])},{p:f([50,52],[[150,175],[150,175]],[[5,0,90],[80,-150,90]])}],hero:0},
@@ -599,16 +680,16 @@ const PZ={
  chair:{frames:[{p:s([48,52],178,[[5,5],[5,5]],[[0,0,90],[0,0,90]])},{p:s([44,66],160,[[170,175],[170,175]],[[75,-10,90],[75,-10,90]]),ar:[['line',[72,56],[72,70]]]}]},
  triangle:{frames:[{p:f([50,60],[[90,90],[90,90]],[[45,45,90],[-45,-45,90]])},{p:f([50,60],[[90,90],[90,90]],[[45,45,90],[-45,-45,90]],{tilt:40}),ar:[['arc',[50,60],34,180,140]]}]},
  side_angle:{frames:[{p:f([50,60],[[90,90],[90,90]],[[55,-50,90],[-30,-20,90]])},{p:f([50,60],[[100,20],[-150,-170]],[[55,-50,90],[-30,-20,90]],{tilt:35}),ar:[['arc',[50,60],34,180,145]]}]},
- boat:{frames:[{p:s([44,84],160,[[90,90],[90,90]],[[90,90,180],[90,90,180]])},{p:s([44,84],150,[[80,80],[80,80]],[[120,120,180],[120,120,180]]),ar:[['arc',[44,84],30,80,120]]}]},
- cobra:{frames:[{p:s([44,86],90,[[90,90],[90,90]],[[-90,-90,-100],[-90,-90,-100]],{head:-5})},{p:s([44,86],130,[[40,-10],[40,-10]],[[-90,-90,-100],[-90,-90,-100]],{head:-10}),ar:[['arc',[44,86],26,95,135]]}]},
- updog:{frames:[{p:s([44,86],90,[[90,90],[90,90]],[[-90,-90,-100],[-90,-90,-100]],{head:-5})},{p:s([44,80],140,[[20,0],[20,0]],[[-90,-90,-100],[-90,-90,-100]],{head:-10}),ar:[['arc',[44,86],26,95,145]]}]},
- bow:{frames:[{p:s([44,84],90,[[90,90],[90,90]],[[-90,-90,-100],[-90,-90,-100]],{head:-5})},{p:s([44,84],130,[[-100,-170],[-100,-170]],[[-130,-160,-100],[-130,-160,-100]],{head:-10}),ar:[['line',[70,74],[70,62]],['line',[18,74],[18,62]]]}]},
- camel:{frames:[{p:s([40,70],180,[[0,0],[0,0]],[[-100,-180,-100],[-100,-180,-100]])},{p:s([40,70],215,[[-150,-170],[-150,-170]],[[-100,-180,-100],[-100,-180,-100]],{head:-30}),ar:[['arc',[40,70],26,180,215]]}]},
- wheel:{frames:[{p:s([40,84],90,[[150,30],[150,30]],[[-40,10,90],[-40,10,90]])},{p:s([50,52],100,[[30,-10],[30,-10]],[[-60,10,90],[-60,10,90]],{head:40}),ar:[['line',[50,66],[50,50]]]}]},
- bridge_pose:{frames:[{p:s([40,84],90,[[60,60],[60,60]],[[-40,10,90],[-40,10,90]])},{p:s([44,70],100,[[60,60],[60,60]],[[-40,10,90],[-40,10,90]]),ar:[['line',[44,80],[44,66]]]}]},
+ boat:{frames:[{p:sp([44,84],160,{h:[66,70],a:[66,90]})},{p:sp([44,84],150,{h:[82,64],a:[78,56],foot:135}),ar:[['arc',[44,84],30,80,120]]}]},
+ cobra:{frames:[{p:sp([44,86],90,{h:[70,90],hb:-1,a:[6,86],foot:-90,head:-10})},{p:sp([44,86],125,{h:[66,90],a:[6,86],foot:-90,head:-10}),ar:[['arc',[44,86],26,95,135]]}]},
+ updog:{frames:[{p:sp([44,86],90,{h:[70,90],hb:-1,a:[6,86],foot:-90,head:-10})},{p:sp([44,84],140,{h:[66,90],a:[6,86],foot:0,head:-10}),ar:[['arc',[44,84],26,95,145]]}]},
+ bow:{frames:[{p:sp([44,84],90,{h:[92,84],a:[6,84],foot:-90,head:-10})},{p:sp([44,84],115,{h:[40,54],a:[38,52],ab:1,foot:-120,head:-15}),ar:[['line',[70,74],[70,62]],['line',[18,74],[18,62]]]}]},
+ camel:{frames:[{p:sp([40,73],180,{h:[50,72],a:[21,92],ab:1,foot:-100})},{p:sp([40,73],215,{h:[22,90],a:[21,92],ab:1,foot:-100,head:30}),ar:[['arc',[40,73],30,180,215]]}]},
+ wheel:{frames:[{p:sp([40,84],90,{h:[76,80],hb:1,a:[20,88],ab:-1,foot:-90})},{p:sp([46,52],60,{h:[78,90],a:[22,90],head:5}),ar:[['line',[46,66],[46,50]]]}]},
+ bridge_pose:{frames:[{p:sp([40,84],90,{h:[88,86],a:[20,88],ab:-1,foot:-90})},{p:sp([44,70],60,{h:[88,86],a:[20,88],ab:-1,foot:-90,head:30}),ar:[['line',[44,80],[44,66]]]}]},
  neck:{frames:[{p:f([50,52],[[10,10],[10,10]],[[5,0,90],[5,0,90]],{headTilt:25})},{p:f([50,52],[[10,10],[10,10]],[[5,0,90],[5,0,90]],{headTilt:25}),ar:[['arc',[50,26],14,-60,-110]]}]},
- breathing:{frames:[{p:f([50,80],[[40,120],[40,120]],[[80,-150,0],[80,-150,0]])},{p:f([50,80],[[40,120],[40,120]],[[80,-150,0],[80,-150,0]]),ar:[['line',[50,36],[50,44]]]}]},
- lotus:{frames:[{p:f([50,80],[[40,120],[40,120]],[[80,-150,0],[80,-150,0]])}],hero:0},
+ breathing:{frames:[{p:sp([40,84],180,{h:[56,82],legs:[[75,-110,-100],[75,-110,-100]]})},{p:sp([40,84],180,{h:[56,82],legs:[[75,-110,-100],[75,-110,-100]]}),ar:[['line',[40,34],[40,44]]]}]},
+ lotus:{frames:[{p:sp([40,84],180,{h:[56,82],legs:[[75,-110,-100],[75,-110,-100]]})},{p:sp([40,84],180,{h:[56,82],legs:[[75,-110,-100],[75,-110,-100]]})}],hero:0},
  glute_quad:{frames:[{p:s([40,84],90,[[60,100],[60,100]],[[-70,-150,90],[-110,-60,90]])},{p:s([48,52],180,[[90,90],[-30,-120]],[[0,0,90],[-60,-170,-100]]),props:[FLOOR,['wall',90]],ar:[['arc',[40,72],14,-100,-160]]}]},
  hips_stretch:{frames:[{p:f([50,84],[[30,120],[30,120]],[[80,-150,0],[80,-150,0]])},{p:s([44,84],120,[[70,70],[70,70]],[[90,-150,90],[-95,-95,-100]]),ar:[['arc',[44,84],28,160,115]]}]},
  back_stretch:{frames:[{p:s([34,80],110,[[80,80],[80,80]],[[90,-170,-100],[90,-170,-100]])},{p:f([50,54],[[172,178],[172,178]],[[5,-60,90],[5,-60,90]]),props:[['pullbar',10,22,78]]}]},
@@ -652,7 +733,7 @@ function figFrames(ex){ const m=EX_FIG[ex.id]; let tpl,eq,opts;
   else if(ex.icon&&typeof ex.icon==='string'&&(FT[ex.icon]||ex.icon.startsWith('pose:'))){ tpl=ex.icon.startsWith('pose:')?'pose':ex.icon; eq=ex.equip; opts=ex.icon.startsWith('pose:')?ex.icon.slice(5):null; }
   else { tpl=ex.type==='cardio'?'run':ex.type==='stretch'||ex.type==='cooldown'?'pose':ex.muscle==='chest'?'pushup':ex.muscle==='back'?'row_bent':ex.muscle==='shoulders'?'press_overhead':ex.muscle==='arms'?'curl':ex.muscle==='legs'?'squat':ex.muscle==='glutes'?'bridge':ex.muscle==='core'?'crunch':'stand'; eq=ex.equip; opts=tpl==='pose'?'fold_standing':null; }
   try{ if(tpl==='pose'){ const key=typeof opts==='string'?opts:'fold_standing'; return FT.pose(PZ[key]||PZ.fold_standing); } return FT[tpl](eq,opts||{}); }catch(e){ return FT.stand(); } }
-function figSvg(ex,size,frameIdx,opts){ const F=figFrames(ex); const i=frameIdx==null?F.hero:Math.min(frameIdx,F.frames.length-1); return figFrameSvg(F.frames[i],size,Object.assign({muscle:ex&&ex.muscle},opts||{})); }
+function figSvg(ex,size,frameIdx,opts){ const F=figFrames(ex); const i=frameIdx==null?F.hero:Math.min(frameIdx,F.frames.length-1); const o=Object.assign({muscle:ex&&ex.muscle},opts||{}); if(!o.fit)o.fit=figFitBox(F.frames,o); return figFrameSvg(F.frames[i],size,o); }
 const FIG_TEMPLATE_KEYS=Object.keys(FT).filter(k=>k!=='pose').concat(Object.keys(PZ).map(k=>'pose:'+k));
 
 const ICON_DEFS={}; const ICON_IDS=[]; const ICON_CREDIT='';
@@ -693,7 +774,7 @@ en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Set
  done:'Done',finish:'Finish',skip_rest:'Skip rest',set_n:'Set',memo:'Memo',complete:'Complete',vs_last:'vs last',condition:'How did it feel?',
  next_ex:'Next exercise',close:'Close',remove:'Remove from day',nothing_logged:'Nothing logged.',exercises:'exercises',
  items:'items',of_goal:'of goal',planned:'planned',week:'Week',hide_builtin:'Built-in exercises can be hidden, not deleted.',
- muscle:'Muscle',equipment:'Equipment',routines:'Routines',name:'Name',optional:'optional',credits:'Credits',deleted:'(deleted)',routine_default:'My routine',name_required:'Please enter a name.',resume_q:'Resume the workout you left?',resume:'Resume',no_sets_q:'No set was checked. Skip this exercise?',mark_done:'Mark as done',backup_failed:'Backup failed (too large or offline).',sync_error:'Sync error',add_set:'Add set',remove_set:'Remove set',skip_ex:'Skip exercise',add_ex_now:'Add exercise',leave_q:'Leave this exercise?',save_done:'Save what is done',discard_ex:'Discard',minus1:'−1 min',plus1:'+1 min',today_btn:'Today',rest_adj:'Rest',set_of:'of',remaining:'left',sign_in:'Sign in with Google',use_local:'Use without account (this device only)',account:'Account',sign_out:'Sign out',fb_synced:'Synced to Firebase',fb_setup:'Firebase is not configured yet. See README.',login_sub:'Sign in to keep your workouts on every device.',mode_preset:'Preset',mode_smart:'Smart',smart_section:'Smart mode',alternate:'Every other day when possible',alternate_label:'every other day',split:'Split',split_auto:'Auto by days',split_full:'Full body',split_ul:'Upper / Lower',split_ppl:'Push / Pull / Legs',split_home:'Home (bodyweight)',split_db:'Dumbbell',progression_on:'Auto progression',weight_step:'Weight step',version:'Version',whats_new:"What's new",updated_to:'Updated to',on:'On',off:'Off',smart_title:'Smart plan',generate:'Generate this week',regenerate:'Regenerate',smart_starter:'No history yet, so this is a starter plan.',smart_based:'Based on your last 4 weeks.',progression:'Progression',no_progress:'Same targets as last time.',confirm_regen:'Replace this week with a new smart plan?',smart_empty:'Turn on Smart to fill this week automatically.',rest_rule:'Rest day between sessions',backups:'Backups',restore:'Restore',confirm_restore:'Replace all current data with this backup?',auto_backup_note:'A snapshot is saved automatically once a day while synced. The last 14 are kept.',no_backups:'No backups yet.',restored:'Restored',backup_now:'Back up now',backed_up:'Backed up',apply_routine:'Apply routine',apply_week:'Apply to this week',days_week:'days / week',save_week_routine:'Save week as routine',routine_name:'Routine name',applied:'Applied',replace_week:'This week already has exercises.',replace:'Replace week',add_on:'Add on top',builtin_l:'Built-in',mine:'Mine',pick_routine:'Pick a routine',delete_routine:'Delete routine',week_empty_save:'Add exercises to the week first.',week_days:['M','T','W','T','F','S','S'],saved:'Saved',pick:'Pick an exercise',local_only:'Saved on this device only',
+ muscle:'Muscle',equipment:'Equipment',routines:'Routines',name:'Name',optional:'optional',credits:'Credits',deleted:'(deleted)',close:'Close',tap_howto:'Tap the picture for how-to',routine_default:'My routine',name_required:'Please enter a name.',resume_q:'Resume the workout you left?',resume:'Resume',no_sets_q:'No set was checked. Skip this exercise?',mark_done:'Mark as done',backup_failed:'Backup failed (too large or offline).',sync_error:'Sync error',add_set:'Add set',remove_set:'Remove set',skip_ex:'Skip exercise',add_ex_now:'Add exercise',leave_q:'Leave this exercise?',save_done:'Save what is done',discard_ex:'Discard',minus1:'−1 min',plus1:'+1 min',today_btn:'Today',rest_adj:'Rest',set_of:'of',remaining:'left',sign_in:'Sign in with Google',use_local:'Use without account (this device only)',account:'Account',sign_out:'Sign out',fb_synced:'Synced to Firebase',fb_setup:'Firebase is not configured yet. See README.',login_sub:'Sign in to keep your workouts on every device.',mode_preset:'Preset',mode_smart:'Smart',smart_section:'Smart mode',alternate:'Every other day when possible',alternate_label:'every other day',split:'Split',split_auto:'Auto by days',split_full:'Full body',split_ul:'Upper / Lower',split_ppl:'Push / Pull / Legs',split_home:'Home (bodyweight)',split_db:'Dumbbell',progression_on:'Auto progression',weight_step:'Weight step',version:'Version',whats_new:"What's new",updated_to:'Updated to',on:'On',off:'Off',smart_title:'Smart plan',generate:'Generate this week',regenerate:'Regenerate',smart_starter:'No history yet, so this is a starter plan.',smart_based:'Based on your last 4 weeks.',progression:'Progression',no_progress:'Same targets as last time.',confirm_regen:'Replace this week with a new smart plan?',smart_empty:'Turn on Smart to fill this week automatically.',rest_rule:'Rest day between sessions',backups:'Backups',restore:'Restore',confirm_restore:'Replace all current data with this backup?',auto_backup_note:'A snapshot is saved automatically once a day while synced. The last 14 are kept.',no_backups:'No backups yet.',restored:'Restored',backup_now:'Back up now',backed_up:'Backed up',apply_routine:'Apply routine',apply_week:'Apply to this week',days_week:'days / week',save_week_routine:'Save week as routine',routine_name:'Routine name',applied:'Applied',replace_week:'This week already has exercises.',replace:'Replace week',add_on:'Add on top',builtin_l:'Built-in',mine:'Mine',pick_routine:'Pick a routine',delete_routine:'Delete routine',week_empty_save:'Add exercises to the week first.',week_days:['M','T','W','T','F','S','S'],saved:'Saved',pick:'Pick an exercise',local_only:'Saved on this device only',
  synced:'Synced to your account',cannot_write:'Read-only view: changes are not saved',volume:'Volume',duration:'Duration',total_sets:'Sets'},
 ko:{tab_dash:'대시보드',tab_week:'주간',tab_month:'월간',tab_settings:'설정',
  this_week:'이번 주',workout_days:'운동일',total_time:'총 운동 시간',streak:'연속',days:'일',d:'일',
@@ -712,7 +793,7 @@ ko:{tab_dash:'대시보드',tab_week:'주간',tab_month:'월간',tab_settings:'�
  done:'완료',finish:'마치기',skip_rest:'휴식 건너뛰기',set_n:'세트',memo:'메모',complete:'완료',vs_last:'지난번 대비',condition:'컨디션은 어땠나요?',
  next_ex:'다음 운동',close:'닫기',remove:'이 날에서 빼기',nothing_logged:'기록 없음.',exercises:'개 운동',
  items:'개',of_goal:'목표',planned:'계획',week:'주',hide_builtin:'기본 운동은 삭제 대신 숨길 수 있어요.',
- muscle:'부위',equipment:'도구',routines:'루틴',name:'이름',optional:'선택',credits:'출처',deleted:'(삭제됨)',routine_default:'내 루틴',name_required:'이름을 입력해 주세요.',resume_q:'하다 만 운동을 이어서 할까요?',resume:'이어서 하기',no_sets_q:'완료한 세트가 없어요. 이 운동을 건너뛸까요?',mark_done:'완료로 표시',backup_failed:'백업 실패 (용량 초과 또는 오프라인).',sync_error:'동기화 오류',add_set:'세트 추가',remove_set:'세트 삭제',skip_ex:'이 운동 건너뛰기',add_ex_now:'운동 추가',leave_q:'이 운동을 그만둘까요?',save_done:'한 만큼 저장',discard_ex:'버리기',minus1:'−1분',plus1:'+1분',today_btn:'오늘',rest_adj:'휴식',set_of:'/',remaining:'남음',sign_in:'Google로 로그인',use_local:'계정 없이 사용 (이 기기만)',account:'계정',sign_out:'로그아웃',fb_synced:'Firebase에 동기화됨',fb_setup:'Firebase 설정이 아직 없어요. README를 참고하세요.',login_sub:'로그인하면 모든 기기에서 같은 기록을 봐요.',mode_preset:'프리셋',mode_smart:'스마트',smart_section:'스마트 모드',alternate:'가능하면 격일(퐁당퐁당)',alternate_label:'격일',split:'분할',split_auto:'일수에 따라 자동',split_full:'전신',split_ul:'상체 / 하체',split_ppl:'푸시 / 풀 / 레그',split_home:'홈트 (맨몸)',split_db:'덤벨',progression_on:'자동 증량',weight_step:'증량 단위',version:'버전',whats_new:'새로운 기능',updated_to:'업데이트됨',on:'켬',off:'끔',smart_title:'스마트 플랜',generate:'이번 주 생성',regenerate:'다시 생성',smart_starter:'아직 기록이 없어 기본 플랜으로 시작해요.',smart_based:'최근 4주 기록 기준.',progression:'증량',no_progress:'지난번과 같은 목표.',confirm_regen:'이번 주를 새 스마트 플랜으로 바꿀까요?',smart_empty:'스마트를 켜면 이번 주가 자동으로 채워져요.',rest_rule:'세션 사이 휴식일',backups:'백업',restore:'복원',confirm_restore:'현재 데이터를 이 백업으로 되돌릴까요?',auto_backup_note:'동기화 상태에서 하루 한 번 자동으로 스냅샷을 저장해요. 최근 14개 보관.',no_backups:'아직 백업이 없어요.',restored:'복원됨',backup_now:'지금 백업',backed_up:'백업됨',apply_routine:'루틴 적용',apply_week:'이번 주에 적용',days_week:'일 / 주',save_week_routine:'이번 주를 루틴으로 저장',routine_name:'루틴 이름',applied:'적용됨',replace_week:'이번 주에 이미 운동이 있어요.',replace:'덮어쓰기',add_on:'추가로 넣기',builtin_l:'기본',mine:'내 루틴',pick_routine:'루틴 선택',delete_routine:'루틴 삭제',week_empty_save:'먼저 이번 주에 운동을 넣어주세요.',week_days:['월','화','수','목','금','토','일'],saved:'저장됨',pick:'운동 선택',local_only:'이 기기에만 저장됨',
+ muscle:'부위',equipment:'도구',routines:'루틴',name:'이름',optional:'선택',credits:'출처',deleted:'(삭제됨)',close:'닫기',tap_howto:'그림을 누르면 운동 방법',routine_default:'내 루틴',name_required:'이름을 입력해 주세요.',resume_q:'하다 만 운동을 이어서 할까요?',resume:'이어서 하기',no_sets_q:'완료한 세트가 없어요. 이 운동을 건너뛸까요?',mark_done:'완료로 표시',backup_failed:'백업 실패 (용량 초과 또는 오프라인).',sync_error:'동기화 오류',add_set:'세트 추가',remove_set:'세트 삭제',skip_ex:'이 운동 건너뛰기',add_ex_now:'운동 추가',leave_q:'이 운동을 그만둘까요?',save_done:'한 만큼 저장',discard_ex:'버리기',minus1:'−1분',plus1:'+1분',today_btn:'오늘',rest_adj:'휴식',set_of:'/',remaining:'남음',sign_in:'Google로 로그인',use_local:'계정 없이 사용 (이 기기만)',account:'계정',sign_out:'로그아웃',fb_synced:'Firebase에 동기화됨',fb_setup:'Firebase 설정이 아직 없어요. README를 참고하세요.',login_sub:'로그인하면 모든 기기에서 같은 기록을 봐요.',mode_preset:'프리셋',mode_smart:'스마트',smart_section:'스마트 모드',alternate:'가능하면 격일(퐁당퐁당)',alternate_label:'격일',split:'분할',split_auto:'일수에 따라 자동',split_full:'전신',split_ul:'상체 / 하체',split_ppl:'푸시 / 풀 / 레그',split_home:'홈트 (맨몸)',split_db:'덤벨',progression_on:'자동 증량',weight_step:'증량 단위',version:'버전',whats_new:'새로운 기능',updated_to:'업데이트됨',on:'켬',off:'끔',smart_title:'스마트 플랜',generate:'이번 주 생성',regenerate:'다시 생성',smart_starter:'아직 기록이 없어 기본 플랜으로 시작해요.',smart_based:'최근 4주 기록 기준.',progression:'증량',no_progress:'지난번과 같은 목표.',confirm_regen:'이번 주를 새 스마트 플랜으로 바꿀까요?',smart_empty:'스마트를 켜면 이번 주가 자동으로 채워져요.',rest_rule:'세션 사이 휴식일',backups:'백업',restore:'복원',confirm_restore:'현재 데이터를 이 백업으로 되돌릴까요?',auto_backup_note:'동기화 상태에서 하루 한 번 자동으로 스냅샷을 저장해요. 최근 14개 보관.',no_backups:'아직 백업이 없어요.',restored:'복원됨',backup_now:'지금 백업',backed_up:'백업됨',apply_routine:'루틴 적용',apply_week:'이번 주에 적용',days_week:'일 / 주',save_week_routine:'이번 주를 루틴으로 저장',routine_name:'루틴 이름',applied:'적용됨',replace_week:'이번 주에 이미 운동이 있어요.',replace:'덮어쓰기',add_on:'추가로 넣기',builtin_l:'기본',mine:'내 루틴',pick_routine:'루틴 선택',delete_routine:'루틴 삭제',week_empty_save:'먼저 이번 주에 운동을 넣어주세요.',week_days:['월','화','수','목','금','토','일'],saved:'저장됨',pick:'운동 선택',local_only:'이 기기에만 저장됨',
  synced:'계정에 동기화됨',cannot_write:'읽기 전용: 변경 사항이 저장되지 않아요',volume:'볼륨',duration:'시간',total_sets:'세트'}
 };
 const MUSCLE_META={chest:{en:'Chest',ko:'가슴'},back:{en:'Back',ko:'등'},shoulders:{en:'Shoulders',ko:'어깨'},arms:{en:'Arms',ko:'팔'},legs:{en:'Legs',ko:'하체'},glutes:{en:'Glutes',ko:'엉덩이'},core:{en:'Core',ko:'코어'},full:{en:'Full body',ko:'전신'}};
@@ -1206,7 +1287,7 @@ function renderDash(){
 function cardHtml(it,clickable){ const ex=exById(it.exId); const ic=ex?ex.icon:'dumbbell'; const name=ex?exName(ex):t('deleted');
   const sub=`<span class="dot b-${ex?ex.type:'strength'}"></span> ${esc(typeName(ex?ex.type:'strength'))} · ${esc(targetText(it))}`;
   const chk=it.status==='done'?`<span class="chk on">${ICO.check}</span>`:it.status==='skipped'?`<span class="cap">${esc(t('status_skipped'))}</span>`:`<span class="chk"></span>`;
-  return `<button class="card ${it.status==='done'?'done':''}" ${clickable?`data-act="open-item" data-id="${it.id}"`:'disabled'}><span class="ic">${ex?figSvg(ex,52):''}</span><span class="grow"><div class="nm">${esc(name)}</div><div class="sub row" style="gap:6px">${sub}</div></span>${chk}</button>`; }
+  return `<button class="card ${it.status==='done'?'done':''}" ${clickable?`data-act="open-item" data-id="${it.id}"`:'disabled'}><span class="ic" data-howto="${ex?ex.id:''}" title="${esc(t('view_howto'))}">${ex?figSvg(ex,60):''}</span><span class="grow"><div class="nm">${esc(name)}</div><div class="sub row" style="gap:6px">${sub}</div></span>${chk}</button>`; }
 
 // ---------- Weekly ----------
 function smartDays(ws,n,fromDay){ fromDay=fromDay||0; if(S.settings.smartAlternate!==false&&n<=4){ let start=fromDay; if(fromDay===0&&planOf(keyOf(addDays(ws,-1))).length)start=1; const days=[]; for(let d=start;d<7&&days.length<n;d+=2)days.push(d); if(days.length===n)return {days,alt:true}; }
@@ -1235,7 +1316,7 @@ function renderWeek(){
   let cols='';
   for(let i=0;i<7;i++){ const d=addDays(ws,i),k=keyOf(d); const items=planOf(k);
     cols+=`<div class="col ${k===today?'sel today':''}"><span class="wd">${esc(wd[i])}</span><span class="d num">${d.getDate()}</span>
-      ${items.map(it=>{const ex=exById(it.exId);return `<button class="mini ${it.status==='done'?'done':''}" data-act="edit-item" data-k="${k}" data-id="${it.id}" title="${esc(ex?exName(ex):'')}"><i class="b-${ex?ex.type:'strength'}"></i>${ex?figSvg(ex,28,null,{noArrows:true}):''}<span class="mn">${esc(ex?exName(ex):'?')}</span></button>`;}).join('')}
+      ${items.map(it=>{const ex=exById(it.exId);return `<button class="mini ${it.status==='done'?'done':''}" data-act="edit-item" data-k="${k}" data-id="${it.id}" title="${esc(ex?exName(ex):'')}" data-ex="${ex?ex.id:''}"><i class="b-${ex?ex.type:'strength'}"></i>${ex?figSvg(ex,34,null,{noArrows:true}):''}<span class="mn">${esc(ex?exName(ex):'?')}</span></button>`;}).join('')}
       <button class="add" data-act="add-day" data-k="${k}" aria-label="add">+</button></div>`; }
   const weekEmpty=[0,1,2,3,4,5,6].every(i=>!planOf(keyOf(addDays(ws,i))).length);
   const total=[0,1,2,3,4,5,6].reduce((a,i)=>a+planOf(keyOf(addDays(ws,i))).reduce((b,it)=>b+estMin(it),0),0);
@@ -1266,15 +1347,16 @@ function openPicker(date,onPick){
   $('#picklist').addEventListener('click',e=>{const b=e.target.closest('[data-ex]');if(!b)return; if(onPick){closeSheet();onPick(exById(b.dataset.ex));return;} addPlanItem(date,exById(b.dataset.ex));closeSheet();render();});
 }
 function pickRows(){ const q=S.pickQ||''; const list=S.exercises.filter(e=>!e.hidden&&(S.pickMuscle==='all'||e.muscle===S.pickMuscle)&&(S.pickEquip==='all'||e.equip===S.pickEquip)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
-  const row=e=>`<button class="li" data-ex="${e.id}"><span class="ic sm">${figSvg(e,42)}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span></button>`;
+  const row=e=>`<button class="li" data-ex="${e.id}"><span class="ic sm" data-howto="${e.id}">${figSvg(e,48)}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span></button>`;
   if(!list.length)return `<div class="empty">—</div>`;
   if(S.pickMuscle!=='all'||S.pickEquip!=='all'||q)return `<div class="list">${list.map(row).join('')}</div>`;
   return MUSCLES.map(m=>{const g=list.filter(e=>e.muscle===m); return g.length?`<div class="cap" style="margin:12px 0 6px">${esc(muscleName(m))}</div><div class="list">${g.map(row).join('')}</div>`:'';}).join(''); }
 function openItemEditor(date,itemId){
   const orig=planOf(date).find(x=>x.id===itemId); if(!orig)return; const it=Object.assign({},orig); const ex=exById(it.exId);
   const num=(k,label,step,unit)=>`<div class="field"><label>${esc(label)}${unit?' ('+esc(unit)+')':''}</label><div class="step"><button data-st="${k}" data-d="-${step}">−</button><input class="sv num" id="sv-${k}" type="number" inputmode="decimal" step="${step}" value="${it[k]}" data-nk="${k}" style="border:0;background:transparent;text-align:center;width:70px;padding:0"><button data-st="${k}" data-d="${step}">+</button></div></div>`;
-  showSheet(`<div class="row" style="margin-bottom:12px"><span class="ic">${ex?figSvg(ex,52):''}</span><div><h2>${esc(ex?exName(ex):'?')}</h2><div class="cap">${esc(ex?exMeta(ex):'')}</div></div></div>
+  showSheet(`<div class="row" style="margin-bottom:12px"><span class="ic" data-howto="${ex?ex.id:''}">${ex?figSvg(ex,60):''}</span><div><h2>${esc(ex?exName(ex):'?')}</h2><div class="cap">${esc(ex?exMeta(ex):'')}</div></div></div>
    <div class="stack" style="gap:12px">
+   ${ex?`<button class="btn sec" data-howto="${ex.id}">${esc(t('view_howto'))}</button>`:''}
    ${it.mode==='time'?num('minutes',t('minutes'),1,t('min')):num('sets',t('sets'),1,'')+num('reps',t('reps'),1,'')+num('weight',t('weight'),2.5,S.settings.unit)+num('rest',t('rest'),15,t('sec'))}
    ${it.status!=='planned'?`<button class="btn sec" data-act="reset-item">${esc(t('status_planned'))}</button>`:`<button class="btn sec" data-act="mark-done">${esc(t('mark_done'))}</button>`}
    <button class="btn pri" data-act="save-item">${esc(t('save'))}</button>
@@ -1306,7 +1388,7 @@ function renderMonth(){
   </div>`;
 }
 function openDayDetail(k){ const items=planOf(k); const entries=logOf(k);
-  const rows=items.map(it=>{const ex=exById(it.exId);const e=entries.find(x=>x.planItemId===it.id);return `<div class="li"><span class="ic sm">${ex?figSvg(ex,42):''}</span><span class="grow"><div class="nm">${esc(ex?exName(ex):t('deleted'))}</div><div class="sub">${esc(targetText(it))}${e?' → '+esc(entrySummary(e))+(e.memo?' · '+esc(e.memo):''):''}</div></span><span class="cap">${esc(t('status_'+it.status))}</span></div>`;}).join('');
+  const rows=items.map(it=>{const ex=exById(it.exId);const e=entries.find(x=>x.planItemId===it.id);return `<div class="li"><span class="ic sm" data-howto="${ex?ex.id:''}">${ex?figSvg(ex,48):''}</span><span class="grow"><div class="nm">${esc(ex?exName(ex):t('deleted'))}</div><div class="sub">${esc(targetText(it))}${e?' → '+esc(entrySummary(e))+(e.memo?' · '+esc(e.memo):''):''}</div></span><span class="cap">${esc(t('status_'+it.status))}</span></div>`;}).join('');
   showSheet(`<h2 style="margin-bottom:10px">${esc(fmtLong(parseKey(k)))}</h2>${rows?`<div class="list">${rows}</div>`:`<div class="empty">${esc(t('nothing_logged'))}</div>`}
    <button class="btn sec" style="margin-top:12px" data-act="go-day" data-k="${k}">${esc(t('tab_week'))} ${ICO.chev}</button>`);
 }
@@ -1398,7 +1480,7 @@ function renderLibrary(){
   const q=S.libQuery.toLowerCase(); const f=S.libFilter;
   const m=S.libMuscle; const q2=S.libEquip; const all=S.exercises.filter(e=>(f==='all'||e.type===f)&&(m==='all'||e.muscle===m)&&(q2==='all'||e.equip===q2)&&(!q||(e.nameEn+' '+e.nameKo+' '+exMeta(e)).toLowerCase().includes(q)));
   const vis=all.filter(e=>!e.hidden), hid=all.filter(e=>e.hidden);
-  const row=e=>`<button class="li" data-act="edit-ex" data-id="${e.id}"><span class="ic sm">${figSvg(e,42)}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span>${ICO.chev}</button>`;
+  const row=e=>`<button class="li" data-act="edit-ex" data-id="${e.id}"><span class="ic sm" data-howto="${e.id}">${figSvg(e,48)}</span><span class="grow"><div class="nm">${esc(exName(e))}</div><div class="sub"><span class="dot b-${e.type}"></span> ${esc(exMeta(e))} · ${esc(targetText(e))}</div></span>${ICO.chev}</button>`;
   view.innerHTML=`<div class="stack">
    <div class="row"><button class="icon-btn" data-act="back">${ICO.back}</button><input id="libq" class="grow" placeholder="${esc(t('search'))}" value="${esc(S.libQuery)}"><button class="btn sm pri" style="width:auto" data-act="new-ex">+ ${esc(t('new'))}</button></div>
    <div class="chips">${['all',...TYPES].map(ty=>`<button class="chip ${f===ty?'on':''}" data-filter="${ty}">${ty==='all'?esc(t('all')):esc(typeName(ty))}</button>`).join('')}</div>
@@ -1442,6 +1524,8 @@ function saveExercise(){ const e=S.editEx; if(!e.nameEn.trim()&&!e.nameKo.trim()
   persist.exercises(); S.editDirty=false; S.sub='library'; toast(t('saved')); render(); }
 
 // ---------- sheets ----------
+function howtoCards(ex){ const ko=S.lang==='ko'; const steps=ex.steps||[]; return steps.map((s,i)=>`<div class="hc"><div class="fig"><span class="phase">${phaseSvg(phaseOf(s,i),14)} ${esc(t('step'))} ${i+1}</span>${figSvg(ex,300,i)}${bodyMap(ex.muscle,64)}</div><div class="k">${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="cue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div>${(ko?s.mistakeKo:s.mistakeEn)?`<div class="mis">✕ ${esc(ko?s.mistakeKo:s.mistakeEn)}</div>`:''}</div>`).join('')||`<div class="empty grow">—</div>`; }
+function openHowto(exId){ const ex=exById(exId); if(!ex)return; showSheet(`<div class="row" style="margin-bottom:12px;gap:12px"><div><h2>${esc(exName(ex))}</h2><div class="cap"><span class="dot b-${ex.type}"></span> ${esc(exMeta(ex))}</div></div></div><div class="howto v">${howtoCards(ex)}</div><button class="btn ghost" data-act="close-sheet" style="margin-top:12px">${esc(t('close'))}</button>`); }
 function showSheet(html){ closeSheet(); $('#layer').innerHTML=`<div class="backdrop" data-act="close-sheet"></div><div class="sheet" id="sheet" role="dialog"><div class="grip"></div>${html}</div>`; }
 function closeSheet(){ $('#layer').innerHTML=''; }
 function confirmSheet(msg,okLabel,onOk,danger){ showSheet(`<p style="margin:4px 0 16px;font-weight:600">${esc(msg)}</p><div class="stack" style="gap:8px"><button class="btn ${danger?'sec danger':'pri'}" id="ok">${esc(okLabel)}</button><button class="btn ghost" data-act="close-sheet">${esc(t('cancel'))}</button></div>`); $('#ok').addEventListener('click',()=>{closeSheet();onOk();}); }
@@ -1497,7 +1581,7 @@ function renderPerform(keep){
       <button class="btn sec" data-p="howto">${esc(t('view_howto'))}</button></div>`;
     foot=`<button class="btn pri" data-p="start">${esc(t('start'))}</button><div class="row" style="gap:8px"><button class="btn ghost" data-p="skip">${esc(t('skip'))}</button><button class="btn ghost" data-p="addex">+ ${esc(t('add_ex_now'))}</button></div>`; }
   else if(P.stage==='howto'){ const steps=ex.steps||[];
-    body=`<h2 style="margin:4px 0 12px">${esc(exName(ex))}</h2><div class="howto" id="howto">${steps.map((s,i)=>`<div class="hc"><div class="fig"><span class="phase">${phaseSvg(phaseOf(s,i),14)} ${esc(t('step'))} ${i+1}</span>${figSvg(ex,150,i)}${bodyMap(ex.muscle,120)}</div><div class="k">${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="cue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div>${(ko?s.mistakeKo:s.mistakeEn)?`<div class="mis">✕ ${esc(ko?s.mistakeKo:s.mistakeEn)}</div>`:''}</div>`).join('')||`<div class="empty grow">—</div>`}</div><div class="dots" id="dots">${steps.map((s,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>`;
+    body=`<h2 style="margin:4px 0 12px">${esc(exName(ex))}</h2><div class="howto" id="howto">${howtoCards(ex)}</div><div class="dots" id="dots">${steps.map((s,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>`;
     foot=`<button class="btn pri" data-p="start">${esc(t('begin'))}</button>`; }
   else if(P.stage==='perform'){
     if(it.mode==='time'){ body=`<div class="timer"><div class="cap" style="margin-bottom:16px">${esc(exName(ex))} · ${it.minutes} ${esc(t('min'))}</div><div class="ring" id="ring" style="--p:${(100-P.remaining/P.total*100)}%"><div><div class="big num" id="big">${mmss(P.remaining)}</div></div></div></div>
@@ -1526,7 +1610,7 @@ function renderPerform(keep){
 }
 function onHowtoScroll(e){ if(e.target.id!=='howto')return; const h=e.target; const i=Math.round(h.scrollLeft/(h.clientWidth+12)); h.parentElement.querySelectorAll('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); }
 function onPerfInput(e){ const x=e.target; if(x.id==='memo'){P.memo=x.value;saveP();return;} }
-function onPerfClick(e){ const b=e.target.closest('[data-p],[data-c],[data-sp]'); if(!b)return;
+function onPerfClick(e){ if(P.stage==='prepare'&&S._dbl&&Date.now()-S._dbl.at<450&&!e.target.closest('[data-p]')){ S._dbl=null; P.stage='howto'; P.howtoIdx=0; renderPerform(); return; } const b=e.target.closest('[data-p],[data-c],[data-sp]'); if(!b)return;
   if(b.dataset.c){ P.result.condition=+b.dataset.c; $('#cond').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); return; }
   const {it}=curItem();
   if(b.dataset.sp){ const i=+b.dataset.i, k=b.dataset.sp, d=+b.dataset.d; const st=k==='weight'?(S.settings.weightStep||2.5):1; const s0=P.sets[i]; const nv=Math.max(0,Math.round((s0[k]+d*st)*10)/10); s0[k]=nv; for(let j=i+1;j<P.sets.length;j++){ if(!P.sets[j].done)P.sets[j][k]=nv; } const sc=$('#perf .body')?.scrollTop||0; renderPerform(); const bd=$('#perf .body'); if(bd)bd.scrollTop=sc; saveP(); return; }
@@ -1545,7 +1629,7 @@ function onPerfClick(e){ const b=e.target.closest('[data-p],[data-c],[data-sp]')
 // ---------- global events ----------
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;S.tab=b.dataset.tab;S.sub=null;render();view.scrollTop=0;});
 $('#lang').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;S.settings.lang=b.dataset.l;persist.settings();render();});
-$('#layer').addEventListener('click',e=>{ const a=e.target.closest('[data-act]'); if(!a)return; if(a.dataset.act==='close-sheet'&&e.target===a)closeSheet(); if(a.dataset.act==='go-day'){S.tab='week';S.selDay=a.dataset.k;S.weekStart=keyOf(startOfWeek(parseKey(a.dataset.k)));closeSheet();render();} });
+$('#layer').addEventListener('click',e=>{ const hw=e.target.closest('[data-howto]'); if(hw&&hw.dataset.howto){openHowto(hw.dataset.howto);return;} const a=e.target.closest('[data-act]'); if(!a)return; if(a.dataset.act==='close-sheet'&&e.target===a){ if(S._dbl&&S._dbl.ex&&Date.now()-S._dbl.at<450){ const ex=S._dbl.ex; S._dbl=null; openHowto(ex); return; } closeSheet(); } if(a.dataset.act==='go-day'){S.tab='week';S.selDay=a.dataset.k;S.weekStart=keyOf(startOfWeek(parseKey(a.dataset.k)));closeSheet();render();} });
 view.addEventListener('click',e=>{
   const st=e.target.closest('[data-st]'); if(st&&S.sub==='edit'){const k=st.dataset.st,d=Number(st.dataset.d);const ex=S.editEx;ex[k]=Math.max(k==='weight'||k==='rest'?0:1,Math.round((ex[k]+d)*10)/10);S.editDirty=true;$('#sv-'+k).textContent=ex[k]+(k==='minutes'?' '+t('min'):k==='weight'?' '+S.settings.unit:k==='rest'?' '+t('sec'):'');return;}
   const ss=e.target.closest('[data-set]'); if(ss&&S.tab==='settings'&&!S.sub){const k=ss.dataset.set;S.settings[k]=Math.max(k==='restSec'?0:1,S.settings[k]+Number(ss.dataset.d)); if(k==='weeklyGoal')S.settings[k]=Math.min(7,S.settings[k]); persist.settings();render();return;}
@@ -1553,6 +1637,7 @@ view.addEventListener('click',e=>{
   const sp=e.target.closest('[data-split]'); if(sp){S.settings.smartSplit=sp.dataset.split;persist.settings();S.smartInfo=null;render();return;}
   const wsb=e.target.closest('[data-wstep]'); if(wsb){S.settings.weightStep=Number(wsb.dataset.wstep);persist.settings();S.smartInfo=null;render();return;}
   const lg=e.target.closest('[data-lang]'); if(lg){S.settings.lang=lg.dataset.lang;persist.settings();render();return;}
+  const hw=e.target.closest('[data-howto]'); if(hw&&hw.dataset.howto){e.preventDefault();openHowto(hw.dataset.howto);return;}
   const un=e.target.closest('[data-unit]'); if(un){S.settings.unit=un.dataset.unit;persist.settings();render();return;}
   const ic=e.target.closest('[data-icon]'); if(ic&&S.sub==='edit'){S.editEx.icon=ic.dataset.icon;S.editDirty=true;view.querySelectorAll('[data-icon]').forEach(x=>x.classList.toggle('on',x===ic));return;}
   const ty=e.target.closest('[data-type]'); if(ty&&S.sub==='edit'){S.editEx.type=ty.dataset.type;S.editDirty=true;view.querySelectorAll('[data-type]').forEach(x=>x.classList.toggle('on',x===ty));return;}
@@ -1567,7 +1652,7 @@ view.addEventListener('click',e=>{
   switch(act){
     case 'go-week': S.tab='week'; S.selDay=todayKey(); S.weekStart=keyOf(startOfWeek(new Date())); render(); break;
     case 'start-today': { const d=todayKey(); startQueue(planOf(d).filter(i=>i.status==='planned').map(i=>({date:d,id:i.id}))); break; }
-    case 'open-item': { const d=todayKey(); const it=planOf(d).find(x=>x.id===a.dataset.id); if(it&&it.status==='done'){openItemEditor(d,it.id);} else startQueue([{date:d,id:a.dataset.id}]); break; }
+    case 'open-item': { const d=todayKey(); const it=planOf(d).find(x=>x.id===a.dataset.id); S._dbl={at:Date.now(),ex:it&&it.exId}; if(it&&it.status==='done'){openItemEditor(d,it.id);} else startQueue([{date:d,id:a.dataset.id}]); break; }
     case 'add-day': S.selDay=a.dataset.k; openPicker(a.dataset.k); break;
     case 'smart-apply': applySmart(); break;
     case 'smart-regen': confirmSheet(t('confirm_regen'),t('regenerate'),()=>applySmart(),true); break;
@@ -1582,7 +1667,7 @@ view.addEventListener('click',e=>{
     case 'sign-in': signIn(); break;
     case 'sign-out': signOut().then(()=>render()); break;
     case 'save-routine': saveWeekAsRoutine(); break;
-    case 'edit-item': openItemEditor(a.dataset.k||S.selDay,a.dataset.id); break;
+    case 'edit-item': { openItemEditor(a.dataset.k||S.selDay,a.dataset.id); const it=planOf(a.dataset.k||S.selDay).find(x=>x.id===a.dataset.id); S._dbl={at:Date.now(),ex:it&&it.exId}; break; }
     case 'month-prev': { const m=parseKey(S.month); S.month=keyOf(new Date(m.getFullYear(),m.getMonth()-1,1)); render(); break; }
     case 'month-next': { const m=parseKey(S.month); S.month=keyOf(new Date(m.getFullYear(),m.getMonth()+1,1)); render(); break; }
     case 'day-detail': openDayDetail(a.dataset.k); break;
@@ -1604,6 +1689,7 @@ view.addEventListener('click',e=>{
   }
 });
 
+document.addEventListener('dblclick',e=>{ const el=e.target.closest('.card[data-id],.mini[data-ex],.li[data-act="edit-ex"],.li[data-ex]'); if(!el)return; let id=el.dataset.ex||el.dataset.id; if(el.classList.contains('card')){ const it=planOf(todayKey()).find(x=>x.id===id); id=it&&it.exId; } if(id&&exById(id)){ e.preventDefault(); openHowto(id); } });
 // ---------- boot ----------
 loadLocal(); render(); connectDb(); checkWhatsNew(); checkResume();
 let LAST_DAY=todayKey(); setInterval(()=>{ if(todayKey()!==LAST_DAY){ LAST_DAY=todayKey(); S.smartInfo=null; render(); } },60000);
