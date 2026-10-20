@@ -298,8 +298,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.12.1';
+const APP_VERSION='0.12.2';
 const CHANGELOG=[
+ {v:'0.12.2',date:'2026-10-20',en:['Arrows never touch the body: the renderer moves any arrow that overlaps the figure outward until it is clear','No more grey limbs: the far-side arm and leg are drawn with the same black outline, behind the near side'],ko:['화살표가 몸에 닿지 않음: 그림과 겹치는 화살표는 렌더러가 바깥쪽으로 밀어냄','회색 팔다리 제거: 반대쪽 팔다리도 같은 검정 외곽선으로 앞쪽 뒤에 그림']},
  {v:'0.12.1',date:'2026-10-19',en:['Second review round: overhead triceps, bench bar over the chest, back-squat bar at the shoulders, push-up and dip arrows, knee raise from the side, feet on the floor in machine exercises, single-arm row support hand on the bench, calf raise step under the toes, floor line consistent across the steps of one exercise'],ko:['2차 리뷰 반영: 삼두 오버헤드, 벤치 바를 가슴 위로, 백스쿼트 바를 어깨 높이로, 푸시업·딥 화살표, 니 레이즈 측면도, 머신 운동에서 발을 바닥에, 원암 로우 지지 손을 벤치 위에, 카프 레이즈 발판을 발끝 아래로, 한 운동의 단계들 사이에 바닥선 일관']},
  {v:'0.12.0',date:'2026-10-19',en:['Review pass on all 81 figures: grips drawn over bars and plates, lighter arrows on big pictures, working limb always in front, rear leg in lunges and kneeling stretches on the floor, side plank, jogging with a foot down','New cable crossover and chest press machine figures; wall sit against the wall; leg press and rowing machines corrected','Floor line also under seated and kneeling poses','Bigger pictures: Weekly thumbnails, lists, picture picker; exercise picture on the set and timer screens (tap for how-to)','Muscle map moved beside the title in the how-to popup; lists no longer hide behind the start button; month legend; rounded durations'],ko:['81개 그림 전체 리뷰 반영: 바·원판 위에 손이 보이게, 큰 그림에서는 화살표를 가늘게, 작동하는 팔다리를 앞쪽으로, 런지·무릎 스트레칭 뒷다리를 바닥에, 사이드 플랭크, 조깅은 한 발 착지','케이블 크로스오버·체스트 프레스 머신 그림 추가, 월싯은 벽에 붙게, 레그프레스·로잉 머신 수정','앉거나 무릎 꿇는 자세에도 바닥선','그림 더 크게: 주간 썸네일, 목록, 그림 선택, 세트·타이머 화면에도 운동 그림(누르면 운동 방법)','운동 방법 팝업의 근육 지도는 제목 옆으로, 시작 버튼이 목록을 가리지 않게, 월간 범례, 시간 반올림']},
  {v:'0.11.0',date:'2026-10-19',en:['Figures auto-frame: nothing is cut off, every pose fills its box, and shared framing keeps steps aligned','Floor-contact poses redrawn with real joint geometry (push-up, plank, bridge, crunch, leg raise, kneeling and seated stretches, downward dog...)','Floor line only where the body or equipment touches it; far-side limbs in light grey','How-to popup: tap any exercise picture (or double-tap a card) on Dashboard, Weekly, day detail, library and editor','Much bigger pictures everywhere: how-to steps fill the card, thumbnails enlarged'],ko:['그림 자동 프레이밍: 잘림 없이 박스를 꽉 채우고, 단계 간 위치가 흔들리지 않음','바닥에 닿는 자세를 관절 기하로 다시 그림(푸시업, 플랭크, 브릿지, 크런치, 레그레이즈, 무릎·앉은 스트레칭, 다운독 등)','바닥선은 몸이나 기구가 닿는 곳에만, 반대쪽 팔다리는 연한 회색','운동 방법 팝업: 대시보드·주간·날짜 상세·라이브러리·편집에서 그림을 누르거나 카드를 두 번 누르면 열림','그림을 훨씬 크게: 운동 방법 카드를 꽉 채우고 썸네일도 확대']},
@@ -380,7 +381,7 @@ function _figurePaths(pose,opts){
   const handsIn=(far)=>simple?'':hands.slice(far?1:0,far?2:1).map(h=>`<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="2" class="fillp" stroke="none"/>`).join('');
   const render=(list,withHead)=>{ if(simple){ const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(simpleSeg).join('')+(hasArm?handsOut(far):'')+(withHead?headOut+dots():''); } const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(pass1).join('')+(hasArm?handsOut(far):'')+(withHead?headOut:'')+list.map(pass2).join('')+(hasArm?handsIn(far):'')+(withHead?headIn+dots():''); };
   const farSegs=segs.filter(x=>x.far), nearSegs=segs.filter(x=>!x.far);
-  let out=''; if(farSegs.length) out+=`<g opacity=".5" style="color:#8a8d93" transform="translate(1.5 0)">${render(farSegs,false).replace(/class="hls"/g,'class=""')}</g>`;
+  let out=''; if(farSegs.length) out+=`<g transform="translate(2 0)">${render(farSegs,false).replace(/class="hls"/g,'class="fill"')}</g>`;
   const legsOut=[]; const rest=[]; nearSegs.forEach(sg=>((sg.k==='thigh'||sg.k==='shin'||sg.k==='foot')&&pose.tilt?legsOut:rest).push(sg));
   let body=render(rest,true);
   if(pose.tilt) body=`<g transform="rotate(${pose.tilt} ${_n(pose.hip[0])} ${_n(pose.hip[1])})">${body}</g>`;
@@ -462,6 +463,27 @@ function _propBox(sp,L){
   }
   return null; }
 function _arrowBox(sp){ if(sp[0]==='line'){const a=sp[1],b=sp[2]; return [Math.min(a[0],b[0])-3,Math.min(a[1],b[1])-3,Math.max(a[0],b[0])+3,Math.max(a[1],b[1])+3];} if(sp[0]==='arc'){const c=sp[1],r=sp[2]; const p0=_pt(c,sp[3],r),p1=_pt(c,sp[4],r); const xs=[p0[0],p1[0]],ys=[p0[1],p1[1]]; for(let a=Math.min(sp[3],sp[4]);a<=Math.max(sp[3],sp[4]);a+=15){const q=_pt(c,a,r);xs.push(q[0]);ys.push(q[1]);} return [Math.min(...xs)-3,Math.min(...ys)-3,Math.max(...xs)+3,Math.max(...ys)+3];} return null; }
+// body segments [[p,q,halfWidth]] in frame coordinates, for arrow clearance
+function _bodySegs(pose,L){ const out=[]; const hip=pose.hip; const tilt=pose.tilt||0, rot=pose.rot||0;
+  const T=(p,inTilt)=>{ let q=inTilt?_rotP(p,hip,tilt):p; return _rotP(q,hip,rot); };
+  const seg=(a,b,w,inTilt)=>out.push([T(a,inTilt),T(b,inTilt),w]);
+  L.legs.forEach(l=>{seg(l.h,l.kn,5);seg(l.kn,l.an,5);seg(l.an,l.toe,4);});
+  L.arms.forEach(a=>{seg(a.s,a.el,5,true);seg(a.el,a.hd,5,true);});
+  if(pose.v==='f'){ seg(L.sh[0],L.sh[1],6,true); seg(L.hips[0],L.hips[1],6); seg(L.shC,hip,9,true); } else { seg(hip,L.sh,6,true); }
+  const hc=[L.headC[0]+(pose.headTilt||0)*0.25,L.headC[1]+Math.abs(pose.headTilt||0)*0.05]; seg(hc,hc,FIG.head+1.5,true);
+  return out; }
+function _distSeg(p,a,b){ const dx=b[0]-a[0],dy=b[1]-a[1]; const l2=dx*dx+dy*dy; let t=l2?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/l2:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(p[0]-(a[0]+t*dx),p[1]-(a[1]+t*dy)); }
+function _arrowPts(sp){ if(sp[0]==='line'){const a=sp[1],b=sp[2]; const n=8; return Array.from({length:n+1},(_,i)=>[a[0]+(b[0]-a[0])*i/n,a[1]+(b[1]-a[1])*i/n]);} if(sp[0]==='arc'){const c=sp[1],r=sp[2]; const a0=Math.min(sp[3],sp[4]),a1=Math.max(sp[3],sp[4]); const pts=[]; for(let a=a0;a<=a1+0.01;a+=10)pts.push(_pt(c,a,r)); pts.push(_pt(c,a1,r)); return pts;} return []; }
+function _arrowHits(sp,segs,margin){ const pts=_arrowPts(sp); return pts.some(p=>segs.some(sg=>_distSeg(p,sg[0],sg[1])<sg[2]+margin)); }
+function _shiftArrow(sp,dx,dy){ if(sp[0]==='line')return ['line',[sp[1][0]+dx,sp[1][1]+dy],[sp[2][0]+dx,sp[2][1]+dy]]; if(sp[0]==='arc')return ['arc',[sp[1][0]+dx,sp[1][1]+dy],sp[2],sp[3],sp[4]]; return sp; }
+// move an arrow outward from the body centre until it no longer touches the figure
+function _clearArrow(sp,segs,pose,L){ const margin=2.5; if(!_arrowHits(sp,segs,margin))return sp;
+  const pts=_arrowPts(sp); const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length, cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+  const bc=[(pose.hip[0]+L.headC[0])/2,(pose.hip[1]+L.headC[1])/2]; let vx=cx-bc[0], vy=cy-bc[1]; const vl=Math.hypot(vx,vy)||1; vx/=vl; vy/=vl;
+  const dirs=[[vx,vy],[-vy,vx],[vy,-vx],[-vx,-vy]];
+  for(let d=2;d<=22;d+=2){ for(const [ux,uy] of dirs){ const c=_shiftArrow(sp,ux*d,uy*d); if(!_arrowHits(c,segs,margin))return c; } }
+  return sp; }
+function _fixedArrows(frame,L){ const segs=_bodySegs(frame.pose,L); return (frame.arrows||[]).map(a=>_clearArrow(a,segs,frame.pose,L)); }
 function _isLying(pose){ if(pose.v==='f')return false; const t=((((pose.torso==null?180:pose.torso)+(pose.tilt||0)+(pose.rot||0))%360)+360)%360; return Math.abs(t-180)>50; }
 // bounding box of one frame: [x0,y0,x1,y1] (before flip), plus whether a floor line is wanted
 const ON_FLOOR=['bench','box','step','machine','bike','stairs','rower','treadmill','wall','door','pullbar'];
@@ -474,7 +496,7 @@ function figFrameBox(frame,opts){ const pose=frame.pose; const L=_limbs(pose); l
   const fi=floorInfo(frame,L,opts&&opts.floorAll); L.floorY=fi.floor?fi.floorY:null;
   _bodyPts(pose,L).forEach(p=>add([p[0]-p[2],p[1]-p[2],p[0]+p[2],p[1]+p[2]]));
   (frame.props||[]).forEach(p=>add(_propBox(p,L)));
-  if(!(opts&&opts.noArrows))(frame.arrows||[]).forEach(a=>add(_arrowBox(a)));
+  if(!(opts&&opts.noArrows))_fixedArrows(frame,L).forEach(a=>add(_arrowBox(a)));
   if(fi.floor)add([x0,fi.floorY-2,x1,fi.floorY+2]);
   if(pose.flip){const nx0=100-x1,nx1=100-x0;x0=nx0;x1=nx1;}
   return {x0,y0,x1,y1,floor:fi.floor,floorY:fi.floorY}; }
@@ -485,7 +507,7 @@ function figFrameSvg(frame,size,opts){ const s=size||100; const pose=frame.pose;
   const BEHIND=['bench','benchv','ball','box','wall','bike','stairs','rower','treadmill','step','machine','floor','door','pullbar'];
   const behind=propsAll.filter(p=>BEHIND.includes(p[0])).map(p=>_prop(p,L)).join('');
   const front=propsAll.filter(p=>!BEHIND.includes(p[0])).map(p=>_prop(p,L)).join('');
-  const ak=s>150?0.65:s>90?0.85:1; const arrows=(opts&&opts.noArrows)?'':(frame.arrows||[]).map(a=>_arrow(a,ak)).join('');
+  const ak=s>150?0.65:s>90?0.85:1; const arrows=(opts&&opts.noArrows)?'':_fixedArrows(frame,L).map(a=>_arrow(a,ak)).join('');
   // floor: only with equipment, lying or hands-on-floor poses; spans the figure width (+margin)
   let floorSvg=''; if(own.floor){ const m=6; const fx0=pose.flip?100-fit.x1:fit.x0, fx1=pose.flip?100-fit.x0:fit.x1; floorSvg=`<path class="p" d="M${_n(fx0-m)} ${own.floorY}H${_n(fx1+m)}"/>`; }
   const inner=`${floorSvg}${behind}${front}${arrows}<g class="fg">${svg}</g>`;
