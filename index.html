@@ -86,6 +86,13 @@ nav.tabs button.on{color:var(--accent)}
 .pf .fill{stroke:var(--soft)}.pf .fillp{fill:var(--soft)}.pf .hls{stroke:var(--hl)}.pf .hlf{fill:var(--hl);stroke:none}.pf .p{stroke:var(--equip);stroke-width:3}.pf .ar{stroke:var(--accent);opacity:.9}.pf .ah{fill:var(--accent);stroke:none}.pf .band{stroke-dasharray:3 2}
 .bigico{display:grid;place-items:center;width:140px;height:140px;border-radius:32px;background:var(--soft);margin:0 auto;color:var(--fg)}
 .hero{display:flex;align-items:center;justify-content:center;gap:20px}
+.ptiles{grid-template-columns:1fr 1fr!important;max-width:440px;margin:0 auto;width:100%;text-align:center}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;cursor:pointer}
+.sc{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:8px 6px 10px;text-align:center;display:flex;flex-direction:column;gap:6px;min-width:0}
+.sfig{background:var(--soft);border-radius:10px;display:grid;place-items:center;aspect-ratio:1;color:var(--fg)}.sfig .pf{width:100%;height:100%}
+.sk{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scue{font-size:13px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-width:600px){ .sk{font-size:12px} .scue{font-size:14px} }
 .howto .hc .fig{color:var(--fg)}
 .board .mini .ico-svg{flex:none}
 .card .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -298,8 +305,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.14.0';
+const APP_VERSION='0.14.1';
 const CHANGELOG=[
+ {v:'0.14.1',date:'2026-10-21',en:['Get-ready screen: everything centred, muscle silhouettes removed, the three how-to steps shown right on the screen (tap them for the big version)','Arrows keep a wider gap from the body'],ko:['준비 화면: 전부 가운데 정렬, 자극 부위 실루엣 제거, 운동 방법 3단계를 화면에 바로 표시(누르면 크게)','화살표가 몸에서 더 멀리 떨어짐']},
  {v:'0.14.0',date:'2026-10-21',en:['More human figures: shoes instead of foot lines (sole always on the floor side), hands drawn as hands and as fists when holding equipment, torso with a chest curve, rounded upper back and a waist (front view has a waist too)','Held equipment (bar, plates, dumbbells, kettlebells, balls, bands) now sits in front of the body with the fist on top'],ko:['더 사람다운 인체: 발은 신발 모양(밑창이 항상 바닥 쪽), 손은 손 모양·기구를 잡을 땐 주먹, 몸통은 가슴 곡선·둥근 등·허리(정면도도 허리 있음)','들고 있는 기구(바·원판·덤벨·케틀벨·공·밴드)는 몸 앞에, 주먹은 그 위에 표시']},
  {v:'0.13.0',date:'2026-10-20',en:['Consistent arrows: straight arrows have one length and snap to 8 directions, curved arrows one radius and 60/90/120 degree sweeps','Saving made safer: every cloud write is sanitised, and a failed save now shows a message instead of being lost silently','Slightly tapered limbs (upper arm and thigh thicker than forearm and shin)'],ko:['화살표 통일: 직선은 길이 하나·8방향, 곡선은 반지름 하나·60/90/120도','저장 안전성: 모든 클라우드 저장을 정리해서 보내고, 실패하면 조용히 사라지지 않고 알림 표시','팔다리를 살짝 테이퍼(위팔·허벅지가 아래팔·정강이보다 두껍게)']},
  {v:'0.12.2',date:'2026-10-20',en:['Arrows never touch the body: the renderer moves any arrow that overlaps the figure outward until it is clear','No more grey limbs: the far-side arm and leg are drawn with the same black outline, behind the near side'],ko:['화살표가 몸에 닿지 않음: 그림과 겹치는 화살표는 렌더러가 바깥쪽으로 밀어냄','회색 팔다리 제거: 반대쪽 팔다리도 같은 검정 외곽선으로 앞쪽 뒤에 그림']},
@@ -495,11 +503,11 @@ function _arrowPts(sp){ if(sp[0]==='line'){const a=sp[1],b=sp[2]; const n=8; ret
 function _arrowHits(sp,segs,margin){ const pts=_arrowPts(sp); return pts.some(p=>segs.some(sg=>_distSeg(p,sg[0],sg[1])<sg[2]+margin)); }
 function _shiftArrow(sp,dx,dy){ if(sp[0]==='line')return ['line',[sp[1][0]+dx,sp[1][1]+dy],[sp[2][0]+dx,sp[2][1]+dy]]; if(sp[0]==='arc')return ['arc',[sp[1][0]+dx,sp[1][1]+dy],sp[2],sp[3],sp[4]]; return sp; }
 // move an arrow outward from the body centre until it no longer touches the figure
-function _clearArrow(sp,segs,pose,L){ const margin=2.5; if(!_arrowHits(sp,segs,margin))return sp;
+function _clearArrow(sp,segs,pose,L){ const margin=4.5; if(!_arrowHits(sp,segs,margin))return sp;
   const pts=_arrowPts(sp); const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length, cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;
   const bc=[(pose.hip[0]+L.headC[0])/2,(pose.hip[1]+L.headC[1])/2]; let vx=cx-bc[0], vy=cy-bc[1]; const vl=Math.hypot(vx,vy)||1; vx/=vl; vy/=vl;
   const dirs=[[vx,vy],[-vy,vx],[vy,-vx],[-vx,-vy]];
-  for(let d=2;d<=22;d+=2){ for(const [ux,uy] of dirs){ const c=_shiftArrow(sp,ux*d,uy*d); if(!_arrowHits(c,segs,margin))return c; } }
+  for(let d=2;d<=30;d+=2){ for(const [ux,uy] of dirs){ const c=_shiftArrow(sp,ux*d,uy*d); if(!_arrowHits(c,segs,margin))return c; } }
   return sp; }
 const ARROW_LEN=14, ARC_R=15;
 function _normArrow(sp){
@@ -1593,8 +1601,9 @@ function saveExercise(){ const e=S.editEx; if(!e.nameEn.trim()&&!e.nameKo.trim()
   persist.exercises(); S.editDirty=false; S.sub='library'; toast(t('saved')); render(); }
 
 // ---------- sheets ----------
+function stepCards(ex){ const ko=S.settings.lang==='ko'; const steps=(ex.steps||[]).slice(0,3); return steps.map((s,i)=>`<div class="sc"><div class="sfig">${figSvg(ex,140,i)}</div><div class="sk">${esc(t('step'))} ${i+1} · ${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="scue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div></div>`).join(''); }
 function howtoCards(ex){ const ko=S.settings.lang==='ko'; const steps=ex.steps||[]; return steps.map((s,i)=>`<div class="hc"><div class="fig"><span class="phase">${phaseSvg(phaseOf(s,i),14)} ${esc(t('step'))} ${i+1}</span>${figSvg(ex,300,i)}</div><div class="k">${esc(ko?(s.titleKo||s.titleEn):(s.titleEn||s.titleKo))}</div><div class="cue">${esc(ko?(s.cueKo||s.cueEn):(s.cueEn||s.cueKo))}</div>${(ko?s.mistakeKo:s.mistakeEn)?`<div class="mis">✕ ${esc(ko?s.mistakeKo:s.mistakeEn)}</div>`:''}</div>`).join('')||`<div class="empty grow">—</div>`; }
-function openHowto(exId){ const ex=exById(exId); if(!ex)return; showSheet(`<div class="row between" style="margin-bottom:12px;gap:12px"><div><h2>${esc(exName(ex))}</h2><div class="cap"><span class="dot b-${ex.type}"></span> ${esc(exMeta(ex))}</div></div>${bodyMap(ex.muscle,72)}</div><div class="howto v">${howtoCards(ex)}</div><button class="btn ghost" data-act="close-sheet" style="margin-top:12px">${esc(t('close'))}</button>`); }
+function openHowto(exId){ const ex=exById(exId); if(!ex)return; showSheet(`<div class="row between" style="margin-bottom:12px;gap:12px"><div><h2>${esc(exName(ex))}</h2><div class="cap"><span class="dot b-${ex.type}"></span> ${esc(exMeta(ex))}</div></div></div><div class="howto v">${howtoCards(ex)}</div><button class="btn ghost" data-act="close-sheet" style="margin-top:12px">${esc(t('close'))}</button>`); }
 function showSheet(html){ closeSheet(); $('#layer').innerHTML=`<div class="backdrop" data-act="close-sheet"></div><div class="sheet" id="sheet" role="dialog"><div class="grip"></div>${html}</div>`; }
 function closeSheet(){ $('#layer').innerHTML=''; }
 function confirmSheet(msg,okLabel,onOk,danger){ showSheet(`<p style="margin:4px 0 16px;font-weight:600">${esc(msg)}</p><div class="stack" style="gap:8px"><button class="btn ${danger?'sec danger':'pri'}" id="ok">${esc(okLabel)}</button><button class="btn ghost" data-act="close-sheet">${esc(t('cancel'))}</button></div>`); $('#ok').addEventListener('click',()=>{closeSheet();onOk();}); }
@@ -1645,9 +1654,9 @@ function renderPerform(keep){
   const n=P.queue.length>1?`<span class="cap num">${P.idx+1} / ${P.queue.length}</span>`:'<span></span>';
   let body='',foot='';
   if(P.stage==='prepare'){ const last=lastEntry(ex.id,date);
-    body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div class="hero"><div class="bigico">${figSvg(ex,132)}</div>${bodyMap(ex.muscle,120)}</div><h1 style="margin-top:10px">${esc(exName(ex))}</h1><div class="cap" style="margin-top:4px"><span class="dot b-${ex.type}"></span> ${esc(exMeta(ex))}</div></div>
-      <div class="tiles"><div class="tile"><div class="cap">${esc(t('target'))}</div><div class="v num" style="font-size:18px">${esc(targetText(it))}</div></div><div class="tile"><div class="cap">${esc(t('last'))}</div><div class="v num" style="font-size:18px">${esc(entrySummary(last))}</div></div></div>
-      <button class="btn sec" data-p="howto">${esc(t('view_howto'))}</button></div>`;
+    body=`<div class="stack" style="padding-top:8px;align-items:stretch"><div style="text-align:center"><div class="hero"><div class="bigico" data-howto="${ex.id}">${figSvg(ex,132)}</div></div><h1 style="margin-top:10px">${esc(exName(ex))}</h1><div class="cap" style="margin-top:4px"><span class="dot b-${ex.type}"></span> ${esc(exMeta(ex))}</div></div>
+      <div class="tiles ptiles"><div class="tile"><div class="cap">${esc(t('target'))}</div><div class="v num" style="font-size:18px">${esc(targetText(it))}</div></div><div class="tile"><div class="cap">${esc(t('last'))}</div><div class="v num" style="font-size:18px">${esc(entrySummary(last))}</div></div></div>
+      <div class="steps3" data-howto="${ex.id}">${stepCards(ex)}</div></div>`;
     foot=`<button class="btn pri" data-p="start">${esc(t('start'))}</button><div class="row" style="gap:8px"><button class="btn ghost" data-p="skip">${esc(t('skip'))}</button><button class="btn ghost" data-p="addex">+ ${esc(t('add_ex_now'))}</button></div>`; }
   else if(P.stage==='howto'){ const steps=ex.steps||[];
     body=`<h2 style="margin:4px 0 12px">${esc(exName(ex))}</h2><div class="howto" id="howto">${howtoCards(ex)}</div><div class="dots" id="dots">${steps.map((s,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>`;
@@ -1679,7 +1688,7 @@ function renderPerform(keep){
 }
 function onHowtoScroll(e){ if(e.target.id!=='howto')return; const h=e.target; const i=Math.round(h.scrollLeft/(h.clientWidth+12)); h.parentElement.querySelectorAll('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); }
 function onPerfInput(e){ const x=e.target; if(x.id==='memo'){P.memo=x.value;saveP();return;} }
-function onPerfClick(e){ if(P.stage==='prepare'&&S._dbl&&Date.now()-S._dbl.at<450&&!e.target.closest('[data-p]')){ S._dbl=null; P.stage='howto'; P.howtoIdx=0; renderPerform(); return; } const b=e.target.closest('[data-p],[data-c],[data-sp]'); if(!b)return;
+function onPerfClick(e){ if(P.stage==='prepare'&&S._dbl&&Date.now()-S._dbl.at<450&&!e.target.closest('[data-p]')){ S._dbl=null; openHowto(curItem().ex.id); return; } const hw=e.target.closest('[data-howto]'); if(hw&&hw.dataset.howto){ openHowto(hw.dataset.howto); return; } const b=e.target.closest('[data-p],[data-c],[data-sp]'); if(!b)return;
   if(b.dataset.c){ P.result.condition=+b.dataset.c; $('#cond').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); return; }
   const {it}=curItem();
   if(b.dataset.sp){ const i=+b.dataset.i, k=b.dataset.sp, d=+b.dataset.d; const st=k==='weight'?(S.settings.weightStep||2.5):1; const s0=P.sets[i]; const nv=Math.max(0,Math.round((s0[k]+d*st)*10)/10); s0[k]=nv; for(let j=i+1;j<P.sets.length;j++){ if(!P.sets[j].done)P.sets[j][k]=nv; } const sc=$('#perf .body')?.scrollTop||0; renderPerform(); const bd=$('#perf .body'); if(bd)bd.scrollTop=sc; saveP(); return; }
