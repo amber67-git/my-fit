@@ -285,8 +285,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.13.0';
+const APP_VERSION='0.14.0';
 const CHANGELOG=[
+ {v:'0.14.0',date:'2026-10-21',en:['More human figures: shoes instead of foot lines (sole always on the floor side), hands drawn as hands and as fists when holding equipment, torso with a chest curve, rounded upper back and a waist (front view has a waist too)','Held equipment (bar, plates, dumbbells, kettlebells, balls, bands) now sits in front of the body with the fist on top'],ko:['더 사람다운 인체: 발은 신발 모양(밑창이 항상 바닥 쪽), 손은 손 모양·기구를 잡을 땐 주먹, 몸통은 가슴 곡선·둥근 등·허리(정면도도 허리 있음)','들고 있는 기구(바·원판·덤벨·케틀벨·공·밴드)는 몸 앞에, 주먹은 그 위에 표시']},
  {v:'0.13.0',date:'2026-10-20',en:['Consistent arrows: straight arrows have one length and snap to 8 directions, curved arrows one radius and 60/90/120 degree sweeps','Saving made safer: every cloud write is sanitised, and a failed save now shows a message instead of being lost silently','Slightly tapered limbs (upper arm and thigh thicker than forearm and shin)'],ko:['화살표 통일: 직선은 길이 하나·8방향, 곡선은 반지름 하나·60/90/120도','저장 안전성: 모든 클라우드 저장을 정리해서 보내고, 실패하면 조용히 사라지지 않고 알림 표시','팔다리를 살짝 테이퍼(위팔·허벅지가 아래팔·정강이보다 두껍게)']},
  {v:'0.12.2',date:'2026-10-20',en:['Arrows never touch the body: the renderer moves any arrow that overlaps the figure outward until it is clear','No more grey limbs: the far-side arm and leg are drawn with the same black outline, behind the near side'],ko:['화살표가 몸에 닿지 않음: 그림과 겹치는 화살표는 렌더러가 바깥쪽으로 밀어냄','회색 팔다리 제거: 반대쪽 팔다리도 같은 검정 외곽선으로 앞쪽 뒤에 그림']},
  {v:'0.12.1',date:'2026-10-19',en:['Second review round: overhead triceps, bench bar over the chest, back-squat bar at the shoulders, push-up and dip arrows, knee raise from the side, feet on the floor in machine exercises, single-arm row support hand on the bench, calf raise step under the toes, floor line consistent across the steps of one exercise'],ko:['2차 리뷰 반영: 삼두 오버헤드, 벤치 바를 가슴 위로, 백스쿼트 바를 어깨 높이로, 푸시업·딥 화살표, 니 레이즈 측면도, 머신 운동에서 발을 바닥에, 원암 로우 지지 손을 벤치 위에, 카프 레이즈 발판을 발끝 아래로, 한 운동의 단계들 사이에 바닥선 일관']},
@@ -336,19 +337,19 @@ function _figurePaths(pose,opts){
   const addLimb=(pts,k,far)=>segs.push({pts,k,far});
   if(pose.v==='f'){
     const arms=pose.arms||[[0,0],[0,0]], legs=pose.legs||[[0,0],[0,0]];
-    L.legs.forEach((l,i)=>{addLimb([l.h,l.kn],'thigh',false);addLimb([l.kn,l.an],'shin',false);addLimb([l.an,l.toe],'foot',false);});
+    L.legs.forEach((l,i)=>{addLimb([l.h,l.kn],'thigh',false);addLimb([l.kn,l.an],'shin',false);segs.push({pts:[l.an,l.toe],k:'foot',far:false,kn:l.kn,fv:true});});
     segs.push({torsoF:true});
     segs.push({pts:[L.shC,L.neckEnd],k:'neck'});
     L.arms.forEach((a,i)=>{addLimb([a.s,a.el],'armU',false);addLimb([a.el,a.hd],'armF',false);});
   } else {
     const arms=pose.arms||[[0,0],[0,0]], legs=pose.legs||[[0,0,90],[0,0,90]];
     const farArm=arms.length>1&&!same(arms[0],arms[1]), farLeg=legs.length>1&&!same(legs[0],legs[1]);
-    if(legs.length>1){const l=L.legs[1]; addLimb([l.h,l.kn],'thigh',true);addLimb([l.kn,l.an],'shin',true);addLimb([l.an,l.toe],'foot',true);}
+    if(legs.length>1){const l=L.legs[1]; addLimb([l.h,l.kn],'thigh',true);addLimb([l.kn,l.an],'shin',true);segs.push({pts:[l.an,l.toe],k:'foot',far:true,kn:l.kn});}
     if(arms.length>1){const a=L.arms[1]; addLimb([a.s,a.el],'armU',true);addLimb([a.el,a.hd],'armF',true);}
     const mid=[(pose.hip[0]+L.sh[0])/2,(pose.hip[1]+L.sh[1])/2];
-    segs.push({pts:[pose.hip,mid],k:'torsoL'}); segs.push({pts:[mid,L.sh],k:'torsoU'});
+    segs.push({torsoS:true,mid});
     segs.push({pts:[L.sh,L.neckEnd],k:'neck'});
-    {const l=L.legs[0]; addLimb([l.h,l.kn],'thigh',false);addLimb([l.kn,l.an],'shin',false);addLimb([l.an,l.toe],'foot',false);}
+    {const l=L.legs[0]; addLimb([l.h,l.kn],'thigh',false);addLimb([l.kn,l.an],'shin',false);segs.push({pts:[l.an,l.toe],k:'foot',far:false,kn:l.kn});}
     {const a=L.arms[0]; addLimb([a.s,a.el],'armU',false);addLimb([a.el,a.hd],'armF',false);}
   }
   const hlKinds={chest:['torsoU'],back:['torsoU'],core:['torsoL'],arms:['armU','armF'],legs:['thigh','shin'],glutes:['hip'],shoulders:['shoulder'],full:[]};
@@ -356,17 +357,32 @@ function _figurePaths(pose,opts){
   const hc=[L.headC[0]+(pose.headTilt||0)*0.25,L.headC[1]+Math.abs(pose.headTilt||0)*0.05];
   const wOut=(k)=>k==='torsoU'||k==='torsoL'?11:k==='neck'?6.5:k==='foot'?6.5:k==='thigh'?9.5:k==='armU'?9:k==='shin'?8.2:8;
   const wIn=(k)=>k==='torsoU'||k==='torsoL'?7:k==='neck'?3:k==='foot'?3:k==='thigh'?5.6:k==='armU'?5.2:k==='shin'?4.5:4.3;
-  const torsoPoly=()=>_poly([L.sh[1],L.sh[0],L.hips[0],L.hips[1]])+'Z';
-  const pass1=(sg)=>{ if(sg.torsoF) return `<path d="${torsoPoly()}" stroke-width="3.5" fill="currentColor"/>`; return `<path d="${_poly(sg.pts)}" stroke-width="${wOut(sg.k)}"/>`; };
-  const pass2=(sg)=>{ if(sg.torsoF){ let x=`<path d="${torsoPoly()}" class="fillp" stroke="none"/>`; const top=[L.sh[1],L.sh[0],[L.hips[0][0]+1.5,L.hips[0][1]-11],[L.hips[1][0]-1.5,L.hips[1][1]-11]]; const bot=[[L.hips[1][0]-1.5,L.hips[1][1]-11],[L.hips[0][0]+1.5,L.hips[0][1]-11],L.hips[0],L.hips[1]]; if(hk.has('torsoU'))x+=`<path d="${_poly(top)}Z" class="hlf"/>`; if(hk.has('torsoL'))x+=`<path d="${_poly(bot)}Z" class="hlf"/>`; return x; }
+  const nrm=(v)=>{const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l];}; const ad=(p,v,k)=>[p[0]+v[0]*k,p[1]+v[1]*k]; const r90=(v)=>[-v[1],v[0]];
+  const torsoPoly=()=>{ const sR=L.sh[0],sL=L.sh[1],hR=L.hips[0],hL=L.hips[1]; const wR=[(sR[0]+hR[0])/2-2.2,(sR[1]+hR[1])/2+2], wL=[(sL[0]+hL[0])/2+2.2,(sL[1]+hL[1])/2+2]; return `M${_n(sL[0])} ${_n(sL[1])}L${_n(sR[0])} ${_n(sR[1])}Q${_n(wR[0])} ${_n(wR[1])} ${_n(hR[0])} ${_n(hR[1])}L${_n(hL[0])} ${_n(hL[1])}Q${_n(wL[0])} ${_n(wL[1])} ${_n(sL[0])} ${_n(sL[1])}Z`; };
+  const torsoSide=()=>{ const H=pose.hip,S=L.sh; const a=nrm([S[0]-H[0],S[1]-H[1]]); const n=r90(a); const P=(t,w)=>ad(ad(H,a,t),n,w);
+    const hf=P(0,4.6), wf=P(9,3.6), cf=P(19,6.2), sf=P(25,4.6), sb=P(25.5,-4.8), ub=P(16,-6.4), lb=P(6,-4.8), hb=P(-0.5,-5.2); const q=(c,p)=>`Q${_n(c[0])} ${_n(c[1])} ${_n(p[0])} ${_n(p[1])}`;
+    return `M${_n(hf[0])} ${_n(hf[1])}${q(wf,P(15,5.4))}${q(cf,sf)}${q(P(27,0),sb)}${q(ub,P(10,-5.4))}${q(lb,hb)}${q(P(-2.5,0),hf)}Z`; };
+  const shoePath=(sg)=>{ const A=sg.pts[0],T=sg.pts[1]; const d=nrm([T[0]-A[0],T[1]-A[1]]); let n;
+    if(sg.fv){ const c=[A[0],A[1]+2.4]; return `M${_n(c[0]-4.2)} ${_n(c[1])}a4.2 3 0 1 0 8.4 0a4.2 3 0 1 0 -8.4 0Z`; }
+    const sdir=nrm([A[0]-sg.kn[0],A[1]-sg.kn[1]]); const dot=sdir[0]*d[0]+sdir[1]*d[1]; let v=[sdir[0]-d[0]*dot,sdir[1]-d[1]*dot]; if(Math.hypot(v[0],v[1])<0.2)v=r90(d); n=nrm(v);
+    const pts=[ad(ad(A,d,-1.5),n,-1.4),ad(ad(A,d,-3.8),n,1.2),ad(ad(A,d,-3.6),n,3.4),ad(ad(A,d,6.5),n,4.6),ad(ad(A,d,8.6),n,3.6),ad(ad(A,d,8.2),n,1.8),ad(ad(A,d,5),n,0.6),ad(ad(A,d,2.2),n,-1.4)]; return _poly(pts)+'Z'; };
+  const grips=opts.grips||[];
+  const handPath=(i)=>{ const a=L.arms[i]; const W=a.hd; const f=nrm([W[0]-a.el[0],W[1]-a.el[1]]); const n=r90(f);
+    if(grips[i]){ const c=ad(W,f,2.2); const ang=Math.atan2(f[1],f[0])*180/Math.PI; return {d:`M${_n(c[0]-3.4)} ${_n(c[1])}a3.4 2.8 0 1 0 6.8 0a3.4 2.8 0 1 0 -6.8 0Z`,tf:`rotate(${_n(ang)} ${_n(c[0])} ${_n(c[1])})`}; }
+    const pts=[ad(W,n,2.2),ad(ad(W,f,3.6),n,2.6),ad(ad(W,f,5.8),n,1.4),ad(ad(W,f,5.8),n,-1.4),ad(ad(W,f,3.6),n,-2.6),ad(W,n,-2.2)]; return {d:_poly(pts)+'Z',tf:''}; };
+  const pass1=(sg)=>{ if(sg.torsoF) return `<path d="${torsoPoly()}" stroke-width="3.7" fill="currentColor"/>`; if(sg.torsoS) return `<path d="${torsoSide()}" stroke-width="3.7" fill="currentColor"/>`; if(sg.k==='foot') return `<path d="${shoePath(sg)}" stroke-width="3.7" fill="currentColor"/>`; return `<path d="${_poly(sg.pts)}" stroke-width="${wOut(sg.k)}"/>`; };
+  const pass2=(sg)=>{ if(sg.torsoS){ let x=`<path d="${torsoSide()}" class="fillp" stroke="none"/>`; if(hk.has('torsoU'))x+=`<path d="${_L(sg.mid,L.sh)}" stroke-width="5.5" class="hls"/>`; if(hk.has('torsoL'))x+=`<path d="${_L(pose.hip,sg.mid)}" stroke-width="5.5" class="hls"/>`; return x; }
+    if(sg.k==='foot') return `<path d="${shoePath(sg)}" class="fillp" stroke="none"/>`;
+    if(sg.torsoF){ let x=`<path d="${torsoPoly()}" class="fillp" stroke="none"/>`; const top=[L.sh[1],L.sh[0],[L.hips[0][0]+1.5,L.hips[0][1]-11],[L.hips[1][0]-1.5,L.hips[1][1]-11]]; const bot=[[L.hips[1][0]-1.5,L.hips[1][1]-11],[L.hips[0][0]+1.5,L.hips[0][1]-11],L.hips[0],L.hips[1]]; if(hk.has('torsoU'))x+=`<path d="${_poly(top)}Z" class="hlf"/>`; if(hk.has('torsoL'))x+=`<path d="${_poly(bot)}Z" class="hlf"/>`; return x; }
     return `<path d="${_poly(sg.pts)}" stroke-width="${wIn(sg.k)}" class="${hk.has(sg.k)?'hls':'fill'}"/>`; };
-  const simpleSeg=(sg)=>{ if(sg.torsoF) return `<path d="${torsoPoly()}" stroke-width="${FIG.sw}"/>`; return `<path d="${_poly(sg.pts)}" stroke-width="${FIG.sw}" class="${hk.has(sg.k)?'hls':''}"/>`; };
+  const simpleSeg=(sg)=>{ if(sg.torsoF) return `<path d="${torsoPoly()}" stroke-width="${FIG.sw}"/>`; if(sg.torsoS) return `<path d="${_poly([pose.hip,L.sh])}" stroke-width="${FIG.sw}" class="${hk.has('torsoU')||hk.has('torsoL')?'hls':''}"/>`; return `<path d="${_poly(sg.pts)}" stroke-width="${FIG.sw}" class="${hk.has(sg.k)?'hls':''}"/>`; };
   const headOut=simple?`<circle cx="${_n(hc[0])}" cy="${_n(hc[1])}" r="${FIG.head}" stroke-width="${FIG.sw}"/>`:`<circle cx="${_n(hc[0])}" cy="${_n(hc[1])}" r="${FIG.head+1.5}" fill="currentColor" stroke="none"/>`;
   const headIn=simple?'':`<circle cx="${_n(hc[0])}" cy="${_n(hc[1])}" r="${FIG.head-0.2}" class="fillp" stroke="none"/>`;
   const dots=()=>{ let x=''; if(hk.has('hip')) x+=(pose.v==='f'?L.hips:[pose.hip]).map(p=>`<circle cx="${_n(p[0])}" cy="${_n(p[1])}" r="${simple?3:4.5}" class="hlf"/>`).join(''); if(hk.has('shoulder')) x+=(pose.v==='f'?L.sh:[L.sh]).map(p=>`<circle cx="${_n(p[0])}" cy="${_n(p[1])}" r="${simple?3:4.5}" class="hlf"/>`).join(''); return x; };
   const hands=L.arms.map(a=>a.hd);
-  const handsOut=(far)=>hands.slice(far?1:0,far?2:1).map(h=>`<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="${simple?2.6:3.6}" fill="currentColor" stroke="none"/>`).join('');
-  const handsIn=(far)=>simple?'':hands.slice(far?1:0,far?2:1).map(h=>`<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="2" class="fillp" stroke="none"/>`).join('');
+  const handIdx=(far)=>far?[1]:[0];
+  const handsOut=(far)=>handIdx(far).filter(i=>L.arms[i]).map(i=>{ if(simple){const h=hands[i];return `<circle cx="${_n(h[0])}" cy="${_n(h[1])}" r="2.6" fill="currentColor" stroke="none"/>`;} const hp=handPath(i); return `<path d="${hp.d}" transform="${hp.tf}" stroke-width="3.4" fill="currentColor"/>`; }).join('');
+  const handsIn=(far)=>simple?'':handIdx(far).filter(i=>L.arms[i]).map(i=>{ const hp=handPath(i); return `<path d="${hp.d}" transform="${hp.tf}" class="fillp" stroke="none"/>`; }).join('');
   const render=(list,withHead)=>{ if(simple){ const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(simpleSeg).join('')+(hasArm?handsOut(far):'')+(withHead?headOut+dots():''); } const far=!withHead&&list.some(x=>x.far); const hasArm=list.some(x=>x.k==='armF'); return list.map(pass1).join('')+(hasArm?handsOut(far):'')+(withHead?headOut:'')+list.map(pass2).join('')+(hasArm?handsIn(far):'')+(withHead?headIn+dots():''); };
   const farSegs=segs.filter(x=>x.far), nearSegs=segs.filter(x=>!x.far);
   let out=''; if(farSegs.length) out+=`<g transform="translate(2 0)">${render(farSegs,false).replace(/class="hls"/g,'class="fill"')}</g>`;
@@ -375,7 +391,8 @@ function _figurePaths(pose,opts){
   if(pose.tilt) body=`<g transform="rotate(${pose.tilt} ${_n(pose.hip[0])} ${_n(pose.hip[1])})">${body}</g>`;
   let svg=(legsOut.length?render(legsOut,false):'')+out+body;
   if(pose.rot) svg=`<g transform="rotate(${pose.rot} ${_n(pose.hip[0])} ${_n(pose.hip[1])})">${svg}</g>`;
-  return {svg,L};
+  let gripSvg=''; if(!simple&&grips[0]&&L.arms[0]){ const hp=handPath(0); gripSvg=`<path d="${hp.d}" transform="${hp.tf}" stroke-width="3.4" fill="currentColor"/><path d="${hp.d}" transform="${hp.tf}" class="fillp" stroke="none"/>`; if(pose.tilt)gripSvg=`<g transform="rotate(${pose.tilt} ${_n(pose.hip[0])} ${_n(pose.hip[1])})">${gripSvg}</g>`; if(pose.rot)gripSvg=`<g transform="rotate(${pose.rot} ${_n(pose.hip[0])} ${_n(pose.hip[1])})">${gripSvg}</g>`; }
+  return {svg,L,gripSvg};
 }
 // props: drawn relative to limb points. spec: ['floor',y] ['bar',[x,y],w] (barbell front) ['plate',[x,y]] (barbell side) ['db',[x,y],ang] ['kb',[x,y]] ['band',[x0,y0],[x1,y1]] ['ball',[x,y],r] ['bench',[x,y],w] ['pullbar',y,x0,x1] ['box',[x,y],w,h] ['wall',x] ['bike'] ['rope',[x,y],r] ['stairs',[x,y]] ['rower',[x,y]] ['treadmill',[x,y]] ['mat',y]
 function _prop(sp,L){
@@ -494,7 +511,7 @@ function figFrameBox(frame,opts){ const pose=frame.pose; const L=_limbs(pose); l
   if(pose.flip){const nx0=100-x1,nx1=100-x0;x0=nx0;x1=nx1;}
   return {x0,y0,x1,y1,floor:fi.floor,floorY:fi.floorY}; }
 function figFitBox(frames,opts){ opts=Object.assign({},opts||{}); const any=frames.some(f=>figFrameBox(f,opts).floor); if(any)opts.floorAll=true; let b=null; frames.forEach(f=>{ const c=figFrameBox(f,opts); if(!b)b=Object.assign({},c); else { b.x0=Math.min(b.x0,c.x0);b.y0=Math.min(b.y0,c.y0);b.x1=Math.max(b.x1,c.x1);b.y1=Math.max(b.y1,c.y1); } }); b.floorAll=any; return b; }
-function figFrameSvg(frame,size,opts){ const s=size||100; const pose=frame.pose; opts=opts||{}; const simple=opts.simple||s<40; const {svg,L}=_figurePaths(pose,{simple,muscle:opts.muscle});
+function figFrameSvg(frame,size,opts){ const s=size||100; const pose=frame.pose; opts=opts||{}; const simple=opts.simple||s<40; const refs=JSON.stringify(frame.props||[]); const grips=[/"h0"|"mid"/.test(refs),/"h1"|"mid"/.test(refs)]; if(pose.v==='s'&&grips[0])grips[1]=true; const {svg,L,gripSvg}=_figurePaths(pose,{simple,muscle:opts.muscle,grips});
   if(opts.fit&&opts.fit.floorAll)opts=Object.assign({},opts,{floorAll:true}); const own=figFrameBox(frame,opts); const fit=opts.fit||own; L.floorY=own.floor?own.floorY:null;
   const propsAll=(frame.props||[]).filter(p=>p[0]!=='floor');
   const BEHIND=['bench','benchv','ball','box','wall','bike','stairs','rower','treadmill','step','machine','floor','door','pullbar'];
@@ -503,7 +520,8 @@ function figFrameSvg(frame,size,opts){ const s=size||100; const pose=frame.pose;
   const ak=s>150?0.65:s>90?0.85:1; const arrows=(opts&&opts.noArrows)?'':_fixedArrows(frame,L).map(a=>_arrow(a,ak)).join('');
   // floor: only with equipment, lying or hands-on-floor poses; spans the figure width (+margin)
   let floorSvg=''; if(own.floor){ const m=6; const fx0=pose.flip?100-fit.x1:fit.x0, fx1=pose.flip?100-fit.x0:fit.x1; floorSvg=`<path class="p" d="M${_n(fx0-m)} ${own.floorY}H${_n(fx1+m)}"/>`; }
-  const inner=`${floorSvg}${behind}${front}${arrows}<g class="fg">${svg}</g>`;
+  const HELD=['plate','db','kb','ball','band','bar']; const held=propsAll.filter(p=>HELD.includes(p[0])&&/h0|h1|mid/.test(JSON.stringify(p.slice(1)))); const frontRest=propsAll.filter(p=>!BEHIND.includes(p[0])&&!held.includes(p)).map(p=>_prop(p,L)).join('');
+  const inner=`${floorSvg}${behind}${frontRest}${arrows}<g class="fg">${svg}</g>${held.map(p=>_prop(p,L)).join('')}<g class="fg">${gripSvg}</g>`;
   const flip=pose.flip?`<g transform="translate(100 0) scale(-1 1)">${inner}</g>`:inner;
   // auto-fit: scale and centre the (shared) box into the 100x100 view with padding
   const pad=opts.pad==null?4:opts.pad; const w=Math.max(10,fit.x1-fit.x0+(own.floor?12:0)), h=Math.max(10,fit.y1-fit.y0);
