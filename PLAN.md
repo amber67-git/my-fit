@@ -554,3 +554,8 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - `index.html` head: manifest, apple-touch-icon, apple-mobile-web-app-capable, theme-color(라이트/다크). 본문 끝에서 SW 등록, 새 SW가 설치되면 `myfit-update` 이벤트 → 앱이 "업데이트 준비됨 / 새로고침" 시트 표시(운동 중에는 표시 안 함).
 - 앱: 설정에 "홈 화면에 추가" 행(안드로이드는 beforeinstallprompt로 바로 설치, 아이폰은 Safari 안내 3단계; 이미 설치된 상태나 아티팩트에서는 숨김). 설치된(standalone) 앱에서는 구글 로그인을 팝업 대신 리다이렉트로.
 - 검증: 로컬 정적 서버에서 SW active, 캐시 생성, 오프라인 새로고침 시 앱 정상 로드.
+
+### 25.1 v0.17.1: 카드 탭·스와이프 삭제
+- 대시보드 카드(오늘·내일)에 날짜(data-k)를 붙이고 모두 탭 가능: 오늘의 계획 항목은 운동 시작, 그 외(내일, 완료·건너뜀)는 항목 편집창.
+- 스와이프 삭제: 카드를 `.swipe` 래퍼로 감싸고 뒤에 빨간 삭제 버튼(96px). 터치/마우스 드래그를 main에서 위임 처리, 수평 이동이면 카드를 translateX로 따라가게 하고(세로 스크롤은 그대로), 놓을 때 −48px 이상이면 열림 상태(삭제 버튼 노출), −130px 이상이면 바로 삭제. 삭제 시 해당 날짜 기록 엔트리도 정리. 스와이프 직후의 클릭은 무시(S._swiping).
+- sw.js 캐시 버전 v0.17.1.
