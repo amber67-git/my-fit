@@ -1,5 +1,5 @@
 // My Fit service worker: app shell offline + updates on reload
-const VERSION = 'v0.18.0';
+const VERSION = 'v0.19.0';
 const SHELL = 'myfit-shell-' + VERSION;
 const RUNTIME = 'myfit-runtime';
 const SHELL_FILES = ['./', './index.html', './firebase-config.js?v=20261019b', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];

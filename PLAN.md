@@ -566,3 +566,9 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 스와이프: 삭제(빨강)+취소(회색) 두 버튼 노출(168px), 길게 밀어도 바로 삭제되지 않음.
 - 준비 화면 목표 타일(✎)을 누르면 항목 편집창 → 저장 시 준비 화면 즉시 갱신(큐의 스냅샷도 갱신).
 - 그림: 리뷰용 dataset.js 추출을 앱 전체(257개 운동, 고유 그림 193개)로 갱신하고 49쪽 전수 재검사. 수정: 레그프레스(등받이에 기댐, 시트·등받이·발판), 푸시프레스 딥 다리, 사이드 런지(골반이 굽힌 다리 쪽으로, 편 다리는 바깥), 싱글레그 데드리프트(지지 다리 거의 폄), 짐볼 햄컬·힙레이즈·브릿지(공을 발 쪽으로), 해피베이비·개구리(측면도), 사이드 라잉 3종 팔 정리. 자동 감사 남은 항목은 의도된 중첩뿐(헤일로, 바벨 어깨 거치, 짐볼 플랭크).
+
+## 27. v0.19.0: 머신·케이블 운동 28개, 완료 표시 정리, 오늘 운동 추가 버튼
+- 머신 14개뿐이던 라이브러리에 28개 추가(총 285개): 펙덱, 리버스 펙덱, 인클라인 체스트 프레스 머신, 숄더 프레스 머신, 시티드 로우 머신, 어시스트 풀업, 티바 로우, 백 익스텐션, 스트레이트 암 풀다운, 프리처 컬 머신, 시티드 딥 머신, 핵 스쿼트, 스미스 머신 스쿼트, 시티드 레그 컬, 스탠딩·시티드 카프 머신, 레그 프레스 카프 프레스, 글루트 킥백 머신, 복근 크런치 머신, 러닝머신, 일립티컬, 케이블 컬·레터럴 레이즈·킥백·크런치·풀스루·우드챱. 각 3단계 설명(EN/KO)과 그림 매핑 포함.
+- 자세 엔진: 새 템플릿 12개(pec_deck, row_machine, hyperext, pulldown_straight, preacher, dip_machine, hack_squat, seated_calf, glute_kickback, ab_machine, cable_crunch, elliptical) + 기존 템플릿 옵션(chest_press incline, press_overhead machine, pullup assist, row_bent tbar, leg_ext curl, leg_press calf, calf_raise machine, squat smith, 케이블 손잡이: curl·raise_lateral·deadlift·kickback·woodchop). 28개 그림 3프레임 전부 렌더 확인(z4-*.png), 머리 겹침 3건 수정(숄더 프레스 레버 피벗, 카프 머신 어깨 패드, 킥백 케이블 높이).
+- 대시보드: 완료 운동의 취소선·흐림 제거, 오른쪽 작은 초록 체크만 표시. "All done for today" 박스 대신 항상 "+ Add exercise" 버튼(오늘 날짜 선택창 바로 열림) + 작은 완료 문구. 스와이프 버튼은 열렸을 때만 보이도록(카드 모서리에 빨간 점 비침 수정).
+- 검증: run10/run11/run12/swipe 스위트 통과, dash19.js(완료 상태 화면, 추가 버튼→선택창→펙덱 추가) 통과, 라이브러리 수 284→285(숨김 제외 표기).
