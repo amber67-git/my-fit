@@ -29,10 +29,11 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - `index.html`: 독립 실행용 페이지 (GitHub Pages, 로컬). Firebase SDK와 `firebase-config.js`를 불러옴
 - `firebase-config.js`: Firebase 웹 앱 구성값 (직접 붙여넣기)
 - `firestore.rules`: Firestore 보안 규칙
+- `manifest.webmanifest`, `sw.js`, `icons/`: 홈 화면 설치(PWA)용 매니페스트·서비스 워커·아이콘
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
-## 기능 (v0.16.1)
+## 기능 (v0.17.0)
 
 - 4탭: Dashboard / Weekly / Monthly / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 247개 (맨몸·바벨·덤벨·케틀벨·밴드·짐볼·요가·스트레칭, 부위·도구 태그, 2~4단계 운동 방법), 추가·편집·숨기기
@@ -44,6 +45,7 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - 하루 1회 자동 백업(14개 보관)과 복원, JSON 내보내기/가져오기
 - 앱 내 버전 안내와 변경 이력
 - Firebase: Google 로그인, Firestore 사용자별 저장, 오프라인 캐시, "계정 없이 사용" 선택 가능
+- 홈 화면 앱(PWA): 안드로이드는 설정 → "홈 화면에 추가", 아이폰은 Safari 공유 → 홈 화면에 추가. 오프라인 실행, 업데이트 준비 알림, 설치된 앱에서는 리다이렉트 방식 구글 로그인
 
 ## 그림
 

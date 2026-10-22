@@ -548,3 +548,9 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 측정: 이전 치수는 6.7등신, 팔(어깨~손목)/키 0.34(실제 약 0.40), 다리/키 0.49(정상), 몸통/키 0.30(정상).
 - 변경: 머리 반지름 6→5.6, 위팔 14→16, 아래팔 13→14, 허벅지 20→21 (IK 헬퍼 길이도 동일하게). 결과 7.2등신, 팔/키 0.37, 다리/키 0.50, 몸통/키 0.30, 위팔:아래팔 1.14, 허벅지:정강이 1.11.
 - 모든 자세가 손·발 목표 좌표(IK)로 정의돼 있어 비율 변경 후에도 손은 바·바닥·벤치 위치를 유지. 81개 그림 전수 재확인, 자동 감사 이상 없음.
+
+## 25. v0.17.0: 홈 화면 앱(PWA)
+- `manifest.webmanifest`(name/short_name My Fit, standalone, portrait, theme #2f6bff, 192/512/maskable 아이콘), `icons/`(자세 엔진의 점핑잭 그림을 흰 외곽선으로 파란 배경에 렌더), `sw.js`(앱 셸 캐시 v0.17.0: index.html·firebase-config·manifest·icons; 내비게이션은 네트워크 우선 후 캐시, 동일 출처·firebasejs·폰트는 캐시 우선+백그라운드 갱신; Firebase 인증/Firestore 요청은 가로채지 않음).
+- `index.html` head: manifest, apple-touch-icon, apple-mobile-web-app-capable, theme-color(라이트/다크). 본문 끝에서 SW 등록, 새 SW가 설치되면 `myfit-update` 이벤트 → 앱이 "업데이트 준비됨 / 새로고침" 시트 표시(운동 중에는 표시 안 함).
+- 앱: 설정에 "홈 화면에 추가" 행(안드로이드는 beforeinstallprompt로 바로 설치, 아이폰은 Safari 안내 3단계; 이미 설치된 상태나 아티팩트에서는 숨김). 설치된(standalone) 앱에서는 구글 로그인을 팝업 대신 리다이렉트로.
+- 검증: 로컬 정적 서버에서 SW active, 캐시 생성, 오프라인 새로고침 시 앱 정상 로드.
