@@ -4,7 +4,7 @@
 사용자(amber6.an)가 정한 흐름입니다. main에 직접 푸시하지 않습니다.
 
 1. 작업은 `feat/…`, `fix/…`, `chore/…` 브랜치에서 한다. 커밋 메시지는 영어, 끝에 지정된 Co-Authored-By / Claude-Session 트레일러.
-2. 푸시 후 `gh pr create`로 PR을 연다. 본문에는 바뀐 것, 검증한 것(테스트 스위트, 그림 렌더 확인), 사용자에게 알릴 한계를 적는다.
+2. 푸시 후 REST로 PR을 연다: `gh api -X POST repos/amber67-git/my-fit/pulls -f title=… -f head=<branch> -f base=main -f body=…` (`gh pr create`는 GraphQL이라 이 세션에서 막힘). 본문에는 바뀐 것, 검증한 것(테스트 스위트, 그림 렌더 확인), 사용자에게 알릴 한계를 적는다.
 3. CodeRabbit 리뷰를 기다린다: `gh api repos/amber67-git/my-fit/pulls/N/comments`와 `/reviews`에서 `coderabbitai[bot]`의 댓글을 최대 10분(30초 간격) 폴링. 연결 전이거나 10분 안에 안 오면 "리뷰 없음"으로 기록하고 진행한다.
 4. 리뷰 댓글은 전부 읽고 판단한다. 실제 버그·회귀는 고쳐서 같은 브랜치에 커밋·푸시하고(다시 리뷰 대기), 오탐이나 의도된 동작은 PR 댓글로 이유를 남긴다.
 5. 테스트가 통과하고 반영이 끝나면 REST로 스쿼시 머지한다: `gh api -X PUT repos/amber67-git/my-fit/pulls/N/merge -f merge_method=squash`. 브랜치는 삭제한다. GraphQL은 이 세션에서 막혀 있으니 `gh pr merge`는 쓰지 않는다.
