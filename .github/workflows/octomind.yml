@@ -1,0 +1,39 @@
+# Octomind E2E — GitHub Pages 배포가 끝날 때마다 배포 URL에 대해 Octomind 테스트를 실행합니다.
+# 연결 방법은 README의 "자동 검증 연결"을 보세요. 비밀값/변수가 없으면 조용히 건너뜁니다.
+name: Octomind E2E
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  e2e:
+    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    env:
+      OCTOMIND_TOKEN: ${{ secrets.OCTOMIND_TOKEN }}
+      OCTOMIND_TEST_TARGET_ID: ${{ vars.OCTOMIND_TEST_TARGET_ID }}
+      APP_URL: ${{ vars.OCTOMIND_APP_URL || 'https://amber67-git.github.io/my-fit/' }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          if [ -z "$OCTOMIND_TOKEN" ] || [ -z "$OCTOMIND_TEST_TARGET_ID" ]; then
+            echo "Octomind is not configured (OCTOMIND_TOKEN secret / OCTOMIND_TEST_TARGET_ID variable). Skipping."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run Octomind tests
+        if: steps.cfg.outputs.ready == 'true'
+        uses: OctoMind-dev/automagically-action-execute@v2
+        with:
+          token: ${{ env.OCTOMIND_TOKEN }}
+          testTargetId: ${{ env.OCTOMIND_TEST_TARGET_ID }}
+          url: ${{ env.APP_URL }}
+          blocking: true
+          environmentName: production

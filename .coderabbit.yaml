@@ -1,0 +1,42 @@
+# CodeRabbit 설정 — https://docs.coderabbit.ai/reference/configuration
+# 저장소를 CodeRabbit GitHub App에 연결하면 PR마다 자동 리뷰가 달립니다.
+language: "ko-KR"
+tone_instructions: "간결하고 구체적으로. 실제로 깨지는 경우(입력, 상태, 결과)를 한 문장으로 설명하고, 고치는 방법을 제안한다. 칭찬은 생략."
+early_access: false
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: true
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["main"]
+  path_filters:
+    - "!icons/**"
+    - "!artifact.html"
+  path_instructions:
+    - path: "index.html"
+      instructions: |
+        단일 파일 PWA(HTML+CSS+IIFE JS)입니다. 중점 확인:
+        - 상태 저장: localStorage 'wwt.state.v1'과 Firestore persist.* 경로 모두에서 undefined 값, JSON 직렬화 실패, 저장 실패가 조용히 삼켜지는지.
+        - 날짜/주 계산: todayKey, startOfWeek, 월요일 시작, 자정 경계, 시간대.
+        - 운동 데이터: X()/T() 항목의 id 중복, EX_FIG 매핑 누락, 단계(steps) 배열 길이와 EN/KO 쌍 누락.
+        - 자세 엔진(figure/poses): 발목·무릎·팔꿈치 각도가 해부학적 범위를 벗어나는 템플릿, 소품이 머리와 겹치는 좌표, 화살표가 몸에 닿는 좌표.
+        - 모바일 UI: 390px 폭에서 가로 스크롤, 스와이프 삭제의 취소 흐름, 고정 CTA가 내용을 가리는지.
+        - i18n: t() 키가 EN/KO 양쪽 테이블에 모두 있는지.
+    - path: "sw.js"
+      instructions: |
+        서비스 워커. VERSION이 index.html의 APP_VERSION과 함께 올라갔는지, Firebase auth/Firestore 요청을 절대 가로채지 않는지, 네비게이션은 network-first인지 확인.
+    - path: "firestore.rules"
+      instructions: "사용자가 자기 uid 문서만 읽고 쓰는지, 인증 없는 접근이 전부 거부되는지 확인."
+    - path: ".github/workflows/**"
+      instructions: "비밀값이 로그에 노출되지 않는지, 비밀값이 없을 때 워크플로가 실패 대신 건너뛰는지 확인."
+chat:
+  auto_reply: true
+knowledge_base:
+  learnings:
+    scope: "auto"

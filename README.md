@@ -50,3 +50,9 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 ## 그림
 
 운동 그림은 앱 안의 자세 엔진이 직접 그립니다. 관절 각도로 자세를 정의하면 같은 비율의 아웃라인 인체(검정 외곽선, 자극 부위만 빨강)가 그려지고, 진한 회색 도구(바벨·덤벨·케틀벨·밴드·짐볼·벤치·케이블·머신)와 몸 뒤로 지나가는 얇은 동작 화살표가 함께 표시됩니다. 바닥선은 도구가 있을 때만 그립니다. 외부 아이콘 세트를 쓰지 않으므로 라이선스 표기가 필요 없습니다.
+
+## 자동 검증 연결
+
+- **CodeRabbit (코드 리뷰)**: https://coderabbit.ai 에서 GitHub으로 로그인 → 이 저장소 추가. 설정은 `.coderabbit.yaml`(한국어 리뷰, 파일별 중점 항목). CodeRabbit은 **PR 단위**로 리뷰하므로 main 직접 푸시에는 달리지 않습니다. 브랜치에서 작업하고 PR을 열면 자동 리뷰가 붙습니다.
+- **Octomind (화면 E2E)**: https://octomind.dev 에서 test target을 만들고 URL에 `https://amber67-git.github.io/my-fit/`를 넣습니다. 시나리오는 `docs/octomind-scenarios.md`의 문장을 그대로 프롬프트로 사용하세요. 배포마다 자동 실행하려면 저장소 Settings → Secrets and variables → Actions에 secret `OCTOMIND_TOKEN`(API key)과 variable `OCTOMIND_TEST_TARGET_ID`를 넣습니다. 워크플로 `.github/workflows/octomind.yml`은 Pages 배포 성공 후 실행되며, 값이 없으면 건너뜁니다.
+- **PageSpeed Insights**: https://pagespeed.web.dev 에 배포 URL을 넣으면 PWA·성능·접근성 점수를 외부에서 확인할 수 있습니다.
