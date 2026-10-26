@@ -54,5 +54,6 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 ## 자동 검증 연결
 
 - **CodeRabbit (코드 리뷰)**: https://coderabbit.ai 에서 GitHub으로 로그인 → 이 저장소 추가. 설정은 `.coderabbit.yaml`(한국어 리뷰, 파일별 중점 항목). CodeRabbit은 **PR 단위**로 리뷰하므로 main 직접 푸시에는 달리지 않습니다. 브랜치에서 작업하고 PR을 열면 자동 리뷰가 붙습니다.
-- **Octomind (화면 E2E)**: https://octomind.dev 에서 test target을 만들고 URL에 `https://amber67-git.github.io/my-fit/`를 넣습니다. 시나리오는 `docs/octomind-scenarios.md`의 문장을 그대로 프롬프트로 사용하세요. 배포마다 자동 실행하려면 저장소 Settings → Secrets and variables → Actions에 secret `OCTOMIND_TOKEN`(API key)과 variable `OCTOMIND_TEST_TARGET_ID`를 넣습니다. 워크플로 `.github/workflows/octomind.yml`은 Pages 배포 성공 후 실행되며, 값이 없으면 건너뜁니다.
+- **작업 흐름**: 모든 변경은 브랜치 → PR → CodeRabbit 리뷰 반영 → 스쿼시 머지 → Pages 배포 순서로 진행합니다(규칙은 `CLAUDE.md`).
+- **E2E 스모크 (Playwright)**: `.github/workflows/e2e.yml`이 PR과 main 푸시마다 저장소를 정적 서버로 띄우고 `tests/smoke.cjs`를 실행합니다(로컬 모드 진입 → 운동 추가 → 시작 → 세트 완료 → 완료 → 스와이프 취소/삭제 → 가로 스크롤·콘솔 오류 검사). 실패하면 Actions의 e2e-screenshots 아티팩트에서 화면을 볼 수 있습니다. 시나리오 전체 목록은 `docs/e2e-scenarios.md`.
 - **PageSpeed Insights**: https://pagespeed.web.dev 에 배포 URL을 넣으면 PWA·성능·접근성 점수를 외부에서 확인할 수 있습니다.
