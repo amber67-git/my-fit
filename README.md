@@ -54,5 +54,7 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 ## 자동 검증 연결
 
 - **CodeRabbit (코드 리뷰)**: https://coderabbit.ai 에서 GitHub으로 로그인 → 이 저장소 추가. 설정은 `.coderabbit.yaml`(한국어 리뷰, 파일별 중점 항목). CodeRabbit은 **PR 단위**로 리뷰하므로 main 직접 푸시에는 달리지 않습니다. 브랜치에서 작업하고 PR을 열면 자동 리뷰가 붙습니다.
+- **작업 흐름**: 모든 변경은 브랜치 → PR → CodeRabbit 리뷰 반영 → 스쿼시 머지 → Pages 배포 순서로 진행합니다(규칙은 `CLAUDE.md`).
+- **Octomind 가입**: https://octomind.dev → "Get started" → GitHub 또는 Google 계정으로 로그인 → 앱(https://app.octomind.dev)에서 "Create test target" → URL에 `https://amber67-git.github.io/my-fit/` 입력 → 자동 탐색(discovery)으로 기본 테스트가 만들어지면 `docs/octomind-scenarios.md`의 문장으로 추가 생성 → 테스트 타깃 ID는 주소창 `app.octomind.dev/testtargets/<ID>`, API 키는 Settings → API keys. 무료 플랜이 있으며 한도는 가입 화면에서 확인.
 - **Octomind (화면 E2E)**: https://octomind.dev 에서 test target을 만들고 URL에 `https://amber67-git.github.io/my-fit/`를 넣습니다. 시나리오는 `docs/octomind-scenarios.md`의 문장을 그대로 프롬프트로 사용하세요. 배포마다 자동 실행하려면 저장소 Settings → Secrets and variables → Actions에 secret `OCTOMIND_TOKEN`(API key)과 variable `OCTOMIND_TEST_TARGET_ID`를 넣습니다. 워크플로 `.github/workflows/octomind.yml`은 Pages 배포 성공 후 실행되며, 값이 없으면 건너뜁니다.
 - **PageSpeed Insights**: https://pagespeed.web.dev 에 배포 URL을 넣으면 PWA·성능·접근성 점수를 외부에서 확인할 수 있습니다.
