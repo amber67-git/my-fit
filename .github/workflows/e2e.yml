@@ -1,0 +1,42 @@
+# Playwright smoke E2E — PR과 main 푸시마다 저장소의 index.html을 정적 서버로 띄워 핵심 흐름을 검사합니다.
+name: E2E smoke
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+      - name: Serve the app
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 >/dev/null 2>&1 &
+          for i in $(seq 1 20); do curl -sf http://127.0.0.1:8080/index.html >/dev/null && break; sleep 1; done
+      - name: Run smoke test
+        run: node tests/smoke.cjs
+        env:
+          APP_URL: http://127.0.0.1:8080/
+          SHOT_DIR: e2e-out
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: e2e-out
+          if-no-files-found: ignore

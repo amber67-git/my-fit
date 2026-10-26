@@ -1,6 +1,6 @@
-# Octomind 시나리오 목록 (My Fit)
+# E2E 시나리오 목록 (My Fit)
 
-Octomind에서 test target을 만든 뒤, 아래 문장을 그대로 "Create test case"의 프롬프트로 넣으면 AI가 테스트를 생성합니다.
+자동화(Playwright) 또는 수동 검증용 체크리스트입니다. `tests/smoke.cjs`는 1·3·4·6번과 회귀 체크를 자동으로 돌립니다(`.github/workflows/e2e.yml`). 나머지는 수동 확인 또는 추후 자동화 대상입니다.
 대상 URL: https://amber67-git.github.io/my-fit/
 로그인 화면이 먼저 뜨면 "Use without account (this device only)"를 누르는 전제 스텝을 모든 테스트에 넣어 주세요.
 

@@ -8,7 +8,7 @@
 3. CodeRabbit 리뷰를 기다린다: `gh api --paginate repos/amber67-git/my-fit/pulls/N/comments`와 `gh api --paginate repos/amber67-git/my-fit/pulls/N/reviews`에서 `coderabbitai[bot]`의 댓글을 최대 10분(30초 간격) 폴링. 연결 전이거나 10분 안에 안 오면 "리뷰 없음"으로 기록하고 진행한다.
 4. 리뷰 댓글은 전부 읽고 판단한다. 실제 버그·회귀는 고쳐서 같은 브랜치에 커밋·푸시하고(다시 리뷰 대기), 오탐이나 의도된 동작은 PR 댓글로 이유를 남긴다.
 5. 테스트가 통과하고 반영이 끝나면 REST로 스쿼시 머지한다: `gh api -X PUT repos/amber67-git/my-fit/pulls/N/merge -f merge_method=squash`. 브랜치는 삭제한다. GraphQL은 이 세션에서 막혀 있으니 `gh pr merge`는 쓰지 않는다.
-6. 머지 후 `gh run watch`로 Pages 배포 성공을 확인하고, Octomind 워크플로 결과를 확인한다(설정 전이면 job은 success, `Run Octomind tests` step만 건너뜀). 아티팩트(https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j)도 같은 버전으로 갱신한다.
+6. 머지 후 `gh run watch`로 Pages 배포 성공을 확인하고, E2E 스모크 워크플로(`.github/workflows/e2e.yml`, `tests/smoke.cjs`) 결과를 확인한다. PR 단계에서도 같은 워크플로가 돌므로 머지 전에 통과를 확인한다. 아티팩트(https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j)도 같은 버전으로 갱신한다.
 7. 사용자에게는 한국어로: 무엇이 바뀌었는지, 리뷰 댓글이 몇 개였고 어떻게 처리했는지, 배포 결과, 권한·네트워크 한계를 보고한다.
 
 ## 검증 최소선 (머지 전)
@@ -19,4 +19,4 @@
 
 ## 권한·한계
 - 이 세션은 외부 사이트 대부분(github.io 포함)에 접속할 수 없다. 라이브 페이지 확인은 워크플로 성공 여부로 대신한다.
-- CodeRabbit/Octomind 계정 연결은 사용자만 할 수 있다. 연결 전에는 리뷰·E2E가 비어 있음을 보고한다.
+- CodeRabbit 계정 연결은 사용자만 할 수 있다. 연결 전에는 리뷰가 비어 있음을 보고한다.
