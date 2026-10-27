@@ -7,12 +7,13 @@ const { chromium } = require(process.env.PW_MODULE||'playwright');
 const HARNESS=process.env.HARNESS||'http://127.0.0.1:8080/build/test.html';
 const APP_VER=(fs.readFileSync(path.resolve(__dirname,'..','src','app.html'),'utf8').match(/APP_VERSION='([^']+)'/)||[])[1];
 const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{};
+let page=null;
+const SHOT_DIR=process.env.SHOT_DIR||'.';
 const R=[]; const note=(id,h,ok,detail)=>{ R.push({id,h,ok,detail:detail||''}); console.log((ok?'PASS ':'ISSUE')+' '+id+' '+h+(detail?' — '+detail:'')); };
 const errors=[];
 (async()=>{
   const browser=await chromium.launch(LAUNCH); const ctx=await browser.newContext({viewport:{width:390,height:844}});
   await ctx.addInitScript((v)=>{ try{ localStorage.setItem('wwt.seenVersion',v); }catch(e){} },APP_VER);
-  let page=null;
   const day=async(iso,hhmm)=>{ if(page)await page.close(); page=await ctx.newPage(); page.on('pageerror',e=>errors.push(iso+' '+String(e).slice(0,160))); await page.clock.install({time:new Date(iso+'T'+(hhmm||'19:00')+':00')}); await page.goto(HARNESS); await page.locator('#tabs').waitFor(); await page.waitForTimeout(100); if(process.env.PERSONA_DEBUG){ console.log('DAY',iso,hhmm||'19:00','logs=',await page.evaluate(()=>Object.keys(window.__T.S.logs).join(',')),'plans=',await page.evaluate(()=>Object.keys(window.__T.S.plans).length)); } return page; };
   const T=(fn,...args)=>page.evaluate(fn,...args);
   const closeSheet=async()=>{ if(await page.locator('#sheet').count()){ await page.mouse.click(195,30); await page.locator('#sheet').waitFor({state:'detached',timeout:3000}).catch(()=>{}); } };
@@ -48,8 +49,8 @@ const errors=[];
   await day('2026-11-05'); await checkin(61.8,7);
   await day('2026-11-06'); await runSession({partial:{'Leg press':2},cond:5,rpe:9});
   l=await logsOf('2026-11-06'); const lp=l.find(e=>e.ex==='ex_legpress'); note('H9','레그프레스 3세트 중 2세트만 완료 → 완료 세트 2로 기록, 항목은 done', !!lp&&lp.sets===2, JSON.stringify(lp));
-  await day('2026-11-07','09:00'); await addToday('ex_hiking'); await page.click('[data-act="start-today"]'); await page.locator('[data-p="start"]').click(); await page.clock.fastForward(95*60*1000); await finish(); await page.locator('[data-p="next"]').first().waitFor(); await page.fill('#dist','7.4'); await page.fill('#durmin','95'); await page.click('[data-rpe="6"]'); await page.locator('[data-p="next"]').first().click(); await page.waitForTimeout(100);
-  l=await logsOf('2026-11-07'); note('H10','토요일 등산 95분: 시간형 기록 duration≈95분, 거리 7.4km 저장 (목표 60분 초과분도 기록되는가?)', !!l[0]&&Math.round(l[0].dur/60)===95&&l[0].dist===7.4, JSON.stringify(l[0]));
+  await day('2026-11-07','09:00'); await addToday('ex_hiking'); await page.click('[data-act="start-today"]'); await page.locator('[data-p="start"]').click(); await page.clock.fastForward(95*60*1000); await finish(); await page.locator('[data-p="next"]').first().waitFor(); const shown=await page.locator('#dur-v').textContent(); note('H10','토요일 등산 95분(목표 60분): 완료 화면 시간이 95:00으로 표시된다(목표+10분에서 잘리지 않음)', shown.trim()==='95:00', 'shown '+shown.trim()); await page.fill('#dist','7.4'); await page.fill('#durmin','98'); const shown2=await page.locator('#dur-v').textContent(); await page.click('[data-rpe="6"]'); await page.locator('[data-p="next"]').first().click(); await page.waitForTimeout(100);
+  l=await logsOf('2026-11-07'); note('H10b','완료 화면에서 시간을 98분으로 고치면 요약 타일과 기록이 98분으로 바뀌고 거리 7.4km가 저장된다', shown2.trim()==='98:00'&&!!l[0]&&Math.round(l[0].dur/60)===98&&l[0].dist===7.4, 'tile '+shown2.trim()+' '+JSON.stringify(l[0]));
   const wkDash=await dashText(); note('H11','이번 주 4일 운동(목표 3) → This week 4/3로 표시되고 진행 바는 100%에서 멈춘다', /This week\s*4\s*\/\s*3/.test(wkDash.replace(/\n/g,' ')), wkDash.replace(/\n/g,' | ').slice(0,80));
 
   // ---------- Week 2: progression, abandon mid-workout and resume ----------
@@ -75,7 +76,7 @@ const errors=[];
   // ---------- Week 5: unit switch round trip incl. body weight ----------
   const bodyBefore=await T(()=>JSON.stringify(window.__T.S.body)); await page.click('[data-tab="settings"]'); await page.click('[data-unit="lb"]'); await page.waitForTimeout(150); const bodyLb=await T(()=>Object.values(window.__T.S.body).map(b=>b.w)); const logLb=await T(()=>window.__T.logOf('2026-11-09').find(e=>e.exId==='ex_bench').sets[0].weight);
   note('H23','kg→lb 전환 시 기록 무게(42.5kg)가 93.5lb로 바뀐다', Math.abs(logLb-93.5)<0.6, 'bench set weight='+logLb);
-  note('H24','kg→lb 전환 시 체크인 체중도 lb로 바뀌어야 한다(근력 보드의 체중 대비 배수에 쓰임)', bodyLb.every(w=>w>100), 'body weights after switch='+JSON.stringify(bodyLb));
+  const expLb=[62.0,61.8].map(w=>Math.round(w*2.20462*10)/10); note('H24','kg→lb 전환 시 체크인 체중 2건이 각각 62.0→136.7, 61.8→136.2 lb로 바뀐다(근력 보드의 체중 대비 배수에 쓰임)', bodyLb.length===2&&bodyLb.every((w,i)=>Math.abs(w-expLb[i])<0.11), 'after switch='+JSON.stringify(bodyLb)+' expected='+JSON.stringify(expLb));
   await page.click('[data-unit="kg"]'); await page.waitForTimeout(150); const logKg=await T(()=>window.__T.logOf('2026-11-09').find(e=>e.exId==='ex_bench').sets[0].weight); note('H25','lb→kg 되돌리면 42.5kg로 복원(0.5 단위 반올림 누적 오차 없음)', Math.abs(logKg-42.5)<0.3, 'back to '+logKg);
   // ---------- Week 6: smart mode, custom exercise ----------
   await day('2026-12-07'); await page.click('[data-tab="settings"]'); await T(()=>{window.__T.S.settings.mode='smart'; window.__T.persist.settings(); window.__T.S.tab='week'; window.__T.render();}); const genBtn=page.locator('[data-act="smart-apply"], [data-act="smart-regen"]'); const hasGen=await genBtn.count(); if(hasGen)await genBtn.first().click(); await page.waitForTimeout(150); if(await page.locator('#sheet').count()){ const ok=page.locator('#sheet .btn.pri'); if(await ok.count())await ok.first().click(); } await page.waitForTimeout(150);
@@ -104,5 +105,5 @@ const errors=[];
   await day('2026-12-23'); await page.click('[data-tab="dash"]'); const mPlanTxt=(await dashText()).replace(/\n/g,' '); const m=mPlanTxt.match(/Workout days\s*(\d+)\s*\/\s*(\d+)\s*planned/); note('H41','의문점: 월간 "planned"는 미래 계획일도 포함하므로 월초에는 분모가 커 보인다', !!m, m&&m[0]);
   console.log('\n=== SUMMARY: '+R.filter(x=>x.ok).length+' PASS / '+R.filter(x=>!x.ok).length+' ISSUE of '+R.length);
   R.filter(x=>!x.ok).forEach(x=>console.log('  ISSUE '+x.id+' '+x.h+' — '+x.detail));
-  console.log('errors',JSON.stringify(errors)); await browser.close();
-})().catch(async e=>{ console.log('SCRIPT ERROR',e.message.split('\n').slice(0,6).join(' / ')); try{ await page.screenshot({path:'persona-fail.png'}); console.log('DEBUG at fail: perf h1=',await page.evaluate(()=>{const h=document.querySelector('#perf h1'); return h?h.textContent:'(no perf)';}),' sheet=',await page.evaluate(()=>{const s=document.querySelector('#sheet'); return s?s.innerText.slice(0,100):'none';})); }catch(x){} console.log('errors',JSON.stringify(errors)); process.exit(1); });
+  console.log('errors',JSON.stringify(errors)); await browser.close(); if(R.some(x=>!x.ok)||errors.length) process.exitCode=1;
+})().catch(async e=>{ console.log('SCRIPT ERROR',e.message.split('\n').slice(0,6).join(' / ')); try{ fs.mkdirSync(SHOT_DIR,{recursive:true}); await page.screenshot({path:path.join(SHOT_DIR,'persona-fail.png')}); console.log('DEBUG at fail: perf h1=',await page.evaluate(()=>{const h=document.querySelector('#perf h1'); return h?h.textContent:'(no perf)';}),' sheet=',await page.evaluate(()=>{const s=document.querySelector('#sheet'); return s?s.innerText.slice(0,100):'none';})); }catch(x){} console.log('errors',JSON.stringify(errors)); process.exit(1); });

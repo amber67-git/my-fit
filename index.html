@@ -1985,13 +1985,12 @@ function renderPerform(keep){
         <div class="row" style="gap:8px"><button class="btn sec" data-p="addset">+ ${esc(t('add_set'))}</button><button class="btn sec" data-p="rmset" ${P.sets.filter(x=>!x.done).length?'':'disabled'}>− ${esc(t('remove_set'))}</button></div>
         <div class="field" style="margin-top:12px"><label>${esc(t('memo'))}</label><textarea id="memo" rows="2">${esc(P.memo)}</textarea></div>`;
       foot=`<button class="btn pri" data-p="finish">${esc(t('finish'))}</button><div class="row" style="gap:8px"><button class="btn ghost" data-p="skip">${esc(t('skip_ex'))}</button><button class="btn ghost" data-p="addex">+ ${esc(t('add_ex_now'))}</button></div>`; } }
-  else if(P.stage==='complete'){ const r=P.result; const prevS=entryScore(P.prev), curS=entryScore(r); let delta='';
-    if(prevS!=null&&curS!=null){ const d=curS-prevS; const cls=d>0?'up':d<0?'down':''; delta=`<span class="delta ${cls}">${d>0?'↑':d<0?'↓':'='} ${r.mode==='time'?mmss(Math.abs(d)):Math.abs(Math.round(d*10)/10)}</span> <span class="cap">${esc(t('vs_last'))} ${esc(entrySummary(P.prev))}</span>`; }
+  else if(P.stage==='complete'){ const r=P.result; const delta=resultDelta(r);
     const doneSets=r.sets.filter(s=>s.done);
     body=`<div class="stack" style="padding-top:8px"><div style="text-align:center"><div class="bigico" style="color:var(--good)"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg></div><h1>${esc(exName(ex))}</h1><div class="cap">${esc(t('complete'))}</div></div>
-      <div class="tiles"><div class="tile"><div class="cap">${esc(t('duration'))}</div><div class="v num">${mmss(r.duration)}</div></div>
+      <div class="tiles"><div class="tile"><div class="cap">${esc(t('duration'))}</div><div class="v num" id="dur-v">${mmss(r.duration)}</div></div>
       <div class="tile"><div class="cap">${esc(r.mode==='time'?t('target'):t('volume'))}</div><div class="v num" style="font-size:18px">${esc(r.mode==='time'?it.minutes+' '+t('min'):entrySummary(r))}</div></div></div>
-      ${delta?`<div style="text-align:center">${delta}</div>`:''}
+      <div style="text-align:center" id="delta">${delta}</div>
       ${r.mode==='sets'?`<div class="cap" style="text-align:center">${doneSets.length} / ${r.sets.length} ${esc(t('total_sets'))}</div>`:''}
       <div class="field"><label>${esc(t('condition'))}</label><div class="cond" id="cond">${[1,2,3,4,5].map(v=>`<button data-c="${v}" class="${r.condition===v?'on':''}">${v}</button>`).join('')}</div><div class="row between cap" style="margin-top:4px"><span>${esc(t('feel_low'))}</span><span>${esc(t('feel_high'))}</span></div></div>
       <div class="field"><label>${esc(t('rpe'))}</label><div class="cond" id="rpe">${[6,7,8,9,10].map(v=>`<button data-rpe="${v}" class="${r.rpe===v?'on':''}">${v}</button>`).join('')}</div><div class="row between cap" style="margin-top:4px"><span>${esc(t('rpe_low'))}</span><span>${esc(t('rpe_high'))}</span></div></div>
@@ -2000,8 +1999,10 @@ function renderPerform(keep){
   let el=$('#perf'); if(!el){el=document.createElement('div');el.className='full';el.id='perf';document.body.appendChild(el);el.addEventListener('click',onPerfClick);el.addEventListener('input',onPerfInput);el.addEventListener('scroll',onHowtoScroll,true);}
   el.innerHTML=`<div class="bar-top"><button class="icon-btn" data-p="exit" aria-label="close">${ICO.close}</button>${n}<span style="width:40px"></span></div><div class="body">${body}</div><div class="foot">${foot}</div>`;
 }
+// completion screen: change vs the previous record of the same exercise
+function resultDelta(r){ const prevS=entryScore(P.prev), curS=entryScore(r); if(prevS==null||curS==null)return ''; const d=curS-prevS; const cls=d>0?'up':d<0?'down':''; return `<span class="delta ${cls}">${d>0?'↑':d<0?'↓':'='} ${r.mode==='time'?mmss(Math.abs(d)):Math.abs(Math.round(d*10)/10)}</span> <span class="cap">${esc(t('vs_last'))} ${esc(entrySummary(P.prev))}</span>`; }
 function onHowtoScroll(e){ if(e.target.id!=='howto')return; const h=e.target; const i=Math.round(h.scrollLeft/(h.clientWidth+12)); h.parentElement.querySelectorAll('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); }
-function onPerfInput(e){ const x=e.target; if(x.id==='memo'){P.memo=x.value;saveP();return;} if(P.result&&x.id==='durmin'){ const m=Math.max(0,Math.min(1440,Math.round(+x.value||0))); if(m>0)P.result.duration=m*60; return;} if(P.result&&x.id==='dist'){P.result.distance=Math.max(0,+x.value||0);return;} if(P.result&&x.id==='hr'){P.result.hr=Math.max(0,Math.round(+x.value||0));return;} }
+function onPerfInput(e){ const x=e.target; if(x.id==='memo'){P.memo=x.value;saveP();return;} if(P.result&&x.id==='durmin'){ const m=Math.max(0,Math.min(1440,Math.round(+x.value||0))); if(m>0){ P.result.duration=m*60; const dv=$('#dur-v'); if(dv)dv.textContent=mmss(P.result.duration); const de=$('#delta'); if(de)de.innerHTML=resultDelta(P.result); } return;} if(P.result&&x.id==='dist'){P.result.distance=Math.max(0,+x.value||0);return;} if(P.result&&x.id==='hr'){P.result.hr=Math.max(0,Math.round(+x.value||0));return;} }
 function onPerfClick(e){ const b=e.target.closest('[data-p],[data-c],[data-sp],[data-rpe]'); if(!b)return;
   if(b.dataset.rpe){ P.result.rpe=+b.dataset.rpe; $('#rpe').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); return; }
   if(b.dataset.c){ P.result.condition=+b.dataset.c; $('#cond').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); return; }
