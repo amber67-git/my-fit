@@ -1,0 +1,32 @@
+const path=require('path'); const fs=require('fs');
+const { chromium } = require(process.env.PW_MODULE||'playwright');
+const HARNESS=process.env.HARNESS||path.resolve(__dirname,'..','..','build','test.html');
+const APP_VER=(fs.readFileSync(path.resolve(__dirname,'..','..','src','app.html'),'utf8').match(/APP_VERSION='([^']+)'/)||[])[1];
+const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{};
+(async()=>{const b=await chromium.launch(LAUNCH);const p=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:2});
+  await p.clock.install({time:new Date('2026-10-19T10:00:00')});
+  await p.addInitScript((v)=>{localStorage.setItem('wwt.seenVersion',v);},APP_VER);
+  const errors=[]; p.on('pageerror',e=>errors.push(String(e)));
+  await p.goto('file://'+HARNESS); await p.waitForTimeout(300);
+  await p.click('[data-tab="report"]'); await p.waitForTimeout(200); await p.screenshot({path:'r21-empty.png',fullPage:true});
+  await p.evaluate(()=>{ const T=window.__T; const S=T.S; const d0=new Date('2026-09-14T18:00:00'); const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    for(let w=0;w<5;w++){ for(const off of [0,2,4]){ const d=new Date(d0); d.setDate(d.getDate()+w*7+off); const k=key(d); const st=d.getTime(); const mk=(exId,w0,reps,n)=>{ const sets=[]; for(let i=0;i<n;i++)sets.push({reps,weight:w0,done:true,t:st+i*150000}); return {id:'e'+k+exId,planItemId:'p'+k+exId,exId,mode:'sets',startedAt:st,endedAt:st+n*150000,duration:n*150,sets,memo:w===2&&exId==='ex_bench'?'felt strong':'',condition:3+(w%3)-1,rpe:7+(w%3)}; };
+      const entries=off===0?[mk('ex_bench',40+w*2.5,8,3),mk('ex_dbpress',12,10,3)]:off===2?[mk('ex_bbsquat',50+w*5,5,4),mk('ex_legpress',80+w*5,10,3)]:[{id:'c'+k,planItemId:'pc'+k,exId:'ex_treadmill',mode:'time',startedAt:st,endedAt:st+1500000,duration:1500,sets:[],memo:'',condition:4,rpe:6,distance:4.2+w*0.3,hr:142+w}];
+      S.logs[k]={entries}; S.plans[k]={items:entries.map(e=>({id:e.planItemId,exId:e.exId,mode:e.mode,sets:3,reps:8,weight:40,rest:90,minutes:25,status:'done'}))}; }
+    const bd=new Date(d0); for(let i=0;i<30;i+=3){ const d=new Date(bd); d.setDate(d.getDate()+i); S.body[key(d)]={w:72.5-i*0.05,sleep:6.5+(i%2),note:i===0?'start':''}; }
+    S.notes['2026-10-12']='Deload week'; T.persist.log('2026-09-14'); T.render(); } });
+  await p.waitForTimeout(300); console.log('sheet?',await p.evaluate(()=>{const s=document.querySelector('#sheet'); return s?s.innerText.slice(0,200):'none';})); if(await p.locator('#sheet').count()){ await p.screenshot({path:'r21-sheet.png'}); await p.mouse.click(195,30); await p.waitForTimeout(300); } await p.screenshot({path:'r21-4w.png',fullPage:true});
+  await p.click('[data-act="rpt-period"][data-v="12w"]'); await p.waitForTimeout(200); await p.screenshot({path:'r21-12w.png',fullPage:true});
+  await p.fill('#ci-w','71.8'); await p.fill('#ci-s','7'); await p.fill('#ci-n','good'); await p.click('[data-act="rpt-save-checkin"]'); await p.waitForTimeout(200);
+  console.log('checkin',await p.evaluate(()=>JSON.stringify(window.__T.S.body[window.__T.todayKey()])));
+  await p.fill('#wk-note','Week note test'); await p.click('[data-act="rpt-save-note"]'); await p.waitForTimeout(200);
+  console.log('note',await p.evaluate(()=>JSON.stringify(window.__T.S.notes)));
+  const txt=await p.evaluate(()=>window.__T.rptText(window.__T.rptBuild())); console.log('--- text ---\n'+txt);
+  const csv=await p.evaluate(()=>window.__T.rptCsv()); console.log('--- csv lines',csv.split('\n').length); console.log(csv.split('\n').slice(0,3).join('\n'));
+  await p.click('#lang [data-l="ko"]'); await p.waitForTimeout(300); await p.screenshot({path:'r21-ko.png',fullPage:true});
+  await p.evaluate(()=>{const T=window.__T; const d=T.todayKey(); const ex=T.S.exercises.find(e=>e.id==='ex_treadmill'); T.addPlanItem(d,ex); T.S.tab='dash'; T.render();});
+  await p.click('[data-act="start-today"]'); await p.waitForTimeout(300); await p.click('[data-p="start"]'); await p.waitForTimeout(300); await p.locator('[data-p="finish"]').first().click(); await p.waitForTimeout(400);
+  await p.click('[data-rpe="8"]'); await p.fill('#dist','3.1'); await p.fill('#hr','140'); await p.screenshot({path:'r21-complete.png'});
+  await p.click('[data-p="next"]'); await p.waitForTimeout(300);
+  console.log('entry',await p.evaluate(()=>{const T=window.__T; const l=T.logOf(T.todayKey()); return JSON.stringify(l[l.length-1]);}));
+  console.log('scrollWidth',await p.evaluate(()=>document.documentElement.scrollWidth),'errors',errors); await b.close();})();

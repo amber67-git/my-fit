@@ -33,7 +33,7 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
-## 기능 (v0.21.0)
+## 기능 (v0.21.1)
 
 - 5탭: Dashboard / Weekly / Monthly / Report / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 353개 (맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외, 부위·도구 태그, 2~4단계 운동 방법), 추가·편집·숨기기
@@ -58,3 +58,10 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - **작업 흐름**: 모든 변경은 브랜치 → PR → CodeRabbit 리뷰 반영 → 스쿼시 머지 → Pages 배포 순서로 진행합니다(규칙은 `CLAUDE.md`).
 - **E2E 스모크 (Playwright)**: `.github/workflows/e2e.yml`이 PR과 main 푸시마다 저장소를 정적 서버로 띄우고 `tests/smoke.cjs`를 실행합니다(로컬 모드 진입 → 운동 추가 → 시작 → 세트 완료 → 완료 → 스와이프 취소/삭제 → 가로 스크롤·콘솔 오류 검사). 실패하면 Actions의 e2e-screenshots 아티팩트에서 화면을 볼 수 있습니다. 시나리오 전체 목록은 `docs/e2e-scenarios.md`.
 - **PageSpeed Insights**: https://pagespeed.web.dev 에 배포 URL을 넣으면 PWA·성능·접근성 점수를 외부에서 확인할 수 있습니다.
+
+## 개발
+
+- 소스: `src/app.html`(앱 본체), `src/head.html`·`src/tail.html`(PWA 헤더·SW 등록), `src/figure/`(자세 엔진: figure.js 렌더러, poses.js 템플릿, figmap.js 운동→그림 매핑). `index.html`과 `artifact.html`은 빌드 산출물이므로 직접 고치지 않습니다.
+- 빌드: `tools/build.sh` → 그림 엔진을 app.html에 끼워 넣고 index.html/artifact.html, `build/dataset.js`, `build/test.html`(테스트 하네스)을 만듭니다.
+- 테스트: `tools/run-suites.sh`(Playwright 스위트 6개), `node tests/smoke.cjs`(정적 서버에서 스모크 15단계). CI(`.github/workflows/e2e.yml`)가 PR과 main 푸시마다 둘 다 실행합니다.
+- 그림 검사: `cd build && node ../tools/joints.js`(발목·무릎·팔꿈치 각도), `node ../tools/audit.js`(바닥·겹침), `tools/review.html`·`tools/zoom4.html`(렌더 확인).

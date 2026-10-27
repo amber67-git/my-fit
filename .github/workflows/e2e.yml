@@ -1,4 +1,4 @@
-# Playwright smoke E2E — PR과 main 푸시마다 저장소의 index.html을 정적 서버로 띄워 핵심 흐름을 검사합니다.
+# E2E — PR과 main 푸시마다: 소스에서 빌드해 커밋된 산출물과 같은지 확인 → Playwright 스위트(tests/suites) → 정적 서버에서 스모크(tests/smoke.cjs).
 name: E2E smoke
 
 on:
@@ -24,6 +24,12 @@ jobs:
           npm init -y >/dev/null
           npm install --no-save playwright@1.49.1
           npx playwright install --with-deps chromium
+      - name: Build from sources and check committed outputs are current
+        run: |
+          tools/build.sh
+          git diff --exit-code -- index.html artifact.html src/app.html
+      - name: Run Playwright suites (tests/suites)
+        run: tools/run-suites.sh
       - name: Serve the app
         run: |
           python3 -m http.server 8080 --bind 127.0.0.1 >/dev/null 2>&1 &
@@ -38,5 +44,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-screenshots
-          path: e2e-out
+          path: |
+            e2e-out
+            build/shots
           if-no-files-found: ignore

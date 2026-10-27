@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{font:13px system-ui;margin:10px;background:#fff;--card:#fff;--equip:#55585e;--hl:#e5484d}.r{display:flex;align-items:center;gap:10px;border-bottom:1px solid #ddd;padding:6px 0}.r .l{width:150px;font-weight:600}.r .l small{display:block;color:#888;font-weight:400}.f{background:#f6f7f9;border-radius:10px}.pf{color:#111}</style><style id="fc"></style></head><body>
+<script src="dataset.js"></script><script src="figall.js"></script>
+<script>document.getElementById('fc').textContent=FIG_CSS; const q=new URLSearchParams(location.search); const page=+q.get('p')||0, per=4;
+const exs=DEFAULT_EXERCISES(); const seen=new Set(); const uniq=[]; for(const ex of exs){ const m=EX_FIG[ex.id]; const key=m?JSON.stringify(m):'fb:'+ex.equip+ex.type+ex.muscle; if(seen.has(key))continue; seen.add(key); uniq.push(ex); }
+const slice=uniq.slice(page*per,page*per+per); window.__total=uniq.length;
+slice.forEach(ex=>{ const m=EX_FIG[ex.id]; const F=figFrames(ex); const fit=figFitBox(F.frames,{}); document.body.insertAdjacentHTML('beforeend',`<div class="r"><div class="l">${ex.id}<small>${m?m[0]+(m[1]?' / '+m[1]:''):'fallback'} · ${ex.equip}<br>${ex.nameEn}</small></div>${F.frames.map(f=>'<div class="f">'+figFrameSvg(f,200,{muscle:ex.muscle,fit})+'</div>').join('')}</div>`); });
+</script></body></html>
