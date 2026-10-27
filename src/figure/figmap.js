@@ -38,7 +38,7 @@ const EX_FIG={
 // For custom exercises: pick by template key list (icon field holds template key or 'pose:<name>')
 function figFrames(ex){ const m=EX_FIG[ex.id]; let tpl,eq,opts;
   if(m){ tpl=m[0]; eq=tpl==='pose'?ex.equip:(m[1]||ex.equip); opts=tpl==='pose'?m[1]:m[2]; }
-  else if(ex.icon&&typeof ex.icon==='string'&&(FT[ex.icon]||ex.icon.startsWith('pose:'))){ tpl=ex.icon.startsWith('pose:')?'pose':ex.icon; eq=ex.equip; opts=ex.icon.startsWith('pose:')?ex.icon.slice(5):null; }
+  else if(ex.icon&&typeof ex.icon==='string'&&(Object.prototype.hasOwnProperty.call(FT,ex.icon)||ex.icon.startsWith('pose:'))){ tpl=ex.icon.startsWith('pose:')?'pose':ex.icon; eq=ex.equip; opts=ex.icon.startsWith('pose:')?ex.icon.slice(5):null; }
   else { tpl=ex.type==='cardio'?'run':ex.type==='stretch'||ex.type==='cooldown'?'pose':ex.muscle==='chest'?'pushup':ex.muscle==='back'?'row_bent':ex.muscle==='shoulders'?'press_overhead':ex.muscle==='arms'?'curl':ex.muscle==='legs'?'squat':ex.muscle==='glutes'?'bridge':ex.muscle==='core'?'crunch':'stand'; eq=ex.equip; opts=tpl==='pose'?'fold_standing':null; }
   try{ if(tpl==='pose'){ const key=typeof opts==='string'?opts:'fold_standing'; return FT.pose(PZ[key]||PZ.fold_standing); } return FT[tpl](eq,opts||{}); }catch(e){ return FT.stand(); } }
 function figSvg(ex,size,frameIdx,opts){ const F=figFrames(ex); const i=frameIdx==null?F.hero:Math.min(frameIdx,F.frames.length-1); const o=Object.assign({muscle:ex&&ex.muscle},opts||{}); if(!o.fit)o.fit=figFitBox(F.frames,o); return figFrameSvg(F.frames[i],size,o); }

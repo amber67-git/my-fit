@@ -14,7 +14,7 @@ for(const ex of DEFAULT_EXERCISES()){ if(only&&!ex.id.includes(only))continue; c
       if(pose.v==="s"&&(rel<34||rel>116)) issues.push(`leg${k} ankle ${rel.toFixed(0)}° (shin ${shin.toFixed(0)}°, foot ${foot.toFixed(0)}°)`);
       if(knee>152) issues.push(`leg${k} knee flex ${knee.toFixed(0)}°`);
     });
-    L.arms.forEach((a,k)=>{ if(!a.sh||!a.el||!a.hd)return; const up=ang(a.sh,a.el), fo=ang(a.el,a.hd); const el=Math.abs(norm(fo-up)); if(el>152) issues.push(`arm${k} elbow flex ${el.toFixed(0)}°`); });
+    L.arms.forEach((a,k)=>{ if(!a.s||!a.el||!a.hd)return; const up=ang(a.s,a.el), fo=ang(a.el,a.hd); const el=Math.abs(norm(fo-up)); if(el>152) issues.push(`arm${k} elbow flex ${el.toFixed(0)}°`); });
     if(issues.length) out.push(`${ex.id} [${m?m[0]+(m[2]?' '+JSON.stringify(m[2]):''):'fb'}] f${i}: ${issues.join('; ')}`);
   });
 }

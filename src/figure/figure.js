@@ -3,6 +3,8 @@ const FIG={head:5.6,neck:3,torso:24,upper:16,fore:14,thigh:21,shin:19,foot:7,shW
 function _dir(a){const r=a*Math.PI/180;return [Math.sin(r),Math.cos(r)];}
 function _pt(p,a,len){const d=_dir(a);return [p[0]+d[0]*len,p[1]+d[1]*len];}
 // ankle range of motion: foot angle is kept within plantarflexion 55° / dorsiflexion 25° of neutral (toes perpendicular to the shin, in front of it); null = neutral
+// elbow range of motion: forearm never folds past 150° of flexion relative to the upper arm
+function _elbow(up,fo){ let d=fo-up; while(d>180)d-=360; while(d<=-180)d+=360; if(d>150)d=150; if(d<-150)d=-150; return up+d; }
 function _ankle(shin,foot){ const n=shin+90; if(foot==null)return n; let d=foot-n; while(d>180)d-=360; while(d<-180)d+=360; if(d<-55)d=-55; if(d>25)d=25; return n+d; }
 function _n(v){return Math.round(v*10)/10;}
 function _L(a,b){return `M${_n(a[0])} ${_n(a[1])}L${_n(b[0])} ${_n(b[1])}`;}
@@ -13,11 +15,11 @@ function _limbs(pose){
   if(pose.v==='f'){
     const shC=[hip[0],hip[1]-FIG.torso]; o.shC=shC; o.sh=[[shC[0]+FIG.shW,shC[1]],[shC[0]-FIG.shW,shC[1]]]; o.hips=[[hip[0]+FIG.hipW,hip[1]],[hip[0]-FIG.hipW,hip[1]]];
     o.headC=[shC[0],shC[1]-FIG.neck-FIG.head]; o.neckEnd=[shC[0],shC[1]-FIG.neck];
-    o.arms=(pose.arms||[[0,0],[0,0]]).map((a,i)=>{const sg=i===0?1:-1; const s=o.sh[i]; const el=_pt(s,a[0]*sg,FIG.upper); const hd=_pt(el,a[1]*sg,FIG.fore); return {s,el,hd};});
+    o.arms=(pose.arms||[[0,0],[0,0]]).map((a,i)=>{const sg=i===0?1:-1; const s=o.sh[i]; const el=_pt(s,a[0]*sg,FIG.upper); const hd=_pt(el,_elbow(a[0],a[1])*sg,FIG.fore); return {s,el,hd};});
     o.legs=(pose.legs||[[0,0],[0,0]]).map((l,i)=>{const sg=i===0?1:-1; const h=o.hips[i]; const kn=_pt(h,l[0]*sg,FIG.thigh); const an=_pt(kn,l[1]*sg,FIG.shin); const toe=_pt(an,(l[2]==null?0:l[2])*sg,FIG.foot*0.6); return {h,kn,an,toe};});
   } else {
     const sh=_pt(hip,t,FIG.torso); o.sh=sh; const ha=t+(pose.head||0); o.neckEnd=_pt(sh,ha,FIG.neck); o.headC=_pt(o.neckEnd,ha,FIG.head);
-    o.arms=(pose.arms||[[0,0],[0,0]]).map(a=>{const el=_pt(sh,a[0],FIG.upper); const hd=_pt(el,a[1],FIG.fore); return {s:sh,el,hd};});
+    o.arms=(pose.arms||[[0,0],[0,0]]).map(a=>{const el=_pt(sh,a[0],FIG.upper); const hd=_pt(el,_elbow(a[0],a[1]),FIG.fore); return {s:sh,el,hd};});
     o.legs=(pose.legs||[[0,0,90],[0,0,90]]).map(l=>{const kn=_pt(hip,l[0],FIG.thigh); const an=_pt(kn,l[1],FIG.shin); const toe=_pt(an,_ankle(l[1],l[2]),FIG.foot); return {h:hip,kn,an,toe};});
   }
   return o;
