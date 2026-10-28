@@ -1469,12 +1469,12 @@ const persist={
 let UNSUBS=[];
 const snapExists=sn=>typeof sn.exists==='function'?sn.exists():!!sn.exists;
 const pending=sn=>!!(sn.metadata&&sn.metadata.hasPendingWrites);
-let FIRST={ex:false,st:false,rt:false,pl:false,lg:false};
+let FIRST={ex:false,st:false,rt:false,pl:false,plSrv:false,lg:false};
 function packExercises(){ const defs=DEFAULT_EXERCISES(); const byId=Object.fromEntries(defs.map(d=>[d.id,d])); const custom=[],overrides={};
   S.exercises.forEach(e=>{ const d=byId[e.id]; if(!d){custom.push(e);return;} const o={}; ['nameEn','nameKo','icon','type','muscle','equip','mode','sets','reps','weight','rest','minutes','hidden'].forEach(k=>{ if(JSON.stringify(e[k])!==JSON.stringify(d[k]))o[k]=e[k]; }); if(JSON.stringify(e.steps)!==JSON.stringify(d.steps))o.steps=e.steps; if(Object.keys(o).length)overrides[e.id]=o; });
   return {v:2,custom,overrides}; }
 function unpackExercises(data){ if(data&&data.v===2){ const list=DEFAULT_EXERCISES().map(d=>Object.assign(d,data.overrides&&data.overrides[d.id]||{})); return list.concat((data.custom||[]).map(x=>Object.assign({},x))); } return ((data&&data.items)||[]).map(x=>Object.assign({},x)); }
-function subscribeAll(){ UNSUBS.forEach(u=>{try{u();}catch(e){}}); UNSUBS=[]; const db=DB; if(!db)return; FIRST={ex:false,st:false,rt:false,pl:false,lg:false};
+function subscribeAll(){ UNSUBS.forEach(u=>{try{u();}catch(e){}}); UNSUBS=[]; const db=DB; if(!db)return; FIRST={ex:false,st:false,rt:false,pl:false,plSrv:false,lg:false};
   const onErr=(e)=>{ S.lastError=(e&&e.code)||'error'; renderStatus(); };
   const maybeBackup=()=>{ if(FIRST.ex&&FIRST.st&&FIRST.pl&&FIRST.lg&&!FIRST.bk){ FIRST.bk=true; if(Object.keys(S.plans).length||Object.keys(S.logs).length)setTimeout(()=>makeBackup(false),3000); } };
   UNSUBS.push(db.doc('app/exercises').onSnapshot(snap=>{
@@ -1488,7 +1488,7 @@ function subscribeAll(){ UNSUBS.forEach(u=>{try{u();}catch(e){}}); UNSUBS=[]; co
     FIRST.st=true; saveLocal();render();maybeBackup();
   },onErr));
   UNSUBS.push(db.doc('app/routines').onSnapshot(snap=>{ if(snapExists(snap)){S.routines=(snap.data().items||[]).map(x=>Object.assign({},x));} else if(S.routines.length&&S.canWrite&&!FIRST.rt){ dbWrite(()=>DB.doc('app/routines').set(clean({items:S.routines}))); } FIRST.rt=true; saveLocal();render(); },onErr));
-  UNSUBS.push(db.collection('plans').onSnapshot(q=>{const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={items:(b.items||[]).map(x=>Object.assign({},x))};});
+  UNSUBS.push(db.collection('plans').onSnapshot(q=>{ if(!(q.metadata&&q.metadata.fromCache))FIRST.plSrv=true; const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={items:(b.items||[]).map(x=>Object.assign({},x))};});
     if(!FIRST.pl&&!q.docs.length&&Object.keys(S.plans).length&&S.canWrite){ const local=S.plans; FIRST.pl=true; Object.keys(local).forEach(k=>persist.plan(k)); maybeBackup(); return; }
     FIRST.pl=true; S.plans=o;saveLocal();render();maybeBackup();},onErr));
   UNSUBS.push(db.collection('logs').onSnapshot(q=>{const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={entries:(b.entries||[]).map(x=>Object.assign({},x))};});
@@ -1558,7 +1558,7 @@ function clearWeek(ws){ for(let i=0;i<7;i++){const k=keyOf(addDays(ws,i)); if(pl
 function placeRoutine(ws,r,wdMap,fromIdx){ r.days.forEach((d,i)=>{ const wd=wdMap[i]; if(wd==null||(fromIdx!=null&&wd<fromIdx))return; const k=keyOf(addDays(ws,wd)); d.exIds.forEach(id=>{const ex=exById(id); if(ex&&!ex.hidden)addPlanItem(k,ex);}); }); }
 function applyRoutine(r,wdMap,replace){ const ws=parseKey(S.weekStart); if(replace)clearWeek(ws); placeRoutine(ws,r,wdMap); toast(t('applied')); render(); }
 // Weekly repeat: when a new week starts empty (preset mode), lay the remembered routine out again
-function ensureRepeatRoutine(){ const rr=S.settings.repeatRoutine; if(!rr||!rr.id)return; if(S.settings.mode==='smart')return; if(DB&&!(FIRST.pl&&FIRST.rt&&FIRST.st))return; /* wait until remote plans, routines and settings have arrived */ const ws=startOfWeek(appNow()); const wk=keyOf(ws); if(rr.applied===wk)return; const r=allRoutines().find(x=>x.id===rr.id); if(!r){ delete S.settings.repeatRoutine; persist.settings(); return; } const empty=[0,1,2,3,4,5,6].every(i=>!planOf(keyOf(addDays(ws,i))).length); const todayIdx=Math.max(0,Math.min(6,Math.round((parseKey(todayKey())-ws)/86400000))); if(empty)placeRoutine(ws,r,rr.map||[],todayIdx); rr.applied=wk; persist.settings(); }
+function ensureRepeatRoutine(){ const rr=S.settings.repeatRoutine; if(!rr||!rr.id)return; if(S.settings.mode==='smart')return; if(DB&&!(FIRST.pl&&FIRST.plSrv&&FIRST.rt&&FIRST.st&&FIRST.ex))return; /* wait until exercises, routines, settings and a server (not cache) plans snapshot have arrived */ const ws=startOfWeek(appNow()); const wk=keyOf(ws); if(rr.applied===wk)return; const r=allRoutines().find(x=>x.id===rr.id); if(!r){ delete S.settings.repeatRoutine; persist.settings(); return; } const empty=[0,1,2,3,4,5,6].every(i=>!planOf(keyOf(addDays(ws,i))).length); const todayIdx=Math.max(0,Math.min(6,Math.round((parseKey(todayKey())-ws)/86400000))); if(empty)placeRoutine(ws,r,rr.map||[],todayIdx); rr.applied=wk; persist.settings(); }
 function addPlanItem(date,ex,afterId){ const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'}; S.plans[date]=S.plans[date]||{items:[]}; const arr=S.plans[date].items; const at=afterId?arr.findIndex(x=>x.id===afterId):-1; if(at>=0)arr.splice(at+1,0,it); else arr.push(it); persist.plan(date); return it; }
 function doneDays(from,to){ const s=new Set(); Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to&&logOf(k).length)s.add(k); }); return s.size; }
 function plannedDays(from,to){ const s=new Set(); Object.keys(S.plans).forEach(k=>{ if(k>=from&&k<=to&&planOf(k).length)s.add(k); }); return s.size; }
