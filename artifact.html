@@ -302,8 +302,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.21.2';
+const APP_VERSION='0.22.0';
 const CHANGELOG=[
+ {v:'0.22.0',date:'2026-10-28',en:['Streak now counts consecutive weeks that met your weekly goal (not calendar days); a week in progress keeps the count until it ends short','Routines can repeat every week: tick "Apply every week" when applying; a new empty week is filled automatically (preset mode). Turn it off in Settings','The day now starts at 04:00, so a workout that ends after midnight stays on that evening\'s date and the dashboard keeps showing it','Monthly "planned" counts only days up to today'],ko:['연속(streak)은 주간 목표를 채운 연속 주 수로 계산(달력 일수가 아님). 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지','루틴 매주 반복: 적용할 때 "매주 자동 적용"을 켜면 새 주가 비어 있을 때 자동으로 채움(프리셋 모드). 설정에서 끌 수 있음','하루의 시작을 새벽 4시로: 자정 넘겨 끝낸 운동은 그날 저녁 날짜로 남고 대시보드에도 계속 보임','월간 "planned"는 오늘까지의 계획일만 셈']},
  {v:'0.21.2',date:'2026-10-27',en:['Timed exercises: the duration on the completion screen is editable, and a long hike or run is no longer cut to the target + 10 minutes (cap is now 3× target + 15 min)','Switching kg/lb now converts your check-in body weights too (used for × body weight in the report)'],ko:['시간형 운동: 완료 화면에서 운동 시간을 직접 고칠 수 있고, 긴 등산·달리기가 목표+10분으로 잘리지 않음(상한 목표×3+15분)','kg/lb 전환 시 체크인 체중도 함께 변환(보고서의 체중 대비 배수에 사용)']},
  {v:'0.21.1',date:'2026-10-27',en:['Figures: elbows never fold past 150° (curls, stretches, squat rack grip, machine handles adjusted)','Custom exercises with an unusual icon name no longer break the picture'],ko:['그림: 팔꿈치가 150° 이상 접히지 않도록 제한(컬·스트레칭·스쿼트 바 그립·머신 손잡이 보정)','특이한 아이콘 이름의 사용자 운동에서 그림이 깨지던 문제 수정']},
  {v:'0.21.0',date:'2026-10-27',en:['New Report tab: period (4 wk / 12 wk / 1 yr / all), summary, week-by-week volume and minutes, growth by estimated 1RM, strength board with × body weight, muscle balance, consistency, effort & recovery, cardio, body, personal records, notes; copy as text or export CSV','New data captured for future reports: time of each set, session RPE, cardio distance and average heart rate, daily check-in (body weight, sleep, note), weekly note. Everything syncs, exports and backs up with the rest of your data'],ko:['보고서 탭 추가: 기간(4주/12주/1년/전체), 요약, 주별 볼륨·시간, 추정 1RM 성장 속도, 근력 보드(체중 대비), 부위 균형, 꾸준함, 강도·회복, 유산소, 신체, 개인 기록, 메모. 텍스트 복사·CSV 내보내기','앞으로의 보고서를 위해 새로 기록되는 값: 세트별 완료 시각, 세션 RPE, 유산소 거리·평균 심박, 오늘 체크인(체중·수면·메모), 주간 메모. 동기화·내보내기·백업에 모두 포함']},
@@ -949,7 +950,7 @@ function defaultIconFor(e){ return (EX_FIG[e.id]||[])[0]||(e.type==='cardio'?'ru
 const ICONS=FIG_TEMPLATE_KEYS;
 const I18N={
 en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Settings',tab_report:'Report',rpt_4w:'4 wk',rpt_12w:'12 wk',rpt_1y:'1 yr',rpt_all:'All',rpt_summary:'Summary',rpt_sessions:'Sessions',rpt_tonnage:'Volume',rpt_tonnage_u:'kg·reps',rpt_minutes:'Minutes',rpt_adherence:'Plan kept',rpt_condition:'Avg feel',rpt_weekly:'Week by week',rpt_growth:'Growth (est. 1RM)',rpt_strength:'Strength board',rpt_rel:'× body weight',rpt_balance:'Muscle balance',rpt_consistency:'Consistency',rpt_recovery:'Effort & recovery',rpt_cardio:'Cardio',rpt_body:'Body',rpt_prs:'Personal records',rpt_notes:'Notes',rpt_checkin:'Today\'s check-in',rpt_weight:'Body weight',rpt_sleep:'Sleep (h)',rpt_note:'Note',rpt_weeknote:'This week\'s note',rpt_weeknote_w:'week of',rpt_csv:'Export CSV',rpt_text:'Copy report text',rpt_need:'Needs more data: {n}+ {what}',rpt_sessions_w:'logged sessions',rpt_points_w:'logged sessions of the same exercise, a week apart',rpt_days_w:'check-ins with body weight',rpt_none:'Nothing logged in this period yet.',rpt_up:'Improving',rpt_down:'Stalled or down',rpt_per_week:'/wk',rpt_push:'Push',rpt_pull:'Pull',rpt_legs:'Legs',rpt_core:'Core',rpt_zero:'No sets this period',rpt_sets:'sets',rpt_by_weekday:'By weekday',rpt_avg_session:'Avg session',rpt_skipped:'Skipped items',rpt_morning:'Morning',rpt_afternoon:'Afternoon',rpt_evening:'Evening',rpt_rest_actual:'Avg set interval',rpt_rest_planned:'planned rest',rpt_rpe_avg:'Avg RPE',rpt_distance:'Distance',rpt_hr:'Avg HR',rpt_latest:'latest',rpt_change:'change',rpt_sleep_avg:'Avg sleep',rpt_pr_note:'Best estimated 1RM or best reps per exercise in this period.',rpt_first_half:'first half',rpt_second_half:'second half',rpt_volume_growth:'Volume growth',rpe:'How hard? (RPE)',rpe_low:'Easy',rpe_high:'Max',distance:'Distance',avg_hr:'Avg HR',rpt_saved:'Saved',
- this_week:'This week',workout_days:'Workout days',total_time:'Total time',streak:'Streak',days:'days',d:'d',
+ this_week:'This week',workout_days:'Workout days',total_time:'Total time',streak:'Streak',days:'days',d:'d',week:'week',weeks:'weeks',repeat_weekly:'Apply every week',repeat_routine:'Weekly routine',
  today:'Today',rest_day:'Rest day',rest_day_sub:'Nothing planned today.',tomorrow:'Tomorrow',est:'Est.',min:'min',
  start_today:"Start today's workout",all_done:'All done for today',add_exercise:'Add exercise',copy_last_week:'Copy last week',
  empty_day:'No exercises on this day.',status_planned:'Planned',status_done:'Done',status_skipped:'Skipped',
@@ -968,7 +969,7 @@ en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Set
  muscle:'Muscle',equipment:'Equipment',routines:'Routines',name:'Name',optional:'optional',credits:'Credits',deleted:'(deleted)',removed:'Removed',delete:'Delete',install:'Add to home screen',install_sub:'Open My Fit like an app',ios_1:'Open this page in Safari',ios_2:'Tap the Share button (square with an arrow)',ios_3:'Choose "Add to Home Screen"',update_ready:'Update ready. Reload to apply.',reload:'Reload',unit_converted:'All weights converted',start_day:'Start this day',feel_low:'Tough',feel_high:'Great',day:'day',preset_hint:'Preset: edit the week by hand',download:'Download .json',save_failed:'Save failed. Check the status line in Settings.',close:'Close',tap_howto:'Tap the picture for how-to',routine_default:'My routine',name_required:'Please enter a name.',resume_q:'Resume the workout you left?',resume:'Resume',no_sets_q:'No set was checked. Skip this exercise?',mark_done:'Mark as done',backup_failed:'Backup failed (too large or offline).',sync_error:'Sync error',add_set:'Add set',remove_set:'Remove set',skip_ex:'Skip exercise',add_ex_now:'Add exercise',leave_q:'Leave this exercise?',save_done:'Save what is done',discard_ex:'Discard',minus1:'−1 min',plus1:'+1 min',today_btn:'Today',rest_adj:'Rest',set_of:'of',remaining:'left',sign_in:'Sign in with Google',use_local:'Use without account (this device only)',account:'Account',sign_out:'Sign out',fb_synced:'Synced to Firebase',fb_setup:'Firebase is not configured yet. See README.',login_sub:'Sign in to keep your workouts on every device.',mode_preset:'Preset',mode_smart:'Smart',smart_section:'Smart mode',alternate:'Every other day when possible',alternate_label:'every other day',split:'Split',split_auto:'Auto by days',split_full:'Full body',split_ul:'Upper / Lower',split_ppl:'Push / Pull / Legs',split_home:'Home (bodyweight)',split_db:'Dumbbell',progression_on:'Auto progression',weight_step:'Weight step',version:'Version',whats_new:"What's new",updated_to:'Updated to',on:'On',off:'Off',smart_title:'Smart plan',generate:'Generate this week',regenerate:'Regenerate',smart_starter:'No history yet, so this is a starter plan.',smart_based:'Based on your last 4 weeks.',progression:'Progression',no_progress:'Same targets as last time.',confirm_regen:'Replace this week with a new smart plan?',smart_empty:'Turn on Smart to fill this week automatically.',rest_rule:'Rest day between sessions',backups:'Backups',restore:'Restore',confirm_restore:'Replace all current data with this backup?',auto_backup_note:'A snapshot is saved automatically once a day while synced. The last 14 are kept.',no_backups:'No backups yet.',restored:'Restored',backup_now:'Back up now',backed_up:'Backed up',apply_routine:'Apply routine',apply_week:'Apply to this week',days_week:'days / week',save_week_routine:'Save as routine',routine_name:'Routine name',applied:'Applied',replace_week:'This week already has exercises.',replace:'Replace week',add_on:'Add on top',builtin_l:'Built-in',mine:'Mine',pick_routine:'Pick a routine',delete_routine:'Delete routine',week_empty_save:'Add exercises to the week first.',week_days:['M','T','W','T','F','S','S'],saved:'Saved',pick:'Pick an exercise',local_only:'Saved on this device only',
  synced:'Synced to your account',cannot_write:'Read-only view: changes are not saved',volume:'Volume',duration:'Duration',total_sets:'Sets'},
 ko:{tab_dash:'대시보드',tab_week:'주간',tab_month:'월간',tab_settings:'설정',tab_report:'보고서',rpt_4w:'4주',rpt_12w:'12주',rpt_1y:'1년',rpt_all:'전체',rpt_summary:'요약',rpt_sessions:'운동 세션',rpt_tonnage:'총 볼륨',rpt_tonnage_u:'kg·회',rpt_minutes:'운동 시간',rpt_adherence:'계획 이행률',rpt_condition:'평균 컨디션',rpt_weekly:'주별 추이',rpt_growth:'성장 속도 (추정 1RM)',rpt_strength:'근력 보드',rpt_rel:'× 체중',rpt_balance:'부위 균형',rpt_consistency:'꾸준함',rpt_recovery:'강도 · 회복',rpt_cardio:'유산소',rpt_body:'신체',rpt_prs:'개인 기록 (PR)',rpt_notes:'메모',rpt_checkin:'오늘 체크인',rpt_weight:'체중',rpt_sleep:'수면 (시간)',rpt_note:'메모',rpt_weeknote:'이번 주 메모',rpt_weeknote_w:'주',rpt_csv:'CSV 내보내기',rpt_text:'보고서 텍스트 복사',rpt_need:'데이터가 더 필요해요: {what} {n}개 이상',rpt_sessions_w:'세션',rpt_points_w:'같은 운동의 기록(일주일 이상 간격)',rpt_days_w:'체중 체크인',rpt_none:'이 기간에는 기록이 없어요.',rpt_up:'성장 중',rpt_down:'정체·하락',rpt_per_week:'/주',rpt_push:'푸시',rpt_pull:'풀',rpt_legs:'하체',rpt_core:'코어',rpt_zero:'이 기간 세트 없음',rpt_sets:'세트',rpt_by_weekday:'요일별',rpt_avg_session:'세션 평균',rpt_skipped:'건너뛴 항목',rpt_morning:'오전',rpt_afternoon:'오후',rpt_evening:'저녁',rpt_rest_actual:'세트 간격 평균',rpt_rest_planned:'계획 휴식',rpt_rpe_avg:'평균 RPE',rpt_distance:'거리',rpt_hr:'평균 심박',rpt_latest:'최근',rpt_change:'변화',rpt_sleep_avg:'평균 수면',rpt_pr_note:'이 기간의 운동별 최고 추정 1RM 또는 최고 횟수.',rpt_first_half:'전반',rpt_second_half:'후반',rpt_volume_growth:'볼륨 성장',rpe:'얼마나 힘들었나요? (RPE)',rpe_low:'쉬움',rpe_high:'한계',distance:'거리',avg_hr:'평균 심박',rpt_saved:'저장됨',
- this_week:'이번 주',workout_days:'운동일',total_time:'총 운동 시간',streak:'연속',days:'일',d:'일',
+ this_week:'이번 주',workout_days:'운동일',total_time:'총 운동 시간',streak:'연속',days:'일',d:'일',week:'주',weeks:'주',repeat_weekly:'매주 자동 적용',repeat_routine:'매주 반복 루틴',
  today:'오늘',rest_day:'휴식일',rest_day_sub:'오늘은 계획된 운동이 없어요.',tomorrow:'내일',est:'예상',min:'분',
  start_today:'오늘 운동 시작',all_done:'오늘 운동 완료',add_exercise:'운동 추가',copy_last_week:'지난주 복사',
  empty_day:'이 날은 운동이 없어요.',status_planned:'계획',status_done:'완료',status_skipped:'건너뜀',
@@ -1412,7 +1413,9 @@ const uid=()=> 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)
 const pad=n=>String(n).padStart(2,'0');
 const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parseKey=k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d);};
-const todayKey=()=>keyOf(new Date());
+// The app's day starts at 04:00: until then "today" is still the previous calendar day (late workouts stay on the evening's date).
+const DAY_START_HOUR=4; const appNow=()=>{ const d=new Date(); if(d.getHours()<DAY_START_HOUR)d.setDate(d.getDate()-1); return d; }; // local calendar shift, DST-safe
+const todayKey=()=>keyOf(appNow());
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
 const startOfWeek=d=>{const x=new Date(d);x.setHours(0,0,0,0);const w=(x.getDay()+6)%7;return addDays(x,-w);};
 const locale=()=>S.settings.lang==='ko'?'ko-KR':'en-US';
@@ -1444,12 +1447,12 @@ const persist={
 let UNSUBS=[];
 const snapExists=sn=>typeof sn.exists==='function'?sn.exists():!!sn.exists;
 const pending=sn=>!!(sn.metadata&&sn.metadata.hasPendingWrites);
-let FIRST={ex:false,st:false,rt:false,pl:false,lg:false};
+let FIRST={ex:false,st:false,rt:false,pl:false,plSrv:false,lg:false};
 function packExercises(){ const defs=DEFAULT_EXERCISES(); const byId=Object.fromEntries(defs.map(d=>[d.id,d])); const custom=[],overrides={};
   S.exercises.forEach(e=>{ const d=byId[e.id]; if(!d){custom.push(e);return;} const o={}; ['nameEn','nameKo','icon','type','muscle','equip','mode','sets','reps','weight','rest','minutes','hidden'].forEach(k=>{ if(JSON.stringify(e[k])!==JSON.stringify(d[k]))o[k]=e[k]; }); if(JSON.stringify(e.steps)!==JSON.stringify(d.steps))o.steps=e.steps; if(Object.keys(o).length)overrides[e.id]=o; });
   return {v:2,custom,overrides}; }
 function unpackExercises(data){ if(data&&data.v===2){ const list=DEFAULT_EXERCISES().map(d=>Object.assign(d,data.overrides&&data.overrides[d.id]||{})); return list.concat((data.custom||[]).map(x=>Object.assign({},x))); } return ((data&&data.items)||[]).map(x=>Object.assign({},x)); }
-function subscribeAll(){ UNSUBS.forEach(u=>{try{u();}catch(e){}}); UNSUBS=[]; const db=DB; if(!db)return; FIRST={ex:false,st:false,rt:false,pl:false,lg:false};
+function subscribeAll(){ UNSUBS.forEach(u=>{try{u();}catch(e){}}); UNSUBS=[]; const db=DB; if(!db)return; FIRST={ex:false,st:false,rt:false,pl:false,plSrv:false,lg:false};
   const onErr=(e)=>{ S.lastError=(e&&e.code)||'error'; renderStatus(); };
   const maybeBackup=()=>{ if(FIRST.ex&&FIRST.st&&FIRST.pl&&FIRST.lg&&!FIRST.bk){ FIRST.bk=true; if(Object.keys(S.plans).length||Object.keys(S.logs).length)setTimeout(()=>makeBackup(false),3000); } };
   UNSUBS.push(db.doc('app/exercises').onSnapshot(snap=>{
@@ -1463,7 +1466,7 @@ function subscribeAll(){ UNSUBS.forEach(u=>{try{u();}catch(e){}}); UNSUBS=[]; co
     FIRST.st=true; saveLocal();render();maybeBackup();
   },onErr));
   UNSUBS.push(db.doc('app/routines').onSnapshot(snap=>{ if(snapExists(snap)){S.routines=(snap.data().items||[]).map(x=>Object.assign({},x));} else if(S.routines.length&&S.canWrite&&!FIRST.rt){ dbWrite(()=>DB.doc('app/routines').set(clean({items:S.routines}))); } FIRST.rt=true; saveLocal();render(); },onErr));
-  UNSUBS.push(db.collection('plans').onSnapshot(q=>{const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={items:(b.items||[]).map(x=>Object.assign({},x))};});
+  UNSUBS.push(db.collection('plans').onSnapshot(q=>{ if(!(q.metadata&&q.metadata.fromCache))FIRST.plSrv=true; const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={items:(b.items||[]).map(x=>Object.assign({},x))};});
     if(!FIRST.pl&&!q.docs.length&&Object.keys(S.plans).length&&S.canWrite){ const local=S.plans; FIRST.pl=true; Object.keys(local).forEach(k=>persist.plan(k)); maybeBackup(); return; }
     FIRST.pl=true; S.plans=o;saveLocal();render();maybeBackup();},onErr));
   UNSUBS.push(db.collection('logs').onSnapshot(q=>{const o={};q.docs.forEach(d=>{const b=d.data();o[d.id]={entries:(b.entries||[]).map(x=>Object.assign({},x))};});
@@ -1530,14 +1533,15 @@ const rtDesc=r=>S.settings.lang==='ko'?(r.descKo||r.descEn||''):(r.descEn||r.des
 const dayLabel=d=>S.settings.lang==='ko'?(d.labelKo||d.labelEn):(d.labelEn||d.labelKo);
 const DEFAULT_WD={1:[0],2:[0,3],3:[0,2,4],4:[0,1,3,4],5:[0,1,2,3,4],6:[0,1,2,3,4,5],7:[0,1,2,3,4,5,6]};
 function clearWeek(ws){ for(let i=0;i<7;i++){const k=keyOf(addDays(ws,i)); if(planOf(k).length){S.plans[k]={items:[]};persist.plan(k);}} }
-function applyRoutine(r,wdMap,replace){ const ws=parseKey(S.weekStart); if(replace)clearWeek(ws);
-  r.days.forEach((d,i)=>{ const wd=wdMap[i]; if(wd==null)return; const k=keyOf(addDays(ws,wd)); d.exIds.forEach(id=>{const ex=exById(id); if(ex&&!ex.hidden)addPlanItem(k,ex);}); });
-  toast(t('applied')); render(); }
+function placeRoutine(ws,r,wdMap,fromIdx){ r.days.forEach((d,i)=>{ const wd=wdMap[i]; if(wd==null||(fromIdx!=null&&wd<fromIdx))return; const k=keyOf(addDays(ws,wd)); d.exIds.forEach(id=>{const ex=exById(id); if(ex&&!ex.hidden)addPlanItem(k,ex);}); }); }
+function applyRoutine(r,wdMap,replace){ const ws=parseKey(S.weekStart); if(replace)clearWeek(ws); placeRoutine(ws,r,wdMap); toast(t('applied')); render(); }
+// Weekly repeat: when a new week starts empty (preset mode), lay the remembered routine out again
+function ensureRepeatRoutine(){ const rr=S.settings.repeatRoutine; if(!rr||!rr.id)return; if(S.settings.mode==='smart')return; if(DB&&!(FIRST.pl&&FIRST.plSrv&&FIRST.rt&&FIRST.st&&FIRST.ex))return; /* wait until exercises, routines, settings and a server (not cache) plans snapshot have arrived */ const ws=startOfWeek(appNow()); const wk=keyOf(ws); if(rr.applied===wk)return; const r=allRoutines().find(x=>x.id===rr.id); if(!r){ delete S.settings.repeatRoutine; persist.settings(); return; } const empty=[0,1,2,3,4,5,6].every(i=>!planOf(keyOf(addDays(ws,i))).length); const todayIdx=Math.max(0,Math.min(6,Math.round((parseKey(todayKey())-ws)/86400000))); if(empty)placeRoutine(ws,r,rr.map||[],todayIdx); rr.applied=wk; persist.settings(); }
 function addPlanItem(date,ex,afterId){ const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'}; S.plans[date]=S.plans[date]||{items:[]}; const arr=S.plans[date].items; const at=afterId?arr.findIndex(x=>x.id===afterId):-1; if(at>=0)arr.splice(at+1,0,it); else arr.push(it); persist.plan(date); return it; }
 function doneDays(from,to){ const s=new Set(); Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to&&logOf(k).length)s.add(k); }); return s.size; }
 function plannedDays(from,to){ const s=new Set(); Object.keys(S.plans).forEach(k=>{ if(k>=from&&k<=to&&planOf(k).length)s.add(k); }); return s.size; }
 function totalSec(from,to){ let s=0; Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to)logOf(k).forEach(e=>s+=e.duration||0); }); return s; }
-function streak(){ let n=0; let d=new Date(); if(!logOf(keyOf(d)).length)d=addDays(d,-1); while(logOf(keyOf(d)).length){n++;d=addDays(d,-1);} return n; }
+function streak(){ const goal=Math.max(1,S.settings.weeklyGoal||3); const wkDone=ws=>doneDays(keyOf(ws),keyOf(addDays(ws,6))); let ws=startOfWeek(appNow()); let n=0; if(wkDone(ws)>=goal)n++; ws=addDays(ws,-7); while(n<520&&wkDone(ws)>=goal){ n++; ws=addDays(ws,-7); } return n; }
 
 // ---------- UI shell ----------
 const $=(s,r)=> (r||document).querySelector(s);
@@ -1555,7 +1559,7 @@ function renderTabs(){ const tabs=[['dash','tab_dash'],['week','tab_week'],['mon
   $('#lang').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.settings.lang)); }
 function toast(msg){ const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),1600); }
 function renderStatus(){ const el=$('#status'); if(!el)return; el.textContent=S.lastError?t('sync_error')+': '+S.lastError:!S.canWrite?t('cannot_write'):(S.backend==='firebase'?t('fb_synced')+(FB.user&&FB.user.email?' · '+FB.user.email:''):S.backend==='db'?t('synced'):t('local_only')); }
-function render(){ renderTabs();
+function render(){ ensureRepeatRoutine(); renderTabs();
   const title={dash:'tab_dash',week:'tab_week',month:'tab_month',report:'tab_report',settings:'tab_settings'}[S.tab];
   $('#title').textContent=S.sub==='library'?t('library'):S.sub==='edit'?(S.editEx&&S.editEx.id?exName(S.editEx):t('new')):t(title);
   if(S.tab==='dash')renderDash(); else if(S.tab==='week')renderWeek(); else if(S.tab==='month')renderMonth(); else if(S.tab==='report')renderReport(); else renderSettings();
@@ -1564,7 +1568,7 @@ function render(){ renderTabs();
 // ---------- Report ----------
 const e1rm=(w,r)=>(!w||!r)?0:(r<=1?w:w*(1+r/30));
 const weekKeyOf=k=>keyOf(startOfWeek(parseKey(k)));
-function rptRange(){ const p=S.rptPeriod||'4w'; const days=p==='4w'?28:p==='12w'?84:p==='1y'?365:36500; const to=todayKey(); const from=days>=36500?'0000-00-00':keyOf(addDays(new Date(),-(days-1))); return {from,to,days,p}; }
+function rptRange(){ const p=S.rptPeriod||'4w'; const days=p==='4w'?28:p==='12w'?84:p==='1y'?365:36500; const to=todayKey(); const from=days>=36500?'0000-00-00':keyOf(addDays(appNow(),-(days-1))); return {from,to,days,p}; }
 function rptEntries(from,to){ const out=[]; Object.keys(S.logs).sort().forEach(k=>{ if(k<from||k>to)return; logOf(k).forEach(e=>{ const ex=exById(e.exId); const done=(e.sets||[]).filter(s=>s.done); const ton=done.reduce((a,s)=>a+(s.weight>0?s.reps*s.weight:0),0); const reps=done.reduce((a,s)=>a+(s.reps||0),0); const best=done.reduce((a,s)=>Math.max(a,e1rm(s.weight,s.reps)),0); out.push({date:k,ex,e,done,ton,reps,best,min:(e.duration||0)/60}); }); }); return out; }
 const rptNeed=(n,what)=>`<div class="rpt-need">${esc(t('rpt_need').replace('{n}',n).replace('{what}',t(what)))}</div>`;
 const fmtN=(v,d)=>{ d=d==null?0:d; return Number(v).toLocaleString(locale(),{maximumFractionDigits:d,minimumFractionDigits:0}); };
@@ -1574,7 +1578,7 @@ function rptRow(label,v,max,valText){ const pct=max>0?Math.round(100*v/max):0; r
 function rptGrowth(entries){ const by={}; entries.forEach(r=>{ if(r.e.mode!=='sets'||!r.best)return; (by[r.e.exId]=by[r.e.exId]||[]).push({d:r.date,v:r.best,ton:r.ton}); }); const rows=[]; Object.keys(by).forEach(id=>{ const a=by[id].sort((x,y)=>x.d<y.d?-1:1); const first=a[0],last=a[a.length-1]; if(a.length<2)return; const days=(parseKey(last.d)-parseKey(first.d))/864e5; if(days<6)return; const ch=(last.v-first.v)/first.v; rows.push({id,n:a.length,first:first.v,last:last.v,ch,perWeek:ch/(days/7),series:a}); }); rows.sort((x,y)=>y.ch-x.ch); return rows; }
 function rptBuild(){ const {from,to,days}=rptRange(); const E=rptEntries(from,to); const dates=[...new Set(E.map(r=>r.date))].sort(); const u=S.settings.unit; const sess=dates.length; const ton=E.reduce((a,r)=>a+r.ton,0), min=E.reduce((a,r)=>a+r.min,0); const pFrom=from<'1000'?(Object.keys(S.plans).sort()[0]||to):from; const planned=plannedDays(pFrom,to), doneD=doneDays(pFrom,to); const adh=planned?Math.round(100*Math.min(doneD,planned)/planned):null; const conds=E.map(r=>r.e.condition).filter(c=>c>0); const avgCond=conds.length?conds.reduce((a,b)=>a+b,0)/conds.length:null; const rpes=E.map(r=>r.e.rpe).filter(c=>c>0); const avgRpe=rpes.length?rpes.reduce((a,b)=>a+b,0)/rpes.length:null;
   // weeks
-  const wk={}; E.forEach(r=>{ const k=weekKeyOf(r.date); wk[k]=wk[k]||{ton:0,min:0,d:new Set()}; wk[k].ton+=r.ton; wk[k].min+=r.min; wk[k].d.add(r.date); }); const firstLog=Object.keys(S.logs).sort()[0]; const wFrom=startOfWeek(parseKey(from<'1000'?(firstLog||to):from)); const wTo=startOfWeek(new Date()); const weeks=[]; for(let d=wFrom; d<=wTo && weeks.length<260; d=addDays(d,7)){ const k=keyOf(d); const w=wk[k]||{ton:0,min:0,d:new Set()}; weeks.push({k,ton:w.ton,min:w.min,sess:w.d.size}); }
+  const wk={}; E.forEach(r=>{ const k=weekKeyOf(r.date); wk[k]=wk[k]||{ton:0,min:0,d:new Set()}; wk[k].ton+=r.ton; wk[k].min+=r.min; wk[k].d.add(r.date); }); const firstLog=Object.keys(S.logs).sort()[0]; const wFrom=startOfWeek(parseKey(from<'1000'?(firstLog||to):from)); const wTo=startOfWeek(appNow()); const weeks=[]; for(let d=wFrom; d<=wTo && weeks.length<260; d=addDays(d,7)){ const k=keyOf(d); const w=wk[k]||{ton:0,min:0,d:new Set()}; weeks.push({k,ton:w.ton,min:w.min,sess:w.d.size}); }
   // muscles
   const mus={}; MUSCLES.forEach(m=>mus[m]={sets:0,min:0}); E.forEach(r=>{ const m=r.ex&&r.ex.muscle; if(!mus[m])return; mus[m].sets+=r.done.length; if(r.e.mode==='time')mus[m].min+=r.min; });
   const grp={push:['chest','shoulders'],pull:['back'],legs:['legs','glutes','innerthigh','outerthigh'],core:['core']}; const grpSets={}; Object.keys(grp).forEach(g=>grpSets[g]=grp[g].reduce((a,m)=>a+(mus[m]?mus[m].sets:0),0));
@@ -1606,7 +1610,7 @@ function rptText(R){ const ko=S.settings.lang==='ko'; const L=[]; const per={ '4
   if(R.prs.length)L.push((ko?'PR: ':'PRs: ')+R.prs.slice(0,6).map(p=>`${exName(p.ex)} ${p.e1>0?fmtN(p.e1,1)+' '+R.u:p.reps+' reps'}`).join(', '));
   return L.join('\n'); }
 function rptCsv(){ const rows=[['date','exercise_id','exercise','type','muscle','equip','mode','set','reps','weight','unit','done','set_time','duration_sec','condition','rpe','distance_km','avg_hr','memo']]; Object.keys(S.logs).sort().forEach(k=>logOf(k).forEach(e=>{ const ex=exById(e.exId); const base=[k,e.exId,ex?ex.nameEn:'',ex?ex.type:'',ex?ex.muscle:'',ex?ex.equip:'',e.mode]; if(e.mode==='sets'&&e.sets&&e.sets.length){ e.sets.forEach((s,i)=>rows.push(base.concat([i+1,s.reps,s.weight,S.settings.unit,s.done?1:0,(typeof s.t==='number'&&isFinite(s.t)&&s.t>0)?new Date(s.t).toISOString():'',e.duration||0,e.condition||'',e.rpe||'','','',e.memo||'']))); } else rows.push(base.concat(['','','',S.settings.unit,1,'',e.duration||0,e.condition||'',e.rpe||'',e.distance||'',e.hr||'',e.memo||''])); })); const body=[['date','weight','unit','sleep_h','note']].concat(Object.keys(S.body).sort().map(k=>[k,S.body[k].w||'',S.settings.unit,S.body[k].sleep||'',S.body[k].note||''])); const notes=[['week_start','note']].concat(Object.keys(S.notes).sort().map(k=>[k,S.notes[k]])); const q=v=>{ const isStr=typeof v==='string'; v=String(v==null?'':v); if(isStr&&/^[=+\-@\t\r]/.test(v))v="'"+v; return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }; const csv=(r)=>r.map(x=>x.map(q).join(',')).join('\n'); return '# sets\n'+csv(rows)+'\n\n# body\n'+csv(body)+'\n\n# weekly_notes\n'+csv(notes)+'\n'; }
-function renderReport(){ const R=rptBuild(); const u=R.u; const tk=todayKey(); const b=S.body[tk]||{}; const wkKey=keyOf(startOfWeek(new Date())); const need=(n,have,what)=>have<n?rptNeed(n,what):'';
+function renderReport(){ const R=rptBuild(); const u=R.u; const tk=todayKey(); const b=S.body[tk]||{}; const wkKey=keyOf(startOfWeek(appNow())); const need=(n,have,what)=>have<n?rptNeed(n,what):'';
   const sec=(title,inner)=>`<div class="rpt-sec"><h3>${esc(title)}</h3>${inner}</div>`;
   const per=`<div class="seg wide">${[['4w','rpt_4w'],['12w','rpt_12w'],['1y','rpt_1y'],['all','rpt_all']].map(([k,l])=>`<button data-act="rpt-period" data-v="${k}" class="${(S.rptPeriod||'4w')===k?'on':''}">${esc(t(l))}</button>`).join('')}</div>`;
   const checkin=sec(t('rpt_checkin'),`<div class="row" style="gap:8px;align-items:flex-end"><div class="field grow"><label>${esc(t('rpt_weight'))} (${esc(u)})</label><input id="ci-w" type="number" inputmode="decimal" step="0.1" min="0" value="${esc(String(+b.w||''))}"></div><div class="field grow"><label>${esc(t('rpt_sleep'))}</label><input id="ci-s" type="number" inputmode="decimal" step="0.5" min="0" max="24" value="${esc(String(+b.sleep||''))}"></div></div><div class="field"><label>${esc(t('rpt_note'))}</label><input id="ci-n" type="text" maxlength="140" value="${esc(b.note||'')}"></div><button class="btn sec" data-act="rpt-save-checkin">${esc(t('save'))}</button>`);
@@ -1615,7 +1619,7 @@ function renderReport(){ const R=rptBuild(); const u=R.u; const tk=todayKey(); c
   const growth=sec(t('rpt_growth'),R.growth.length?`<div class="rpt-list">${R.growth.slice(0,6).map(g=>{const ex=exById(g.id); return `<div class="it"><span>${esc(ex?exName(ex):g.id)} <span class="delta ${g.ch>0?'up':g.ch<0?'down':''}">${g.ch>=0?'+':''}${Math.round(g.ch*100)}%</span></span><span>${fmtN(g.first,1)} → ${fmtN(g.last,1)} ${esc(u)} · ${g.perWeek>=0?'+':''}${(g.perWeek*100).toFixed(1)}%${esc(t('rpt_per_week'))}</span></div>`;}).join('')}</div>${rptSpark(R.growth[0].series.map(x=>x.v),[R.growth[0].series[0].d.slice(5),R.growth[0].series[R.growth[0].series.length-1].d.slice(5)])}`:rptNeed(2,'rpt_points_w'));
   const board=sec(t('rpt_strength'),R.board.length?`<div class="rpt-list">${R.board.slice(0,8).map(x=>`<div class="it"><span>${esc(exName(x.ex))}</span><span>${fmtN(x.e1,1)} ${esc(u)}${R.latestW?` · ${(x.e1/R.latestW).toFixed(2)}${esc(t('rpt_rel'))}`:''}</span></div>`).join('')}</div>${R.latestW?'':`<div class="rpt-small">${esc(t('rpt_rel'))}: ${esc(t('rpt_checkin'))} → ${esc(t('rpt_weight'))}</div>`}`:rptNeed(1,'rpt_sessions_w'));
   const maxSets=Math.max(1,...MUSCLES.map(m=>R.mus[m].sets)); const balance=sec(t('rpt_balance'),R.sess?MUSCLES.map(m=>rptRow(muscleName(m),R.mus[m].sets,maxSets,R.mus[m].sets?R.mus[m].sets+' '+t('rpt_sets'):(R.mus[m].min?fmtN(R.mus[m].min)+' '+t('min'):'0 '+t('rpt_sets')))).join('')+`<div class="rpt-kv" style="margin-top:4px">${[['push','rpt_push'],['pull','rpt_pull'],['legs','rpt_legs'],['core','rpt_core']].map(([k,l])=>`<span>${esc(t(l))} <b>${R.grpSets[k]}</b> ${esc(t('rpt_sets'))}</span>`).join('')}</div>`:need(1,0,'rpt_sessions_w'));
-  const wdL=t('week_days'); const consistency=sec(t('rpt_consistency'),R.sess?rptBars(R.wd.map((v,i)=>({l:wdL[i],v,t:v?String(v):''})),{labelTop:true,h:34})+`<div class="rpt-kv"><span>${esc(t('rpt_avg_session'))} <b>${fmtN(R.avgSess)} ${esc(t('min'))}</b></span><span>${esc(t('rpt_skipped'))} <b>${R.skipped}</b></span><span>${esc(t('rpt_morning'))} <b>${R.tod.m}</b> · ${esc(t('rpt_afternoon'))} <b>${R.tod.a}</b> · ${esc(t('rpt_evening'))} <b>${R.tod.e}</b></span><span>${esc(t('streak'))} <b>${streak()}</b></span></div>`:need(1,0,'rpt_sessions_w'));
+  const wdL=t('week_days'); const consistency=sec(t('rpt_consistency'),R.sess?rptBars(R.wd.map((v,i)=>({l:wdL[i],v,t:v?String(v):''})),{labelTop:true,h:34})+`<div class="rpt-kv"><span>${esc(t('rpt_avg_session'))} <b>${fmtN(R.avgSess)} ${esc(t('min'))}</b></span><span>${esc(t('rpt_skipped'))} <b>${R.skipped}</b></span><span>${esc(t('rpt_morning'))} <b>${R.tod.m}</b> · ${esc(t('rpt_afternoon'))} <b>${R.tod.a}</b> · ${esc(t('rpt_evening'))} <b>${R.tod.e}</b></span><span>${esc(t('streak'))} <b>${streak()} ${esc(streak()===1?t('week'):t('weeks'))}</b></span></div>`:need(1,0,'rpt_sessions_w'));
   const conds=R.E.map(r=>r.e.condition).filter(c=>c>0); const recovery=sec(t('rpt_recovery'),(conds.length||R.avgRpe!=null||R.avgGap!=null)?`<div class="rpt-kv"><span>${esc(t('rpt_condition'))} <b>${R.avgCond!=null?R.avgCond.toFixed(1)+'/5':'–'}</b></span><span>${esc(t('rpt_rpe_avg'))} <b>${R.avgRpe!=null?R.avgRpe.toFixed(1):'–'}</b></span><span>${esc(t('rpt_rest_actual'))} <b>${R.avgGap!=null?mmss(R.avgGap):'–'}</b></span><span>${esc(t('rpt_rest_planned'))} <b>${R.avgRest!=null?mmss(R.avgRest):'–'}</b></span></div>${conds.length>=2?rptSpark(conds):''}`:rptNeed(1,'rpt_sessions_w'));
   const cardio=sec(t('rpt_cardio'),R.card.length?`<div class="rpt-kv"><span>${esc(t('rpt_sessions'))} <b>${R.card.length}</b></span><span>${esc(t('rpt_minutes'))} <b>${fmtN(R.cMin)}</b></span><span>${esc(t('rpt_distance'))} <b>${R.cDist?fmtN(R.cDist,1)+' km':'–'}</b></span><span>${esc(t('rpt_hr'))} <b>${R.cHr?Math.round(R.cHr):'–'}</b></span></div>`:rptNeed(1,'rpt_sessions_w'));
   const body=sec(t('rpt_body'),R.wts.length?`<div class="rpt-kv"><span>${esc(t('rpt_latest'))} <b>${R.wts[R.wts.length-1]} ${esc(u)}</b></span><span>${esc(t('rpt_change'))} <b>${R.wts.length>=2?((R.wts[R.wts.length-1]-R.wts[0])>=0?'+':'')+fmtN(R.wts[R.wts.length-1]-R.wts[0],1)+' '+esc(u):'–'}</b></span><span>${esc(t('rpt_sleep_avg'))} <b>${R.avgSleep!=null?R.avgSleep.toFixed(1)+' h':'–'}</b></span></div>${R.wts.length>=2?rptSpark(R.wts,[R.bodyKeys[0].slice(5),R.bodyKeys[R.bodyKeys.length-1].slice(5)]):''}`:rptNeed(2,'rpt_days_w'));
@@ -1626,23 +1630,23 @@ function renderReport(){ const R=rptBuild(); const u=R.u; const tk=todayKey(); c
 
 // ---------- Dashboard ----------
 function renderDash(){
-  const today=todayKey(); const ws=startOfWeek(new Date()); const wsK=keyOf(ws),weK=keyOf(addDays(ws,6));
-  const now=new Date(); const ms=keyOf(new Date(now.getFullYear(),now.getMonth(),1)), me=keyOf(new Date(now.getFullYear(),now.getMonth()+1,0));
+  const today=todayKey(); const ws=startOfWeek(appNow()); const wsK=keyOf(ws),weK=keyOf(addDays(ws,6));
+  const now=appNow(); const ms=keyOf(new Date(now.getFullYear(),now.getMonth(),1)), me=keyOf(new Date(now.getFullYear(),now.getMonth()+1,0));
   const wDone=doneDays(wsK,weK), goal=S.settings.weeklyGoal||3; const pct=Math.min(100,Math.round(wDone/goal*100));
-  const mDone=doneDays(ms,me), mPlan=Math.max(plannedDays(ms,me),mDone); const tot=Math.round(totalSec(ms,me)/60);
+  const mDone=doneDays(ms,me), mPlan=Math.max(plannedDays(ms,today<me?today:me),mDone); const tot=Math.round(totalSec(ms,me)/60);
   const items=planOf(today); const todo=items.filter(i=>i.status==='planned'); const est=todo.reduce((a,i)=>a+estMin(i),0);
-  const tomorrow=planOf(keyOf(addDays(new Date(),1)));
+  const tomorrow=planOf(keyOf(addDays(appNow(),1)));
   let html=`<div class="stack">
    <div class="tiles">
     <div class="tile"><div class="cap">${esc(t('this_week'))}</div><div class="v num">${wDone}<small> / ${goal} ${esc(goal===1?t('day'):t('days'))}</small></div><div class="bar"><i style="width:${pct}%"></i></div></div>
     <div class="tile"><div class="cap">${esc(t('workout_days'))}</div><div class="v num">${mDone}<small> / ${mPlan} ${esc(t('planned'))}</small></div></div>
     <div class="tile"><div class="cap">${esc(t('total_time'))}</div><div class="v num">${tot}<small> ${esc(t('min'))}</small></div></div>
-    <div class="tile"><div class="cap">${esc(t('streak'))}</div><div class="v num">${streak()}<small> ${esc(streak()===1?t('day'):t('days'))}</small></div></div>
+    <div class="tile"><div class="cap">${esc(t('streak'))}</div><div class="v num">${streak()}<small> ${esc(streak()===1?t('week'):t('weeks'))}</small></div></div>
    </div>
-   <div class="sec-h"><h2>${esc(t('today'))} <span class="muted" style="font-weight:400;font-size:13px">${esc(fmtMD(new Date()))}</span></h2>
+   <div class="sec-h"><h2>${esc(t('today'))} <span class="muted" style="font-weight:400;font-size:13px">${esc(fmtMD(appNow()))}</span></h2>
      ${todo.length?`<span class="cap num">${esc(t('est'))} ${est} ${esc(t('min'))}</span>`:''}</div>`;
   if(!items.length){ html+=`<div class="empty"><div style="font-weight:600;color:var(--fg)">${esc(t('rest_day'))}</div><div class="cap">${esc(t('rest_day_sub'))}</div></div>`;
-    if(tomorrow.length){ html+=`<div class="cap">${esc(t('tomorrow'))} · ${tomorrow.length} ${esc(t('items'))}</div><div class="stack" style="gap:8px">${tomorrow.map(i=>cardHtml(i,false,keyOf(addDays(new Date(),1)))).join('')}</div>`; }
+    if(tomorrow.length){ html+=`<div class="cap">${esc(t('tomorrow'))} · ${tomorrow.length} ${esc(t('items'))}</div><div class="stack" style="gap:8px">${tomorrow.map(i=>cardHtml(i,false,keyOf(addDays(appNow(),1)))).join('')}</div>`; }
     html+=`<button class="btn sec" data-act="add-today">+ ${esc(t('add_exercise'))}</button>`;
   } else {
     html+=`<div class="stack" style="gap:8px">${items.map(i=>cardHtml(i,true,todayKey())).join('')}</div>`;
@@ -1662,8 +1666,8 @@ function cardHtml(it,clickable,date){ date=date||todayKey(); const ex=exById(it.
 function smartDays(ws,n,fromDay){ fromDay=fromDay||0; if(S.settings.smartAlternate!==false&&n<=4){ let start=fromDay; if(fromDay===0&&planOf(keyOf(addDays(ws,-1))).length)start=1; const days=[]; for(let d=start;d<7&&days.length<n;d+=2)days.push(d); if(days.length===n)return {days,alt:true}; }
   const base=(DEFAULT_WD[n]||DEFAULT_WD[7]).filter(d=>d>=fromDay); if(base.length>=n)return {days:base.slice(0,n),alt:false}; const rest=[]; for(let d=fromDay;d<7&&rest.length<n;d++)rest.push(d); return {days:rest,alt:false}; }
 const SPLIT_ROUTINE={full:'rt_full3',ul:'rt_ul',ppl:'rt_ppl',home:'rt_home',db:'rt_db'};
-function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||3)); const isCur=keyOf(ws)===keyOf(startOfWeek(new Date())); const todayIdx=isCur?Math.round((parseKey(todayKey())-ws)/86400000):0; const doneBefore=isCur?[0,1,2,3,4,5,6].filter(i=>i<todayIdx&&planOf(keyOf(addDays(ws,i))).some(x=>x.status!=='planned')).length:0; const n=Math.max(0,nAll-doneBefore); const dd=smartDays(ws,n,todayIdx); const wd=dd.days;
-  const since=keyOf(addDays(new Date(),-28)); const hist=Object.keys(S.logs).filter(k=>k>=since).flatMap(k=>logOf(k)); const used=new Set(hist.map(e=>e.exId));
+function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||3)); const isCur=keyOf(ws)===keyOf(startOfWeek(appNow())); const todayIdx=isCur?Math.round((parseKey(todayKey())-ws)/86400000):0; const doneBefore=isCur?[0,1,2,3,4,5,6].filter(i=>i<todayIdx&&planOf(keyOf(addDays(ws,i))).some(x=>x.status!=='planned')).length:0; const n=Math.max(0,nAll-doneBefore); const dd=smartDays(ws,n,todayIdx); const wd=dd.days;
+  const since=keyOf(addDays(appNow(),-28)); const hist=Object.keys(S.logs).filter(k=>k>=since).flatMap(k=>logOf(k)); const used=new Set(hist.map(e=>e.exId));
   const cands=allRoutines(); let routine,starter=!used.size; const split=S.settings.smartSplit||'auto';
   if(split!=='auto'&&SPLIT_ROUTINE[split]) routine=cands.find(r=>r.id===SPLIT_ROUTINE[split]);
   else if(used.size){ const best=cands.map(r=>({r,score:r.days.flatMap(d=>d.exIds).filter(id=>used.has(id)).length})).sort((a,b)=>b.score-a.score)[0]; routine=best.score>0?best.r:null; }
@@ -1680,7 +1684,7 @@ function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||
   return {plan,routine,starter,changes:[...new Set(changes)],n:nAll,alt:dd.alt,keep:isCur}; }
 function applySmart(){ const ws=parseKey(S.weekStart); const r=smartPlan(ws); for(let i=0;i<7;i++){ const k=keyOf(addDays(ws,i)); const keep=r.keep?planOf(k).filter(x=>x.status!=='planned'):[]; if(planOf(k).length!==keep.length||!planOf(k).length&&r.plan[k]){ S.plans[k]={items:keep}; } } Object.keys(r.plan).forEach(k=>{ const keep=planOf(k).filter(x=>x.status!=='planned'); S.plans[k]={items:keep.concat(r.plan[k])}; }); for(let i=0;i<7;i++){ const k=keyOf(addDays(ws,i)); persist.plan(k); } r.week=S.weekStart; S.smartInfo=r; toast(t('applied')); render(); }
 function renderWeek(){
-  if(!S.weekStart)S.weekStart=keyOf(startOfWeek(new Date()));
+  if(!S.weekStart)S.weekStart=keyOf(startOfWeek(appNow()));
   const ws=parseKey(S.weekStart); const today=todayKey(); const wd=t('week_days'); const smart=S.settings.mode==='smart';
   let cols='';
   for(let i=0;i<7;i++){ const d=addDays(ws,i),k=keyOf(d); const items=planOf(k);
@@ -1697,7 +1701,7 @@ function renderWeek(){
       <button class="btn pri" data-act="${weekEmpty?'smart-apply':'smart-regen'}">${esc(weekEmpty?t('generate'):t('regenerate'))}</button></div>`; }
   view.innerHTML=`<div class="stack">
     <div class="row between"><button class="icon-btn" data-act="week-prev" aria-label="previous">${ICO.left}</button>
-      <div style="text-align:center"><div style="font-weight:600" class="num">${esc(fmtMD(ws))} – ${esc(fmtMD(addDays(ws,6)))}</div><div class="cap num">${total?esc(t('est'))+' '+total+' '+esc(t('min')):''}${S.weekStart!==keyOf(startOfWeek(new Date()))?` · <button class="chip on" data-act="week-today" style="padding:2px 8px">${esc(t('today_btn'))}</button>`:''}</div></div>
+      <div style="text-align:center"><div style="font-weight:600" class="num">${esc(fmtMD(ws))} – ${esc(fmtMD(addDays(ws,6)))}</div><div class="cap num">${total?esc(t('est'))+' '+total+' '+esc(t('min')):''}${S.weekStart!==keyOf(startOfWeek(appNow()))?` · <button class="chip on" data-act="week-today" style="padding:2px 8px">${esc(t('today_btn'))}</button>`:''}</div></div>
       <button class="icon-btn" data-act="week-next" aria-label="next">${ICO.right}</button></div>
     <div class="seg wide"><button data-mode-set="preset" class="${!smart?'on':''}">${esc(t('mode_preset'))}</button><button data-mode-set="smart" class="${smart?'on':''}">${esc(t('mode_smart'))}</button></div>
     ${smartHtml}
@@ -1745,14 +1749,14 @@ function copyLastWeek(){ const ws=parseKey(S.weekStart); for(let i=0;i<7;i++){co
 
 // ---------- Monthly ----------
 function renderMonth(){
-  if(!S.month){const n=new Date();S.month=keyOf(new Date(n.getFullYear(),n.getMonth(),1));}
+  if(!S.month){const n=appNow();S.month=keyOf(new Date(n.getFullYear(),n.getMonth(),1));}
   const m=parseKey(S.month); const first=startOfWeek(m); const today=todayKey(); const wd=t('week_days');
   const ms=S.month, me=keyOf(new Date(m.getFullYear(),m.getMonth()+1,0));
   let cells=''; for(let i=0;i<42;i++){ const d=addDays(first,i),k=keyOf(d); const other=d.getMonth()!==m.getMonth(); const items=planOf(k); const logged=logOf(k).length>0;
     cells+=`<button class="cell ${other?'other':''} ${k===today?'today':''}" data-act="day-detail" data-k="${k}"><span class="d num">${d.getDate()}</span><span class="bars">${items.slice(0,3).map(it=>{const ex=exById(it.exId);return `<i class="b-${ex?ex.type:'strength'} ${it.status==='done'?'done':''}"></i>`;}).join('')}${!items.length&&logged?'<i class="b-strength done"></i>':''}</span></button>`;
     if(i===41&&false)break; }
   view.innerHTML=`<div class="stack">
-   <div class="row between"><button class="icon-btn" data-act="month-prev" aria-label="previous">${ICO.left}</button><div style="font-weight:600">${esc(fmtMonth(m))}${(m.getFullYear()!==new Date().getFullYear()||m.getMonth()!==new Date().getMonth())?` <button class="chip on" data-act="month-today" style="padding:2px 8px;margin-left:6px">${esc(t('today_btn'))}</button>`:''}</div><button class="icon-btn" data-act="month-next" aria-label="next">${ICO.right}</button></div>
+   <div class="row between"><button class="icon-btn" data-act="month-prev" aria-label="previous">${ICO.left}</button><div style="font-weight:600">${esc(fmtMonth(m))}${(m.getFullYear()!==appNow().getFullYear()||m.getMonth()!==appNow().getMonth())?` <button class="chip on" data-act="month-today" style="padding:2px 8px;margin-left:6px">${esc(t('today_btn'))}</button>`:''}</div><button class="icon-btn" data-act="month-next" aria-label="next">${ICO.right}</button></div>
    <div class="tiles"><div class="tile"><div class="cap">${esc(t('workout_days'))}</div><div class="v num">${doneDays(ms,me)}<small> / ${Math.max(plannedDays(ms,me),doneDays(ms,me))}</small></div></div>
      <div class="tile"><div class="cap">${esc(t('total_time'))}</div><div class="v num">${Math.round(totalSec(ms,me)/60)}<small> ${esc(t('min'))}</small></div></div></div>
    <div class="cal">${wd.map(w=>`<div class="wd">${esc(w)}</div>`).join('')}${cells}</div>
@@ -1773,11 +1777,11 @@ function checkWhatsNew(){ let seen=null; try{seen=localStorage.getItem('wwt.seen
 async function makeBackup(force){ if(!DB||!S.canWrite)return false; const k=todayKey();
   try{ if(!force){ const snap=await DB.doc('backups/'+k).get(); if(snapExists(snap))return false; } }catch(e){}
   const limit=S.backend==='db'?200000:900000;
-  const build=(days)=>{ const cut=keyOf(addDays(new Date(),-days)); const pick=o=>Object.fromEntries(Object.entries(o).filter(([d])=>d>=cut)); return {kind:'data',date:k,at:Date.now(),days,settings:S.settings,routines:S.routines,plans:pick(S.plans),logs:pick(S.logs),body:S.body,notes:S.notes,planDays:Object.keys(S.plans).length,logDays:Object.keys(S.logs).length}; };
+  const build=(days)=>{ const cut=keyOf(addDays(appNow(),-days)); const pick=o=>Object.fromEntries(Object.entries(o).filter(([d])=>d>=cut)); return {kind:'data',date:k,at:Date.now(),days,settings:S.settings,routines:S.routines,plans:pick(S.plans),logs:pick(S.logs),body:S.body,notes:S.notes,planDays:Object.keys(S.plans).length,logDays:Object.keys(S.logs).length}; };
   let body=null; for(const days of [730,365,180,90,45]){ const b=build(days); if(JSON.stringify(b).length<limit){body=b;break;} }
   if(!body){ S.backupError=true; return false; }
   try{ await DB.doc('backups/'+k).set(clean(body)); await DB.doc('backups/'+k+'-lib').set(clean(Object.assign({kind:'lib',date:k},packExercises()))); S.backupError=false; }catch(e){ S.backupError=true; return false; }
-  try{ const cutoff=keyOf(addDays(new Date(),-14)); const old=await DB.collection('backups').get(); for(const d of old.docs){ const b=d.data()||{}; if((b.date||'')<cutoff){ try{await DB.doc('backups/'+d.id).delete();}catch(e){} } } }catch(e){}
+  try{ const cutoff=keyOf(addDays(appNow(),-14)); const old=await DB.collection('backups').get(); for(const d of old.docs){ const b=d.data()||{}; if((b.date||'')<cutoff){ try{await DB.doc('backups/'+d.id).delete();}catch(e){} } } }catch(e){}
   return true; }
 async function openBackups(){ showSheet(`<h2 style="margin-bottom:4px">${esc(t('backups'))}</h2><div class="cap" style="margin-bottom:12px">${esc(t('auto_backup_note'))}</div><div id="bklist"><div class="empty">…</div></div>${DB&&S.canWrite?`<button class="btn sec" style="margin-top:12px" id="bknow">${esc(t('backup_now'))}</button>`:''}`);
   $('#bknow')?.addEventListener('click',async()=>{ const ok=await makeBackup(true); toast(ok?t('backed_up'):t('backup_failed')); fill(); });
@@ -1800,16 +1804,18 @@ function openRoutineList(){ const b=BUILTIN_ROUTINES(), m=S.routines;
   showSheet(`<h2 style="margin-bottom:10px">${esc(t('pick_routine'))}</h2>${m.length?`<div class="cap" style="margin-bottom:6px">${esc(t('mine'))}</div><div class="list" style="margin-bottom:12px">${m.map(row).join('')}</div>`:''}<div class="cap" style="margin-bottom:6px">${esc(t('builtin_l'))}</div><div class="list">${b.map(row).join('')}</div>`);
   $('#sheet').addEventListener('click',e=>{const x=e.target.closest('[data-rt]');if(!x)return;openRoutine(x.dataset.rt);}); }
 function openRoutine(id){ const r=allRoutines().find(x=>x.id===id); if(!r)return; const wd=t('week_days'); const map=(DEFAULT_WD[r.days.length]||DEFAULT_WD[7]).slice(0,r.days.length);
-  const ws=S.weekStart?parseKey(S.weekStart):startOfWeek(new Date()); if(!S.weekStart)S.weekStart=keyOf(ws);
+  const ws=S.weekStart?parseKey(S.weekStart):startOfWeek(appNow()); if(!S.weekStart)S.weekStart=keyOf(ws);
   const hasItems=[0,1,2,3,4,5,6].some(i=>planOf(keyOf(addDays(ws,i))).length);
   const dayHtml=(d,i)=>`<div class="tile stack" style="gap:8px"><div class="row between"><b>${esc(dayLabel(d))}</b><div class="seg" data-day="${i}">${wd.map((w,j)=>`<button data-wd="${j}" class="${map[i]===j?'on':''}" style="padding:4px 7px">${esc(w)}</button>`).join('')}</div></div><div class="cap">${esc(d.exIds.map(x=>{const e=exById(x);return e?exName(e):'';}).filter(Boolean).join(' · '))}</div></div>`;
   showSheet(`<h2>${esc(rtName(r))}</h2><div class="cap" style="margin:4px 0 12px">${esc(rtDesc(r))}</div><div class="stack" style="gap:8px">${r.days.map(dayHtml).join('')}</div>
     <div class="cap num" style="margin:12px 0 4px">${esc(fmtMD(ws))} – ${esc(fmtMD(addDays(ws,6)))}</div>
     ${hasItems?`<div class="cap" style="margin-bottom:8px">${esc(t('replace_week'))}</div><div class="row" style="gap:8px"><button class="btn sec" id="rt-add">${esc(t('add_on'))}</button><button class="btn pri" id="rt-replace">${esc(t('replace'))}</button></div>`:`<button class="btn pri" id="rt-apply">${esc(t('apply_week'))}</button>`}
+    <label class="row" style="gap:8px;margin-top:10px"><input type="checkbox" id="rt-repeat" style="width:auto" ${S.settings.repeatRoutine&&S.settings.repeatRoutine.id===r.id?'checked':''}><span class="nm">${esc(t('repeat_weekly'))}</span></label>
     ${r.builtin?'':`<button class="btn ghost danger" id="rt-del" style="margin-top:8px">${esc(t('delete_routine'))}</button>`}`);
+  const setRepeat=()=>{ const on=!!($('#rt-repeat')&&$('#rt-repeat').checked); const cur=S.settings.repeatRoutine; if(on){ S.settings.repeatRoutine={id:r.id,map:map.slice(),applied:keyOf(ws)}; } else if(cur&&cur.id===r.id){ delete S.settings.repeatRoutine; } persist.settings(); };
   $('#sheet').addEventListener('click',e=>{ const w=e.target.closest('[data-wd]'); if(w){const di=+w.closest('[data-day]').dataset.day; map[di]=+w.dataset.wd; w.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===w)); return;}
-    if(e.target.id==='rt-apply'||e.target.id==='rt-add'){closeSheet();S.tab='week';applyRoutine(r,map,false);} 
-    if(e.target.id==='rt-replace'){closeSheet();S.tab='week';applyRoutine(r,map,true);}
+    if(e.target.id==='rt-apply'||e.target.id==='rt-add'){setRepeat();closeSheet();S.tab='week';applyRoutine(r,map,false);} 
+    if(e.target.id==='rt-replace'){setRepeat();closeSheet();S.tab='week';applyRoutine(r,map,true);}
     if(e.target.id==='rt-del'){S.routines=S.routines.filter(x=>x.id!==r.id);persist.routines();closeSheet();render();} }); }
 function saveWeekAsRoutine(){ const ws=parseKey(S.weekStart); const wd=t('week_days'); const days=[]; for(let i=0;i<7;i++){const items=planOf(keyOf(addDays(ws,i))); if(items.length)days.push({labelEn:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i],labelKo:wd[i],exIds:items.map(it=>it.exId)});}
   if(!days.length){toast(t('week_empty_save'));return;}
@@ -1822,7 +1828,8 @@ function renderSettings(){
   const s=S.settings;
   view.innerHTML=`<div class="stack">
    <div class="list"><button class="li" data-act="open-lib"><span class="grow"><div class="nm">${esc(t('library'))}</div><div class="sub">${S.exercises.filter(e=>!e.hidden).length} ${esc(t('exercises'))}</div></span>${ICO.chev}</button>
-   <button class="li" data-act="open-routines"><span class="grow"><div class="nm">${esc(t('routines'))}</div><div class="sub">${BUILTIN_ROUTINES().length+S.routines.length}</div></span>${ICO.chev}</button></div>
+   <button class="li" data-act="open-routines"><span class="grow"><div class="nm">${esc(t('routines'))}</div><div class="sub">${BUILTIN_ROUTINES().length+S.routines.length}</div></span>${ICO.chev}</button>
+   ${(()=>{ const rr=s.repeatRoutine&&allRoutines().find(x=>x.id===s.repeatRoutine.id); return rr?`<div class="li"><span class="grow"><div class="nm">${esc(t('repeat_routine'))}</div><div class="sub">${esc(rtName(rr))}</div></span><button class="btn sm sec" data-act="repeat-off">${esc(t('off'))}</button></div>`:''; })()}</div>
    <div><div class="cap" style="margin-bottom:6px">${esc(t('goals'))}</div><div class="list">
     <div class="li"><span class="grow nm">${esc(t('weekly_goal'))}</span><div class="step"><button data-set="weeklyGoal" data-d="-1">−</button><span class="sv num">${s.weeklyGoal}</span><button data-set="weeklyGoal" data-d="1">+</button></div></div>
     <div class="li"><span class="grow nm">${esc(t('default_rest'))}</span><div class="step"><button data-set="restSec" data-d="-15">−</button><span class="sv num">${s.restSec}${esc(t('sec'))}</span><button data-set="restSec" data-d="15">+</button></div></div>
@@ -2025,10 +2032,11 @@ view.addEventListener('click',e=>{
     case 'add-today': openPicker(todayKey()); break;
     case 'rpt-period': S.rptPeriod=a.dataset.v; render(); break;
     case 'rpt-save-checkin': { const k=todayKey(); const w=+($('#ci-w').value)||0, sl=+($('#ci-s').value)||0, note=($('#ci-n').value||'').trim(); if(w||sl||note)S.body[k]={w,sleep:sl,note}; else delete S.body[k]; toast(persist.body(k)?t('rpt_saved'):t('save_failed')); render(); break; }
-    case 'rpt-save-note': { const k=keyOf(startOfWeek(new Date())); const v=($('#wk-note').value||'').trim(); if(v)S.notes[k]=v; else delete S.notes[k]; toast(persist.notes(k)?t('rpt_saved'):t('save_failed')); break; }
+    case 'rpt-save-note': { const k=keyOf(startOfWeek(appNow())); const v=($('#wk-note').value||'').trim(); if(v)S.notes[k]=v; else delete S.notes[k]; toast(persist.notes(k)?t('rpt_saved'):t('save_failed')); break; }
     case 'rpt-text': { const txt=rptText(rptBuild()); navigator.clipboard.writeText(txt).then(()=>toast(t('copied'))).catch(()=>{ showSheet(`<textarea rows="10" readonly>${esc(txt)}</textarea>`); }); break; }
     case 'rpt-csv': { const blob=new Blob([rptCsv()],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='my-fit-report-'+todayKey()+'.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); break; }
-    case 'go-week': S.tab='week'; S.selDay=todayKey(); S.weekStart=keyOf(startOfWeek(new Date())); render(); break;
+    case 'repeat-off': delete S.settings.repeatRoutine; persist.settings(); render(); break;
+    case 'go-week': S.tab='week'; S.selDay=todayKey(); S.weekStart=keyOf(startOfWeek(appNow())); render(); break;
     case 'install': { if(S.installEvt){ const ev=S.installEvt; S.installEvt=null; ev.prompt(); ev.userChoice.then(()=>render()); } else { showSheet(`<h2 style="margin-bottom:10px">${esc(t('install'))}</h2><ol style="padding-left:20px;line-height:1.7;margin:0 0 12px"><li>${esc(t('ios_1'))}</li><li>${esc(t('ios_2'))}</li><li>${esc(t('ios_3'))}</li></ol><button class="btn ghost" data-act="close-sheet">${esc(t('close'))}</button>`); } break; }
     case 'start-day': { const d=S.selDay||todayKey(); startQueue(planOf(d).filter(i=>i.status==='planned').map(i=>({date:d,id:i.id}))); break; }
     case 'start-today': { const d=todayKey(); startQueue(planOf(d).filter(i=>i.status==='planned').map(i=>({date:d,id:i.id}))); break; }
@@ -2038,8 +2046,8 @@ view.addEventListener('click',e=>{
     case 'add-day': S.selDay=a.dataset.k; openPicker(a.dataset.k); break;
     case 'smart-apply': applySmart(); break;
     case 'smart-regen': confirmSheet(t('confirm_regen'),t('regenerate'),()=>applySmart(),true); break;
-    case 'week-today': S.weekStart=keyOf(startOfWeek(new Date())); S.selDay=todayKey(); S.smartInfo=null; render(); break;
-    case 'month-today': { const n=new Date(); S.month=keyOf(new Date(n.getFullYear(),n.getMonth(),1)); render(); break; }
+    case 'week-today': S.weekStart=keyOf(startOfWeek(appNow())); S.selDay=todayKey(); S.smartInfo=null; render(); break;
+    case 'month-today': { const n=appNow(); S.month=keyOf(new Date(n.getFullYear(),n.getMonth(),1)); render(); break; }
     case 'week-prev': S.weekStart=keyOf(addDays(parseKey(S.weekStart),-7)); S.selDay=S.weekStart; S.smartInfo=null; render(); break;
     case 'week-next': S.weekStart=keyOf(addDays(parseKey(S.weekStart),7)); S.selDay=S.weekStart; S.smartInfo=null; render(); break;
     case 'copy-week': copyLastWeek(); break;
