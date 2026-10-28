@@ -33,15 +33,15 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
-## 기능 (v0.21.2)
+## 기능 (v0.22.0)
 
 - 5탭: Dashboard / Weekly / Monthly / Report / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 353개 (맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외, 부위·도구 태그, 2~4단계 운동 방법), 추가·편집·숨기기
 - 자세 엔진이 그리는 운동 그림(운동마다 준비·동작 프레임, 도구, 화살표) + 자극 부위를 빨간색으로 보여주는 바디맵 + 단계별 동작 배지
-- 프리셋 루틴 6개 + 이번 주를 내 루틴으로 저장
+- 프리셋 루틴 6개 + 이번 주를 내 루틴으로 저장. 적용할 때 "매주 자동 적용"을 켜면 새 주가 비어 있을 때 자동으로 채움(프리셋 모드, 남은 요일만). 설정에서 끌 수 있음
 - Weekly: Preset(직접 배치) / Smart(격일 배치, 주당 일수에 맞는 분할, 자동 증량)
 - 운동 수행: 준비 → 운동 방법 카드 → 타이머/세트 기록 → 완료 요약. 운동 중 횟수·무게 즉시 수정, 세트 추가/삭제, 휴식 ±15초, 운동 추가·건너뛰기, 저장/버리기 후 나가기, 앱을 닫아도 이어서 하기
-- Monthly 달력, 대시보드 요약
+- Monthly 달력, 대시보드 요약(연속 = 주간 목표를 채운 연속 주 수, 월간 planned는 오늘까지). 하루의 시작은 새벽 4시(자정 넘긴 운동은 그날 저녁 날짜)
 - 보고서 탭: 기간(4주/12주/1년/전체)별 요약, 주별 볼륨·시간, 추정 1RM 성장 속도, 근력 보드(체중 대비), 부위 균형, 꾸준함, 강도·회복, 유산소, 신체, 개인 기록, 메모. 텍스트 복사·CSV 내보내기. 세트 완료 시각, 세션 RPE, 유산소 거리·심박, 오늘 체크인(체중·수면·메모), 주간 메모를 기록해 둡니다.
 - 하루 1회 자동 백업(14개 보관)과 복원, JSON 내보내기/가져오기
 - 앱 내 버전 안내와 변경 이력
@@ -63,5 +63,5 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 
 - 소스: `src/app.html`(앱 본체), `src/head.html`·`src/tail.html`(PWA 헤더·SW 등록), `src/figure/`(자세 엔진: figure.js 렌더러, poses.js 템플릿, figmap.js 운동→그림 매핑). `index.html`과 `artifact.html`은 빌드 산출물이므로 직접 고치지 않습니다.
 - 빌드: `tools/build.sh` → 그림 엔진을 app.html에 끼워 넣고 index.html/artifact.html, `build/dataset.js`, `build/test.html`(테스트 하네스)을 만듭니다.
-- 테스트: `tools/run-suites.sh`(Playwright 스위트 6개), `node tests/smoke.cjs`(정적 서버에서 스모크 15단계), `node tests/persona.cjs`(가상 사용자 8주 시뮬레이션, 가설 41개). CI(`.github/workflows/e2e.yml`)가 PR과 main 푸시마다 둘 다 실행합니다.
+- 테스트: `tools/run-suites.sh`(Playwright 스위트 6개), `node tests/smoke.cjs`(정적 서버에서 스모크 15단계), `node tests/persona.cjs`(가상 사용자 8주 시뮬레이션, 가설 47개). CI(`.github/workflows/e2e.yml`)가 PR과 main 푸시마다 둘 다 실행합니다.
 - 그림 검사: `cd build && node ../tools/joints.js`(발목·무릎·팔꿈치 각도), `node ../tools/audit.js`(바닥·겹침), `tools/review.html`·`tools/zoom4.html`(렌더 확인).
