@@ -47,7 +47,7 @@ chat:
 ```markdown
 ## 배포 흐름: 브랜치 → PR → CodeRabbit 반영 → 자동 머지
 1. 작업은 feat/… fix/… chore/… 브랜치에서. main에 직접 푸시하지 않는다. 새 셸마다 먼저
-   BRANCH=$(git rev-parse --abbrev-ref HEAD); [ "$BRANCH" != main ] || { echo "branch first"; exit 1; }
+   BRANCH=$(git symbolic-ref --quiet --short HEAD) || { echo "detached HEAD: checkout a branch first"; exit 1; }; [ "$BRANCH" != main ] || { echo "branch first"; exit 1; }
 2. 푸시 후 PR을 연다: gh pr create --base main --head "$BRANCH" --title "..." --body "..."
    (GraphQL이 막힌 환경이면 REST: gh api -X POST repos/OWNER/REPO/pulls -f title="..." -f head="$BRANCH" -f base=main -f body="...").
    PR 번호를 변수로 잡아 둔다: PR_NUMBER=$(gh api "repos/OWNER/REPO/pulls?head=OWNER:$BRANCH" -q '.[0].number')
