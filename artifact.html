@@ -1684,10 +1684,10 @@ function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||
   const changes=[]; const plan={};
   for(let i=0;i<n;i++){ const d=routine.days[i%routine.days.length]; const date=keyOf(addDays(ws,wd[i])); plan[date]=plan[date]||[];
     d.exIds.forEach(id=>{ const ex=exById(id); if(!ex||ex.hidden)return; const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'};
-      const last=lighten?lastEntry(ex.id,keyOf(addDays(ws,-1))):prog?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
+      const before=lighten?lastEntry(ex.id,keyOf(addDays(ws,-1))):null; const thisWeek=lighten&&!before?lastEntry(ex.id):null; const lightenHere=lighten&&!!before; const last=lighten?(before||thisWeek):prog?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
         if(last.mode==='sets'&&it.mode==='sets'){ const done=last.sets.filter(x=>x.done); if(done.length&&done.length>=last.sets.length){ const w=Math.max(...done.map(x=>x.weight||0)); const r=Math.round(done.reduce((a,x)=>a+x.reps,0)/done.length);
-            if(w>0){ if(lighten){ it.weight=lightW(w); } else if(prog&&r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(!lighten&&prog&&r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } }
-          else if(done.length){ const w=Math.max(...done.map(x=>x.weight||0)); it.weight=lighten?lightW(w):w; } }
+            if(w>0){ if(lightenHere){ it.weight=lightW(w); } else if(lighten){ it.weight=w; } else if(prog&&r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(!lighten&&prog&&r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } }
+          else if(done.length){ const w=Math.max(...done.map(x=>x.weight||0)); it.weight=lightenHere?lightW(w):w; } }
         else if(last.mode==='time'&&it.mode==='time'){ const lm=Math.max(1,Math.round(last.duration/60)); if(!lighten&&prog&&last.duration>=lm*60*0.9-30&&lm<ex.minutes*2){ it.minutes=Math.min(ex.minutes*2,lm+1); changes.push(exName(ex)+' +1 '+t('min')); } else it.minutes=Math.max(it.minutes,lm); } }
       plan[date].push(it); }); }
   return {plan,routine,starter,changes:[...new Set(changes)],n:nAll,alt:dd.alt,keep:isCur,returning,deload,lighten,gapDays}; }
