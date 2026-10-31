@@ -49,17 +49,18 @@ chat:
 1. 작업은 feat/… fix/… chore/… 브랜치에서. main에 직접 푸시하지 않는다.
 2. 푸시 후 PR을 연다: gh pr create --base main --head "$BRANCH" --title "..." --body "..."
    (GraphQL이 막힌 환경이면 REST: gh api -X POST repos/OWNER/REPO/pulls -f title="..." -f head="$BRANCH" -f base=main -f body="...").
+   PR 번호를 변수로 잡아 둔다: PR_NUMBER=$(gh api "repos/OWNER/REPO/pulls?head=OWNER:$BRANCH" -q '.[0].number')
    본문에 바뀐 것, 검증한 것, 사용자에게 알릴 한계를 적는다.
 3. CodeRabbit 리뷰를 기다린다. 세 곳을 모두 본다(코드 줄 댓글, 리뷰 본문, PR 전체 댓글):
-   gh api --paginate repos/OWNER/REPO/pulls/N/comments
-   gh api --paginate repos/OWNER/REPO/pulls/N/reviews
-   gh api --paginate repos/OWNER/REPO/issues/N/comments
+   gh api --paginate "repos/OWNER/REPO/pulls/$PR_NUMBER/comments"
+   gh api --paginate "repos/OWNER/REPO/pulls/$PR_NUMBER/reviews"
+   gh api --paginate "repos/OWNER/REPO/issues/$PR_NUMBER/comments"
    coderabbitai[bot]의 "Actionable comments posted" 리뷰가 올 때까지 최대 10분(30초 간격) 폴링.
    10분 안에 안 오면 "리뷰 없음"으로 기록하고 진행한다.
 4. 댓글은 전부 읽고 판단한다. 실제 버그·회귀는 고쳐서 같은 브랜치에 커밋·푸시(다시 리뷰 대기),
-   오탐·의도된 동작은 PR 댓글로 이유를 남긴다. 댓글마다 "반영했습니다 (commit …)" 답글을 단다.
-5. 테스트 통과 + 반영 완료면 스쿼시 머지하고 브랜치를 지운다: gh pr merge N --squash --delete-branch
-   (REST: gh api -X PUT repos/OWNER/REPO/pulls/N/merge -f merge_method=squash 다음에 git push origin --delete "$BRANCH").
+   답글은 처리 결과에 맞게: 고친 댓글에는 "반영했습니다 (commit <sha>): <무엇을>", 오탐·의도된 동작에는 "유지합니다: <이유>".
+5. 테스트 통과 + 반영 완료면 스쿼시 머지하고 브랜치를 지운다: gh pr merge "$PR_NUMBER" --squash --delete-branch
+   (REST: gh api -X PUT "repos/OWNER/REPO/pulls/$PR_NUMBER/merge" -f merge_method=squash 다음에 git push origin --delete "$BRANCH").
 6. 머지 후 CI/배포 성공을 확인한다.
 7. 사용자에게 한국어로 보고: 무엇이 바뀌었는지, 리뷰 댓글 수와 처리 결과, 배포 결과, 권한·네트워크 한계.
 ```
