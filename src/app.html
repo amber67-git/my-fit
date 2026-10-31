@@ -1543,6 +1543,7 @@ function addPlanItem(date,ex,afterId){ const it={id:uid(),exId:ex.id,mode:ex.mod
 function doneDays(from,to){ const s=new Set(); Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to&&logOf(k).length)s.add(k); }); return s.size; }
 function plannedDays(from,to){ const s=new Set(); Object.keys(S.plans).forEach(k=>{ if(k>=from&&k<=to&&planOf(k).length)s.add(k); }); return s.size; }
 function totalSec(from,to){ let s=0; Object.keys(S.logs).forEach(k=>{ if(k>=from&&k<=to)logOf(k).forEach(e=>s+=e.duration||0); }); return s; }
+function streakBefore(ws){ const goal=Math.max(1,S.settings.weeklyGoal||3); const wkDone=w=>doneDays(keyOf(w),keyOf(addDays(w,6))); let w=addDays(ws,-7), n=0; while(n<520&&wkDone(w)>=goal){ n++; w=addDays(w,-7); } return n; }
 function streak(){ const goal=Math.max(1,S.settings.weeklyGoal||3); const wkDone=ws=>doneDays(keyOf(ws),keyOf(addDays(ws,6))); let ws=startOfWeek(appNow()); let n=0; if(wkDone(ws)>=goal)n++; ws=addDays(ws,-7); while(n<520&&wkDone(ws)>=goal){ n++; ws=addDays(ws,-7); } return n; }
 
 // ---------- UI shell ----------
@@ -1676,17 +1677,18 @@ function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||
   if(!routine) routine=cands.find(r=>r.id===(n<=3?'rt_full3':n===4?'rt_ul':'rt_ppl'))||cands[0];
   const prog=S.settings.smartProgress!==false; const step=S.settings.weightStep||(S.settings.unit==='lb'?5:2.5);
   // Lighter weeks: a return week after a break (no logs for returnGapDays) or a scheduled deload week (every deloadEvery-th week on goal)
-  const st=S.settings; const lastLogKey=Object.keys(S.logs).filter(k=>logOf(k).length).sort().pop(); const gapDays=lastLogKey?Math.round((parseKey(todayKey())-parseKey(lastLogKey))/86400000):0;
-  const returning=!!(st.returnOn!==false&&isCur&&lastLogKey&&gapDays>=(st.returnGapDays||14)); const every=Math.max(2,st.deloadEvery||4); const stk=streak();
-  const deload=!returning&&!!(st.deloadOn!==false&&isCur&&stk>0&&stk%every===every-1); const lighten=returning?(st.returnPct||10):deload?(st.deloadPct||10):0; const lightW=w=>Math.max(0,Math.round(w*(1-lighten/100)*2)/2);
+  // Decided from data before this week only, so the decision does not flip once the user logs a workout in the planned week.
+  const st=S.settings; const pctOf=v=>Math.min(50,Math.max(0,Math.round(Number(v)||0)))||10; const wsKey=keyOf(ws); const lastLogKey=Object.keys(S.logs).filter(k=>k<wsKey&&logOf(k).length).sort().pop(); const gapDays=lastLogKey?Math.round((ws-parseKey(lastLogKey))/86400000):0;
+  const returning=!!(st.returnOn!==false&&isCur&&lastLogKey&&gapDays>=(Number(st.returnGapDays)||14)); const every=Math.max(2,Number(st.deloadEvery)||4); const stk=streakBefore(ws);
+  const deload=!returning&&!!(st.deloadOn!==false&&isCur&&stk>0&&stk%every===every-1); const lighten=returning?pctOf(st.returnPct):deload?pctOf(st.deloadPct):0; const lightW=w=>Math.max(0,Math.round(w*(1-lighten/100)*2)/2);
   const changes=[]; const plan={};
   for(let i=0;i<n;i++){ const d=routine.days[i%routine.days.length]; const date=keyOf(addDays(ws,wd[i])); plan[date]=plan[date]||[];
     d.exIds.forEach(id=>{ const ex=exById(id); if(!ex||ex.hidden)return; const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'};
-      const last=prog?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
+      const last=(prog||lighten)?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
         if(last.mode==='sets'&&it.mode==='sets'){ const done=last.sets.filter(x=>x.done); if(done.length&&done.length>=last.sets.length){ const w=Math.max(...done.map(x=>x.weight||0)); const r=Math.round(done.reduce((a,x)=>a+x.reps,0)/done.length);
-            if(w>0){ if(lighten){ it.weight=lightW(w); } else if(r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(!lighten&&r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } }
+            if(w>0){ if(lighten){ it.weight=lightW(w); } else if(prog&&r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(!lighten&&prog&&r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } }
           else if(done.length){ const w=Math.max(...done.map(x=>x.weight||0)); it.weight=lighten?lightW(w):w; } }
-        else if(last.mode==='time'&&it.mode==='time'){ const lm=Math.max(1,Math.round(last.duration/60)); if(last.duration>=lm*60*0.9-30&&lm<ex.minutes*2){ it.minutes=Math.min(ex.minutes*2,lm+1); changes.push(exName(ex)+' +1 '+t('min')); } else it.minutes=Math.max(it.minutes,lm); } }
+        else if(last.mode==='time'&&it.mode==='time'){ const lm=Math.max(1,Math.round(last.duration/60)); if(!lighten&&prog&&last.duration>=lm*60*0.9-30&&lm<ex.minutes*2){ it.minutes=Math.min(ex.minutes*2,lm+1); changes.push(exName(ex)+' +1 '+t('min')); } else it.minutes=Math.max(it.minutes,lm); } }
       plan[date].push(it); }); }
   return {plan,routine,starter,changes:[...new Set(changes)],n:nAll,alt:dd.alt,keep:isCur,returning,deload,lighten,gapDays}; }
 function applySmart(){ const ws=parseKey(S.weekStart); const r=smartPlan(ws); for(let i=0;i<7;i++){ const k=keyOf(addDays(ws,i)); const keep=r.keep?planOf(k).filter(x=>x.status!=='planned'):[]; if(planOf(k).length!==keep.length||!planOf(k).length&&r.plan[k]){ S.plans[k]={items:keep}; } } Object.keys(r.plan).forEach(k=>{ const keep=planOf(k).filter(x=>x.status!=='planned'); S.plans[k]={items:keep.concat(r.plan[k])}; }); for(let i=0;i<7;i++){ const k=keyOf(addDays(ws,i)); persist.plan(k); } r.week=S.weekStart; S.smartInfo=r; toast(t('applied')); render(); }
@@ -1704,7 +1706,7 @@ function renderWeek(){
   if(smart){ const info=S.smartInfo&&S.smartInfo.week===S.weekStart?S.smartInfo:Object.assign(smartPlan(ws),{week:S.weekStart,preview:true});
     smartHtml=`<div class="smart"><div class="k">${esc(t('smart_title'))}</div><div><b>${info.n} ${esc(t('days_week'))}</b> · ${esc(rtName(info.routine))} · ${esc(info.alt?t('alternate_label'):t('rest_rule'))}</div>
       <div class="cap">${esc(info.starter?t('smart_starter'):t('smart_based'))}</div>
-      ${info.returning?`<div class="cap" style="color:var(--warn)"><b>${esc(t('return_week'))}</b> · −${info.lighten}% (${info.gapDays} ${esc(t('days'))})</div>`:info.deload?`<div class="cap" style="color:var(--warn)"><b>${esc(t('deload_week'))}</b> · −${info.lighten}%</div>`:''}
+      ${info.returning?`<div class="cap" style="color:var(--warn)"><b>${esc(t('return_week'))}</b> · −${esc(String(info.lighten))}% (${esc(String(info.gapDays))} ${esc(t('days'))})</div>`:info.deload?`<div class="cap" style="color:var(--warn)"><b>${esc(t('deload_week'))}</b> · −${esc(String(info.lighten))}%</div>`:''}
       <div class="cap"><b>${esc(t('progression'))}:</b> ${info.changes.length?esc(info.changes.slice(0,6).join(', '))+(info.changes.length>6?' …':''):esc(t('no_progress'))}</div>
       <button class="btn pri" data-act="${weekEmpty?'smart-apply':'smart-regen'}">${esc(weekEmpty?t('generate'):t('regenerate'))}</button></div>`; }
   view.innerHTML=`<div class="stack">
@@ -1848,11 +1850,11 @@ function renderSettings(){
     <div class="li"><span class="grow nm">${esc(t('progression_on'))}</span><div class="onoff"><button data-sset="smartProgress" data-v="1" class="${s.smartProgress!==false?'on':''}">${esc(t('on'))}</button><button data-sset="smartProgress" data-v="0" class="${s.smartProgress===false?'on':''}">${esc(t('off'))}</button></div></div>
     <div class="li"><span class="grow nm">${esc(t('weight_step'))}</span><div class="seg">${[1,2.5,5].map(v=>`<button data-wstep="${v}" class="${(s.weightStep||2.5)===v?'on':''}">${v}${esc(s.unit)}</button>`).join('')}</div></div>
     <div class="li"><span class="grow"><div class="nm">${esc(t('deload_on'))}</div><div class="sub">${esc(t('deload_sub'))}</div></span><div class="onoff"><button data-sset="deloadOn" data-v="1" class="${s.deloadOn!==false?'on':''}">${esc(t('on'))}</button><button data-sset="deloadOn" data-v="0" class="${s.deloadOn===false?'on':''}">${esc(t('off'))}</button></div></div>
-    ${s.deloadOn!==false?`<div class="li"><span class="grow nm">${esc(t('deload_every'))}</span><div class="seg">${[3,4,6].map(v=>`<button data-snum="deloadEvery" data-v="${v}" class="${(s.deloadEvery||4)===v?'on':''}">${v}${esc(t('weeks_short'))}</button>`).join('')}</div></div>
-    <div class="li"><span class="grow nm">${esc(t('deload_pct'))}</span><div class="seg">${[5,10,15,20].map(v=>`<button data-snum="deloadPct" data-v="${v}" class="${(s.deloadPct||10)===v?'on':''}">−${v}%</button>`).join('')}</div></div>`:''}
+    ${s.deloadOn!==false?`<div class="li"><span class="grow nm">${esc(t('deload_every'))}</span><div class="seg">${[3,4,6].map(v=>`<button data-snum="deloadEvery" data-v="${v}" class="${(Number(s.deloadEvery)||4)===v?'on':''}">${v}${esc(t('weeks_short'))}</button>`).join('')}</div></div>
+    <div class="li"><span class="grow nm">${esc(t('deload_pct'))}</span><div class="seg">${[5,10,15,20].map(v=>`<button data-snum="deloadPct" data-v="${v}" class="${(Number(s.deloadPct)||10)===v?'on':''}">−${v}%</button>`).join('')}</div></div>`:''}
     <div class="li"><span class="grow"><div class="nm">${esc(t('return_on'))}</div><div class="sub">${esc(t('return_sub'))}</div></span><div class="onoff"><button data-sset="returnOn" data-v="1" class="${s.returnOn!==false?'on':''}">${esc(t('on'))}</button><button data-sset="returnOn" data-v="0" class="${s.returnOn===false?'on':''}">${esc(t('off'))}</button></div></div>
-    ${s.returnOn!==false?`<div class="li"><span class="grow nm">${esc(t('return_pct'))}</span><div class="seg">${[5,10,15,20].map(v=>`<button data-snum="returnPct" data-v="${v}" class="${(s.returnPct||10)===v?'on':''}">−${v}%</button>`).join('')}</div></div>
-    <div class="li"><span class="grow nm">${esc(t('return_gap'))}</span><div class="seg">${[7,14,21].map(v=>`<button data-snum="returnGapDays" data-v="${v}" class="${(s.returnGapDays||14)===v?'on':''}">${v}${esc(t('d'))}</button>`).join('')}</div></div>`:''}
+    ${s.returnOn!==false?`<div class="li"><span class="grow nm">${esc(t('return_pct'))}</span><div class="seg">${[5,10,15,20].map(v=>`<button data-snum="returnPct" data-v="${v}" class="${(Number(s.returnPct)||10)===v?'on':''}">−${v}%</button>`).join('')}</div></div>
+    <div class="li"><span class="grow nm">${esc(t('return_gap'))}</span><div class="seg">${[7,14,21].map(v=>`<button data-snum="returnGapDays" data-v="${v}" class="${(Number(s.returnGapDays)||14)===v?'on':''}">${v}${esc(t('d'))}</button>`).join('')}</div></div>`:''}
    </div></div>
    <div class="list">
     <div class="li"><span class="grow nm">${esc(t('language'))}</span><div class="seg"><button data-lang="en" class="${s.lang==='en'?'on':''}">EN</button><button data-lang="ko" class="${s.lang==='ko'?'on':''}">KO</button></div></div>
