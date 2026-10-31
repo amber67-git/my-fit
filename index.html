@@ -324,8 +324,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.22.0';
+const APP_VERSION='0.22.1';
 const CHANGELOG=[
+ {v:'0.22.1',date:'2026-10-31',en:['Smart plan: an exercise you could not finish last time keeps that weight next week instead of dropping back to the library default'],ko:['스마트 플랜: 지난번에 세트를 다 못 채운 운동은 다음 주에 기본 무게로 돌아가지 않고 그 무게를 유지']},
  {v:'0.22.0',date:'2026-10-28',en:['Streak now counts consecutive weeks that met your weekly goal (not calendar days); a week in progress keeps the count until it ends short','Routines can repeat every week: tick "Apply every week" when applying; a new empty week is filled automatically (preset mode). Turn it off in Settings','The day now starts at 04:00, so a workout that ends after midnight stays on that evening\'s date and the dashboard keeps showing it','Monthly "planned" counts only days up to today'],ko:['연속(streak)은 주간 목표를 채운 연속 주 수로 계산(달력 일수가 아님). 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지','루틴 매주 반복: 적용할 때 "매주 자동 적용"을 켜면 새 주가 비어 있을 때 자동으로 채움(프리셋 모드). 설정에서 끌 수 있음','하루의 시작을 새벽 4시로: 자정 넘겨 끝낸 운동은 그날 저녁 날짜로 남고 대시보드에도 계속 보임','월간 "planned"는 오늘까지의 계획일만 셈']},
  {v:'0.21.2',date:'2026-10-27',en:['Timed exercises: the duration on the completion screen is editable, and a long hike or run is no longer cut to the target + 10 minutes (cap is now 3× target + 15 min)','Switching kg/lb now converts your check-in body weights too (used for × body weight in the report)'],ko:['시간형 운동: 완료 화면에서 운동 시간을 직접 고칠 수 있고, 긴 등산·달리기가 목표+10분으로 잘리지 않음(상한 목표×3+15분)','kg/lb 전환 시 체크인 체중도 함께 변환(보고서의 체중 대비 배수에 사용)']},
  {v:'0.21.1',date:'2026-10-27',en:['Figures: elbows never fold past 150° (curls, stretches, squat rack grip, machine handles adjusted)','Custom exercises with an unusual icon name no longer break the picture'],ko:['그림: 팔꿈치가 150° 이상 접히지 않도록 제한(컬·스트레칭·스쿼트 바 그립·머신 손잡이 보정)','특이한 아이콘 이름의 사용자 운동에서 그림이 깨지던 문제 수정']},
@@ -1700,7 +1701,8 @@ function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||
     d.exIds.forEach(id=>{ const ex=exById(id); if(!ex||ex.hidden)return; const it={id:uid(),exId:ex.id,mode:ex.mode,minutes:ex.minutes,sets:ex.sets,reps:ex.reps,weight:ex.weight,rest:ex.rest??S.settings.restSec,status:'planned'};
       const last=prog?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
         if(last.mode==='sets'&&it.mode==='sets'){ const done=last.sets.filter(x=>x.done); if(done.length&&done.length>=last.sets.length){ const w=Math.max(...done.map(x=>x.weight||0)); const r=Math.round(done.reduce((a,x)=>a+x.reps,0)/done.length);
-            if(w>0){ if(r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } } }
+            if(w>0){ if(r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } }
+          else if(done.length){ it.weight=Math.max(...done.map(x=>x.weight||0)); } }
         else if(last.mode==='time'&&it.mode==='time'){ const lm=Math.max(1,Math.round(last.duration/60)); if(last.duration>=lm*60*0.9-30&&lm<ex.minutes*2){ it.minutes=Math.min(ex.minutes*2,lm+1); changes.push(exName(ex)+' +1 '+t('min')); } else it.minutes=Math.max(it.minutes,lm); } }
       plan[date].push(it); }); }
   return {plan,routine,starter,changes:[...new Set(changes)],n:nAll,alt:dd.alt,keep:isCur}; }
