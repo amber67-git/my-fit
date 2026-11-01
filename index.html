@@ -1710,7 +1710,7 @@ function smartPlan(ws){ const nAll=Math.min(7,Math.max(1,S.settings.weeklyGoal||
       const doneOf=e=>(e&&e.sets||[]).filter(x=>x.done); const lastDone=(exId,before)=>{ const ks=Object.keys(S.logs).filter(k=>!before||k<=before).sort().reverse(); for(const k of ks){ const e=logOf(k).slice().reverse().find(x=>x.exId===exId&&(x.mode!=='sets'||doneOf(x).length)); if(e)return e; } return null; };
       const before=lighten?lastDone(ex.id,keyOf(addDays(ws,-1))):null; const thisWeek=lighten&&!before?lastDone(ex.id):null; const lightenHere=lighten&&!!before; const last=lighten?(before||thisWeek):prog?lastEntry(ex.id):null; if(last&&!plan[date].some(x=>x.exId===ex.id)){
         if(last.mode==='sets'&&it.mode==='sets'){ const done=doneOf(last);
-          if(lighten&&done.length){ const w=Math.max(0,...done.map(x=>x.weight||0)); it.weight=lightenHere?lightW(w):w; it.sets=last.sets.length; it.reps=last.sets[0].reps||it.reps; }
+          if(lighten&&done.length){ const w=Math.max(0,...done.map(x=>x.weight||0)); it.weight=lightenHere?lightW(w):w; it.sets=last.sets.length; it.reps=done[0].reps||it.reps; }
           else if(done.length&&done.length>=last.sets.length){ const w=Math.max(...done.map(x=>x.weight||0)); const r=Math.round(done.reduce((a,x)=>a+x.reps,0)/done.length);
             if(w>0){ if(prog&&r>=it.reps){ it.weight=Math.round((w+step)*10)/10; changes.push(exName(ex)+' +'+step+S.settings.unit); } else it.weight=w; } else if(prog&&r>=it.reps&&r<20){ it.reps=r+1; changes.push(exName(ex)+' +1 '+t('reps')); } }
           else if(done.length){ it.weight=Math.max(...done.map(x=>x.weight||0)); } }
