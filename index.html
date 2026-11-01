@@ -1372,7 +1372,7 @@ const EX_TARGETS={
  ex_worldgreatest:[['hip_flexors','hams'],['erectors','obliques']],
 };
 const SUB_FALLBACK={chest:['chest_mid'],back:['lats'],shoulders:['delt_side'],arms:['biceps','triceps'],legs:['quads','glute_max'],innerthigh:['adductors'],outerthigh:['glute_med'],glutes:['glute_max'],core:['abs'],full:['full_body']};
-function targetsOf(ex){ if(!ex)return {p:[],s:[]}; const m=EX_TARGETS[ex.id]; if(m)return {p:m[0],s:m[1]}; return {p:SUB_FALLBACK[ex.muscle]||['full_body'],s:[]}; }
+function targetsOf(ex){ if(!ex)return {p:[],s:[]}; const m=Object.prototype.hasOwnProperty.call(EX_TARGETS,ex.id)?EX_TARGETS[ex.id]:null; if(m)return {p:m[0],s:m[1]}; return {p:SUB_FALLBACK[ex.muscle]||['full_body'],s:[]}; }
 const subName=k=>(SUB_META[k]||{})[S.settings.lang]||k;
 function targetsHtml(ex){ const tg=targetsOf(ex); if(!tg.p.length)return ''; return `<div class="targets"><span class="cap"><b>${esc(t('targets_primary'))}</b> ${esc(tg.p.map(subName).join(' · '))}</span>${tg.s.length?`<span class="cap"> · <b>${esc(t('targets_secondary'))}</b> ${esc(tg.s.map(subName).join(' · '))}</span>`:''}</div>`; }
 const EQUIP_META={bodyweight:{en:'Bodyweight',ko:'맨몸'},dumbbell:{en:'Dumbbell',ko:'덤벨'},barbell:{en:'Barbell',ko:'바벨'},machine:{en:'Machine',ko:'머신'},cable:{en:'Cable',ko:'케이블'},band:{en:'Band',ko:'밴드'},kettlebell:{en:'Kettlebell',ko:'케틀벨'},ball:{en:'Stability ball',ko:'짐볼'},yoga:{en:'Yoga',ko:'요가'},sport:{en:'Sports & outdoor',ko:'스포츠·야외'},other:{en:'Other',ko:'기타'}};
