@@ -1366,6 +1366,10 @@ const EX_TARGETS={
  ex_abmachine:[['abs'],['hip_flexors','obliques']],
  ex_treadmill:[['heart','quads','glute_max'],['calves','hams']],
  ex_elliptical:[['heart','full_body'],['lats','quads']],
+ ex_childpose:[['erectors','lats'],['glute_max']],
+ ex_farmer:[['forearms','traps'],['core_deep','calves']],
+ ex_taichi:[['quads','core_deep'],['glute_med']],
+ ex_worldgreatest:[['hip_flexors','hams'],['erectors','obliques']],
 };
 const SUB_FALLBACK={chest:['chest_mid'],back:['lats'],shoulders:['delt_side'],arms:['biceps','triceps'],legs:['quads','glute_max'],innerthigh:['adductors'],outerthigh:['glute_med'],glutes:['glute_max'],core:['abs'],full:['full_body']};
 function targetsOf(ex){ if(!ex)return {p:[],s:[]}; const m=EX_TARGETS[ex.id]; if(m)return {p:m[0],s:m[1]}; return {p:SUB_FALLBACK[ex.muscle]||['full_body'],s:[]}; }
