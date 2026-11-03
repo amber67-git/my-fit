@@ -106,7 +106,7 @@ nav.tabs button.on{color:var(--accent)}
 .hero{display:flex;align-items:center;justify-content:center;gap:20px}
 .bmtile{display:grid;place-items:center;width:140px;height:140px;border-radius:32px;background:var(--soft);--bm-gap:var(--soft);flex:none}
 .bm{display:inline-block;vertical-align:middle}.bm .r{fill:var(--bm-rest);stroke:var(--bm-gap,var(--card));stroke-width:1.5}.bm .r.d{fill:var(--bm-decor)}.bm .r.p{fill:var(--hl)}.bm .r.s{fill:var(--hl);opacity:.42}.bm .hair path,.bm .hair ellipse{fill:var(--bm-hair);stroke:none}.bmwrap{display:inline-flex;gap:4px;align-items:center}
-.bmsm{flex:none;margin-left:auto;--bm-gap:var(--card)}.rpt-map{display:flex;justify-content:center;margin:2px 0 4px;--bm-gap:var(--card)}
+.bmsm{flex:none;margin-left:auto;--bm-gap:var(--card)}.hero .bigico{margin:0}.rpt-map{display:flex;justify-content:center;margin:2px 0 4px;--bm-gap:var(--card)}
 .ptiles{grid-template-columns:1fr 1fr!important;max-width:440px;margin:0 auto;width:100%;text-align:center}
 .steps3{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}.steps3:empty{display:none}
 .sc{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:8px 6px 10px;text-align:center;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -223,7 +223,7 @@ nav.tabs button.on{color:var(--accent)}
 .targets{margin-top:6px;line-height:1.5}.targets b{font-weight:600;color:var(--fg)}
 .rpt-sec{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:12px;display:flex;flex-direction:column;gap:10px}
 .rpt-sec h3{font-size:14px;font-weight:700;margin:0}
-.rpt-chart svg{width:100%;height:auto;display:block}
+.rpt-chart svg{width:100%;height:auto;display:block}.rpt-chart{max-width:560px;margin-inline:auto;width:100%}
 .rpt-chart text{font-size:4.2px;fill:var(--muted);font-family:inherit}
 .rpt-chart rect{fill:var(--accent)}
 .rpt-chart .alt rect{fill:var(--good)}
@@ -285,6 +285,11 @@ nav.tabs button.on{color:var(--accent)}
 .chk.big{width:44px;height:44px}
 .chk.big svg{width:22px;height:22px}
 
+/* tablet portrait and large phones: keep the phone layout but stop stretching cards across the screen */
+@media (min-width:600px) and (max-width:819px){
+  main > .stack{max-width:640px;margin-left:auto;margin-right:auto}
+  .rpt-chart text{font-size:3.4px}
+}
 /* tablet and desktop: side navigation, centered content, wider board */
 @media (min-width: 820px){
   :root{--nav-w:200px}
@@ -311,6 +316,23 @@ nav.tabs button.on{color:var(--accent)}
   .sheet .grip{display:none}
   .full .bar-top,.full .body,.full .foot{width:100%;max-width:600px;margin-left:auto;margin-right:auto}
   .toast{bottom:24px;left:calc(50% + var(--nav-w) / 2)}
+}
+@media (min-width: 820px){ .rpt-chart text{font-size:3.2px} }
+/* phones turned sideways (short screens): icon-only side navigation, smaller hero tiles, one-line workout footer */
+@media (max-height: 500px) and (orientation: landscape) and (min-width: 820px){
+  :root{--nav-w:64px}
+  nav.tabs button{justify-content:center;padding:0}
+  nav.tabs button span{display:none}
+  main{padding-left:20px;padding-right:20px}
+}
+@media (max-height: 500px) and (orientation: landscape){
+  .full .bar-top{min-height:44px}
+  .full .foot{flex-direction:row;align-items:center;padding-block:8px 10px}
+  .full .foot > .btn.pri{flex:1.3}
+  .full .foot > .row{flex:1}
+  .full .foot > .row .btn{white-space:nowrap;padding-inline:8px;font-size:14px}
+  .bigico,.bmtile{width:104px;height:104px;border-radius:24px}
+  .bmtile .bm{height:92px;width:auto}
 }
 </style>
 
@@ -2043,7 +2065,7 @@ const ICO={dash:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"
  check:'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',chev:'<svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2"><path d="M9 6l6 6-6 6"/></svg>',
  left:'<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',right:'<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'};
 function renderTabs(){ const tabs=[['dash','tab_dash'],['week','tab_week'],['month','tab_month'],['report','tab_report'],['settings','tab_settings']];
-  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button data-tab="${k}" class="${S.tab===k?'on':''}">${ICO[k]}<span>${esc(t(l))}</span></button>`).join('');
+  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button data-tab="${k}" class="${S.tab===k?'on':''}" aria-label="${esc(t(l))}">${ICO[k]}<span>${esc(t(l))}</span></button>`).join('');
   $('#lang').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.l===S.settings.lang)); }
 function toast(msg){ const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),1600); }
 function renderStatus(){ const el=$('#status'); if(!el)return; el.textContent=S.lastError?t('sync_error')+': '+S.lastError:!S.canWrite?t('cannot_write'):(S.backend==='firebase'?t('fb_synced')+(FB.user&&FB.user.email?' · '+FB.user.email:''):S.backend==='db'?t('synced'):t('local_only')); }
