@@ -15,5 +15,6 @@ s=M.bodyMapSvg('f',['quads'],['hip_flexors'],200,{}); check('secondary band neve
 s=M.bodyMapSvg('f',['hip_flexors'],['quads'],200,{}); check('primary band over secondary piece is fully red', bandOp(s)===1, bandOp(s));
 s=M.bodyMapSvg('f',['chest_upper'],[],200,{}); check('upper chest is a band, not the whole pec', bands(s)===2 && !/class="r p"(?! clip)/.test(s.replace(/<path d="[^"]*" class="r p" clip-path[^>]*>/g,'')));
 for(const sex of ['m','f'])for(const v of ['f','b']){ s=M.bodyMapSvg(v,[],[],200,{sex}); check(`hair drawn (${sex}/${v})`, /class="hair"/.test(s)); check(`tagged with its body (${sex}/${v})`, s.includes(`data-sex="${sex}"`)); }
-for(const v of ['f','b']){ const m=M.bodyMapSvg(v,[],[],200,{sex:'m'}).match(/viewBox="([^"]+)"/)[1], f=M.bodyMapSvg(v,[],[],200,{sex:'f'}).match(/viewBox="([^"]+)"/)[1]; check(`male and female artwork differ (${v})`, m!==f); }
+const vbOf=x=>x.match(/viewBox="([^"]+)"/)[1]; const pathsOf=x=>[...x.matchAll(/<path d="([^"]+)" class="r /g)].map(m=>m[1]).join('|');
+for(const v of ['f','b']){ const m=M.bodyMapSvg(v,[],[],200,{sex:'m'}), f=M.bodyMapSvg(v,[],[],200,{sex:'f'}); check(`male and female viewBoxes differ (${v})`, vbOf(m)!==vbOf(f)); check(`male and female artwork paths differ (${v})`, pathsOf(m).length>0 && pathsOf(m)!==pathsOf(f)); }
 console.log('errors',JSON.stringify(errors)); process.exit(errors.length?1:0);
