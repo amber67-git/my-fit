@@ -9,7 +9,7 @@
 4. 리뷰 댓글은 전부 읽고 판단한다. 실제 버그·회귀는 고쳐서 같은 브랜치에 커밋·푸시하고(다시 리뷰 대기), 오탐이나 의도된 동작은 PR 댓글로 이유를 남긴다.
 5. 테스트가 통과하고 반영이 끝나면 REST로 스쿼시 머지한다: `gh api -X PUT repos/amber67-git/my-fit/pulls/N/merge -f merge_method=squash`. 브랜치는 삭제한다. GraphQL은 이 세션에서 막혀 있으니 `gh pr merge`는 쓰지 않는다.
 6. 머지 후 `gh run watch`로 Pages 배포 성공을 확인하고, E2E 스모크 워크플로(`.github/workflows/e2e.yml`, `tests/smoke.cjs`) 결과를 확인한다. PR 단계에서도 같은 워크플로가 돌므로 머지 전에 통과를 확인한다. 아티팩트(https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j)도 같은 버전으로 갱신한다.
-7. 사용자에게는 한국어로: 무엇이 바뀌었는지, 리뷰 댓글이 몇 개였고 어떻게 처리했는지, 배포 결과, 권한·네트워크 한계를 보고한다.
+7. 사용자에게는 한국어로: 무엇이 바뀌었는지, 리뷰 댓글이 몇 개였고 어떻게 처리했는지, 배포 결과, 권한·네트워크 한계를 보고한다. 사용자가 직접 열어 봐야 하는 것(PR, 라이브 앱, 아티팩트, 시안 페이지, Actions 실행)은 항상 링크를 함께 붙인다.
 
 ## 검증 최소선 (머지 전)
 - 소스는 `src/`(app.html, head.html, tail.html, figure/{figure,poses,figmap}.js)이고 `index.html`·`artifact.html`은 빌드 산출물이다. 앱을 고칠 때는 `src/`를 고치고 `tools/build.sh`로 빌드한다(그림 엔진 splice, dataset.js, 테스트 하네스 생성, 인라인 스크립트 블록별 `node --check`, sw.js VERSION 대조). CI가 빌드 결과와 커밋된 산출물이 같은지 확인한다.

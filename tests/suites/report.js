@@ -17,6 +17,7 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
     S.notes['2026-10-12']='Deload week'; T.persist.log('2026-09-14'); T.render(); } });
   await p.waitForTimeout(300); console.log('sheet?',await p.evaluate(()=>{const s=document.querySelector('#sheet'); return s?s.innerText.slice(0,200):'none';})); if(await p.locator('#sheet').count()){ await p.screenshot({path:'r21-sheet.png'}); await p.mouse.click(195,30); await p.waitForTimeout(300); } await p.screenshot({path:'r21-4w.png',fullPage:true});
   await p.click('[data-act="rpt-period"][data-v="12w"]'); await p.waitForTimeout(200); await p.screenshot({path:'r21-12w.png',fullPage:true});
+  { const maps=await p.locator('.rpt-map svg.bm').count(); if(maps!==2) throw new Error('weekly muscle map: expected front+back, got '+maps); const red=await p.locator('.rpt-map .r.p').count(); if(!red) throw new Error('weekly muscle map has no highlighted muscle'); console.log('muscle map ok',maps,red); }
   await p.fill('#ci-w','71.8'); await p.fill('#ci-s','7'); await p.fill('#ci-n','good'); await p.click('[data-act="rpt-save-checkin"]'); await p.waitForTimeout(200);
   console.log('checkin',await p.evaluate(()=>JSON.stringify(window.__T.S.body[window.__T.todayKey()])));
   await p.fill('#wk-note','Week note test'); await p.click('[data-act="rpt-save-note"]'); await p.waitForTimeout(200);
@@ -29,4 +30,6 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   await p.click('[data-rpe="8"]'); await p.fill('#dist','3.1'); await p.fill('#hr','140'); await p.screenshot({path:'r21-complete.png'});
   await p.click('[data-p="next"]'); await p.waitForTimeout(300);
   console.log('entry',await p.evaluate(()=>{const T=window.__T; const l=T.logOf(T.todayKey()); return JSON.stringify(l[l.length-1]);}));
+  await p.evaluate(()=>{const T=window.__T; T.S.tab='settings'; T.render();}); await p.click('[data-body="f"]'); await p.waitForTimeout(200);
+  { const v=await p.evaluate(()=>window.__T.S.settings.body); const saved=await p.evaluate(()=>{ try{ const raw=localStorage.getItem('wwt.state.v1'); return raw?(JSON.parse(raw).settings||{}).body:undefined; }catch(e){ return 'read-error'; } }); if(v!=='f'||saved!=='f') throw new Error('body figure setting not saved: state='+v+' local='+saved); await p.evaluate(()=>{const T=window.__T; T.S.tab='report'; T.render();}); await p.waitForTimeout(200); const hair=await p.locator('.rpt-map .hair').count(); const sexes=await p.locator('.rpt-map svg.bm').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-sex'))); if(hair!==2||JSON.stringify(sexes)!=='["f","f"]') throw new Error('female map not rendered: hair='+hair+' sexes='+JSON.stringify(sexes)); console.log('body figure ok'); }
   console.log('scrollWidth',await p.evaluate(()=>document.documentElement.scrollWidth),'errors',errors); await b.close();})();
