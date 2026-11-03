@@ -320,8 +320,8 @@ nav.tabs button.on{color:var(--accent)}
 @media (min-width: 820px){ .rpt-chart text{font-size:3.2px} }
 /* phones turned sideways (short screens): icon-only side navigation, smaller hero tiles, one-line workout footer */
 @media (max-height: 500px) and (orientation: landscape) and (min-width: 820px){
-  :root{--nav-w:64px}
-  nav.tabs{overflow-y:auto}
+  :root{--nav-w:calc(64px + env(safe-area-inset-left,0px))}
+  nav.tabs{overflow-y:auto;padding-left:calc(8px + env(safe-area-inset-left,0px))}
   nav.tabs button{justify-content:center;padding:0}
   nav.tabs button span{display:none}
   main{padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px))}

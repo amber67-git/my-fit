@@ -30,13 +30,18 @@ for(const [name,w,h,dpr] of VP){ const p=await b.newPage({viewport:{width:w,heig
     report[name]=report[name]||{}; report[name][screen]=m; };
   const shot=async(screen,full=true)=>{ await p.waitForTimeout(250); await measure(screen); await p.screenshot({path:OUT+name+'--'+screen+'.png',fullPage:full}); };
   for(const tab of ['dash','week','month','report','settings']){ await p.evaluate(t=>{ const T=window.__T; T.S.tab=t; T.render(); window.scrollTo(0,0); },tab); if(await p.locator('#sheet').count())throw new Error(name+': unexpected sheet open on '+tab); await shot(tab); }
+  if(h<=500&&w>h){ // the last side-menu tab must be reachable by a real scroll and must open its tab
+    await p.evaluate(()=>{ const T=window.__T; T.S.tab='dash'; T.render(); });
+    const nb=await p.locator('nav.tabs').boundingBox(); await p.mouse.move(nb.x+nb.width/2,nb.y+Math.min(nb.height-4,40)); await p.mouse.wheel(0,600); await p.waitForTimeout(150);
+    const last=p.locator('nav.tabs button').last(); const r=await last.boundingBox();
+    if(!r||r.y<0||r.y+r.height>h+1){ errs.push('side menu: last tab not reachable by scrolling ('+(r?Math.round(r.y)+'-'+Math.round(r.y+r.height):'none')+' of '+h+')'); }
+    else { await p.mouse.click(r.x+r.width/2,r.y+r.height/2); await p.waitForTimeout(150); const on=await last.evaluate(b=>b.classList.contains('on')); if(!on)errs.push('side menu: tapping the last tab did not open it'); } }
   await p.evaluate(()=>{ const T=window.__T; T.S.tab='dash'; T.render(); T.openItemEditor(T.todayKey(), T.planOf(T.todayKey())[0].id); }); await shot('editor',false);
   await p.evaluate(()=>{ const x=document.querySelector('.backdrop'); if(x)x.click(); }); await p.waitForTimeout(300);
   const add=await p.$('[data-act="add-ex"],[data-act="add-today"],[data-act="add"]'); if(!add)throw new Error(name+': add-exercise button not found'); { await add.click(); await shot('picker',false); await p.evaluate(()=>{ const x=document.querySelector('.backdrop'); if(x)x.click(); }); await p.waitForTimeout(300); }
   await p.click('[data-act="start-today"]'); await p.locator('[data-p="start"]').waitFor({timeout:5000}); await shot('prepare');
   await p.click('[data-p="start"]'); await p.locator('[data-p="setdone"]').first().waitFor({timeout:5000}); await shot('perform');
   await p.locator('[data-p="setdone"]').first().click(); await p.waitForTimeout(200); await p.locator('[data-p="finish"]').first().click(); await p.locator('[data-p="next"]').first().waitFor({timeout:5000}); await shot('complete');
-  if(h<=500&&w>h){ const reach=await p.evaluate(()=>{ const nav=document.querySelector('nav.tabs'); const last=nav&&nav.querySelector('button:last-child'); if(!nav||!last)return 'no nav'; last.scrollIntoView({block:'nearest'}); const r=last.getBoundingClientRect(); return r.bottom<=window.innerHeight+1&&r.top>=0?'ok':'last tab at '+Math.round(r.top)+'-'+Math.round(r.bottom)+' of '+window.innerHeight; }); if(reach!=='ok')errs.push('side menu: '+reach); }
   report[name]._errors=errs; await p.close(); }
 fs.writeFileSync(OUT+'report.json',JSON.stringify(report,null,1)); await b.close();
 let fail=0; for(const [vp,sc] of Object.entries(report)){ for(const [s,m] of Object.entries(sc)){ if(s.startsWith('_'))continue; const bad=[]; if(m.docW>m.W)bad.push('horizontal scroll '+m.docW+'>'+m.W); if(m.off.length)bad.push('outside viewport: '+m.off.join(', ')); if(m.clipped.length)bad.push('clipped text: '+m.clipped.join(', ')); if(m.H<=500&&m.W>m.H&&['dash','week','month','report','settings'].includes(s)&&!m.navSide)bad.push('short landscape screen still uses the bottom tab bar'); console.log((bad.length?'FAIL ':'ok   ')+vp.padEnd(17)+s.padEnd(9)+(bad.length?' '+bad.join(' | '):'')); if(bad.length)fail=1; }
