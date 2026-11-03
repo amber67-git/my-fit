@@ -299,17 +299,18 @@ nav.tabs button.on{color:var(--accent)}
 /* phones turned sideways (short screens): icon-only side navigation, smaller hero tiles, one-line workout footer */
 @media (max-height: 500px) and (orientation: landscape) and (min-width: 820px){
   :root{--nav-w:64px}
+  nav.tabs{overflow-y:auto}
   nav.tabs button{justify-content:center;padding:0}
   nav.tabs button span{display:none}
-  main{padding-left:20px;padding-right:20px}
+  main{padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px))}
 }
 @media (max-height: 500px) and (orientation: landscape) and (max-width: 819px){
   :root{--nav-h:0px;--nav-w:calc(64px + env(safe-area-inset-left,0px))}
-  nav.tabs{top:calc(56px + env(safe-area-inset-top,0px));bottom:0;right:auto;width:var(--nav-w);flex-direction:column;border-top:0;border-right:1px solid var(--line);padding:12px 8px 12px calc(8px + env(safe-area-inset-left,0px));gap:4px}
+  nav.tabs{top:calc(56px + env(safe-area-inset-top,0px));bottom:0;right:auto;width:var(--nav-w);flex-direction:column;border-top:0;border-right:1px solid var(--line);padding:12px 8px 12px calc(8px + env(safe-area-inset-left,0px));gap:4px;overflow-y:auto}
   nav.tabs button{flex:none;height:44px;justify-content:center;padding:0;border-radius:10px}
   nav.tabs button span{display:none}
   nav.tabs button.on{background:var(--accent-soft)}
-  main{margin-left:var(--nav-w);padding-block:16px 24px;padding-left:20px;padding-right:20px}
+  main{margin-left:var(--nav-w);padding-block:16px 24px;padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px))}
   .toast{left:calc(50% + var(--nav-w) / 2)}
 }
 @media (max-height: 500px) and (orientation: landscape){

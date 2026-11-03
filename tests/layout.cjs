@@ -2,7 +2,7 @@
 // Fails on horizontal page scroll, elements outside the viewport, clipped text or page errors. Screenshots go to SHOT_DIR/layout.
 const {chromium}=require(process.env.PW_MODULE||'playwright'); const fs=require('fs'); const path=require('path');
 const HARNESS=process.env.HARNESS||'http://127.0.0.1:8080/build/test.html'; const APP_VER=(fs.readFileSync(path.resolve(__dirname,'..','src','app.html'),'utf8').match(/APP_VERSION='([^']+)'/)||[])[1]; const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{};
-const VP=[['desktop-full',1920,1080,1],['desktop-split',960,1080,1],['tab-s8-landscape',1280,800,2],['tab-s8-portrait',800,1280,2],['phone-portrait',384,854,2.8],['phone-landscape',854,384,2.8],['iphone-landscape',812,375,3],['galaxy-s-landscape',780,360,3]];
+const VP=[['desktop-full',1920,1080,1],['desktop-split',960,1080,1],['tab-s8-landscape',1280,800,2],['tab-s8-portrait',800,1280,2],['phone-portrait',384,854,2.8],['phone-landscape',854,384,2.8],['iphone-landscape',812,375,3],['galaxy-s-landscape',780,360,3],['tiny-landscape',568,240,2]];
 const OUT=path.join(process.env.SHOT_DIR||'e2e-out','layout')+path.sep; fs.mkdirSync(OUT,{recursive:true}); const report={};
 (async()=>{ const b=await chromium.launch(LAUNCH);
 for(const [name,w,h,dpr] of VP){ const p=await b.newPage({viewport:{width:w,height:h},deviceScaleFactor:Math.min(dpr,2),hasTouch:w<1000,isMobile:false}); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
@@ -36,6 +36,7 @@ for(const [name,w,h,dpr] of VP){ const p=await b.newPage({viewport:{width:w,heig
   await p.click('[data-act="start-today"]'); await p.locator('[data-p="start"]').waitFor({timeout:5000}); await shot('prepare');
   await p.click('[data-p="start"]'); await p.locator('[data-p="setdone"]').first().waitFor({timeout:5000}); await shot('perform');
   await p.locator('[data-p="setdone"]').first().click(); await p.waitForTimeout(200); await p.locator('[data-p="finish"]').first().click(); await p.locator('[data-p="next"]').first().waitFor({timeout:5000}); await shot('complete');
+  if(h<=500&&w>h){ const reach=await p.evaluate(()=>{ const nav=document.querySelector('nav.tabs'); const last=nav&&nav.querySelector('button:last-child'); if(!nav||!last)return 'no nav'; last.scrollIntoView({block:'nearest'}); const r=last.getBoundingClientRect(); return r.bottom<=window.innerHeight+1&&r.top>=0?'ok':'last tab at '+Math.round(r.top)+'-'+Math.round(r.bottom)+' of '+window.innerHeight; }); if(reach!=='ok')errs.push('side menu: '+reach); }
   report[name]._errors=errs; await p.close(); }
 fs.writeFileSync(OUT+'report.json',JSON.stringify(report,null,1)); await b.close();
 let fail=0; for(const [vp,sc] of Object.entries(report)){ for(const [s,m] of Object.entries(sc)){ if(s.startsWith('_'))continue; const bad=[]; if(m.docW>m.W)bad.push('horizontal scroll '+m.docW+'>'+m.W); if(m.off.length)bad.push('outside viewport: '+m.off.join(', ')); if(m.clipped.length)bad.push('clipped text: '+m.clipped.join(', ')); if(m.H<=500&&m.W>m.H&&['dash','week','month','report','settings'].includes(s)&&!m.navSide)bad.push('short landscape screen still uses the bottom tab bar'); console.log((bad.length?'FAIL ':'ok   ')+vp.padEnd(17)+s.padEnd(9)+(bad.length?' '+bad.join(' | '):'')); if(bad.length)fail=1; }
