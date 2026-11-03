@@ -1,12 +1,12 @@
-// Layout check: every main screen at desktop (full/split), Galaxy Tab S8 (landscape/portrait) and phone (portrait/landscape).
+// Layout check: every main screen at desktop (full/split), Galaxy Tab S8 (landscape/portrait) and phones (portrait, three landscape widths).
 // Fails on horizontal page scroll, elements outside the viewport, clipped text or page errors. Screenshots go to SHOT_DIR/layout.
 const {chromium}=require(process.env.PW_MODULE||'playwright'); const fs=require('fs'); const path=require('path');
-const HARNESS=process.env.HARNESS||'http://127.0.0.1:8080/build/test.html'; const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{};
-const VP=[['desktop-full',1920,1080,1],['desktop-split',960,1080,1],['tab-s8-landscape',1280,800,2],['tab-s8-portrait',800,1280,2],['phone-portrait',384,854,2.8],['phone-landscape',854,384,2.8]];
+const HARNESS=process.env.HARNESS||'http://127.0.0.1:8080/build/test.html'; const APP_VER=(fs.readFileSync(path.resolve(__dirname,'..','src','app.html'),'utf8').match(/APP_VERSION='([^']+)'/)||[])[1]; const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{};
+const VP=[['desktop-full',1920,1080,1],['desktop-split',960,1080,1],['tab-s8-landscape',1280,800,2],['tab-s8-portrait',800,1280,2],['phone-portrait',384,854,2.8],['phone-landscape',854,384,2.8],['iphone-landscape',812,375,3],['galaxy-s-landscape',780,360,3]];
 const OUT=path.join(process.env.SHOT_DIR||'e2e-out','layout')+path.sep; fs.mkdirSync(OUT,{recursive:true}); const report={};
 (async()=>{ const b=await chromium.launch(LAUNCH);
 for(const [name,w,h,dpr] of VP){ const p=await b.newPage({viewport:{width:w,height:h},deviceScaleFactor:Math.min(dpr,2),hasTouch:w<1000,isMobile:false}); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
-  await p.addInitScript(()=>{ try{localStorage.clear();localStorage.setItem('wwt.seenVersion','99');}catch(e){} });
+  await p.addInitScript(v=>{ try{localStorage.clear();localStorage.setItem('wwt.seenVersion',v);}catch(e){} },APP_VER);
   await p.goto(HARNESS); await p.waitForTimeout(400);
   await p.evaluate(()=>{ const T=window.__T; const S=T.S; const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     const ids=[['ex_bench','ex_bbrow','ex_ohp'],['ex_bbsquat','ex_rdl','ex_calf'],['ex_lateral','ex_curl','ex_pushdown'],['ex_treadmill']];
@@ -20,14 +20,16 @@ for(const [name,w,h,dpr] of VP){ const p=await b.newPage({viewport:{width:w,heig
   const measure=async(screen)=>{ const m=await p.evaluate(()=>{ const W=window.innerWidth, H=window.innerHeight; const off=[]; const seen=new Set();
       document.querySelectorAll('body *').forEach(el=>{ const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden')return; const r=el.getBoundingClientRect(); if(!r.width||!r.height)return;
         // ignore content inside horizontal scrollers
-        let a=el.parentElement, inScroll=false; while(a){ const s=getComputedStyle(a); if(/(auto|scroll)/.test(s.overflowX)&&a.scrollWidth>a.clientWidth){inScroll=true;break;} a=a.parentElement; } if(inScroll)return;
+        let a=el.parentElement, inScroll=false; while(a&&a.tagName!=='MAIN'){ const s=getComputedStyle(a); if(/(auto|scroll)/.test(s.overflowX)&&a.scrollWidth>a.clientWidth){inScroll=true;break;} a=a.parentElement; } if(inScroll)return;
         if(r.right>W+1||r.left<-1){ const id=el.tagName.toLowerCase()+(el.id?'#'+el.id:'')+(el.className&&typeof el.className==='string'?'.'+el.className.trim().split(/\s+/).slice(0,2).join('.'):''); if(!seen.has(id)){seen.add(id); off.push(id+' ['+Math.round(r.left)+','+Math.round(r.right)+']');} } });
       // text clipped: elements whose scrollWidth > clientWidth with overflow hidden and no ellipsis intent
       const clipped=[]; document.querySelectorAll('button,.nm,.cap,h1,h2,h3,.v,.tile,.sk,.scue').forEach(el=>{ const cs=getComputedStyle(el); if(cs.display==='none')return; if(el.scrollWidth>el.clientWidth+2&&cs.overflow!=='visible'&&cs.textOverflow!=='ellipsis'){ clipped.push((el.className||el.tagName)+': '+(el.innerText||'').slice(0,30)); } });
-      return {docW:document.documentElement.scrollWidth,W,H,off:off.slice(0,12),clipped:clipped.slice(0,8)}; });
+      const mn=document.querySelector('main'); if(mn&&getComputedStyle(mn).display!=='none'&&mn.scrollWidth>mn.clientWidth+1)off.unshift('main overflow '+mn.scrollWidth+'>'+mn.clientWidth);
+      const nav=document.querySelector('nav.tabs'); const nr=nav?nav.getBoundingClientRect():null; const navSide=!!(nr&&nr.height>nr.width);
+      return {docW:document.documentElement.scrollWidth,W,H,navSide,off:off.slice(0,12),clipped:clipped.slice(0,8)}; });
     report[name]=report[name]||{}; report[name][screen]=m; };
   const shot=async(screen,full=true)=>{ await p.waitForTimeout(250); await measure(screen); await p.screenshot({path:OUT+name+'--'+screen+'.png',fullPage:full}); };
-  for(const tab of ['dash','week','month','report','settings']){ await p.evaluate(t=>{ const T=window.__T; T.S.tab=t; T.render(); window.scrollTo(0,0); },tab); await shot(tab); }
+  for(const tab of ['dash','week','month','report','settings']){ await p.evaluate(t=>{ const T=window.__T; T.S.tab=t; T.render(); window.scrollTo(0,0); },tab); if(await p.locator('#sheet').count())throw new Error(name+': unexpected sheet open on '+tab); await shot(tab); }
   await p.evaluate(()=>{ const T=window.__T; T.S.tab='dash'; T.render(); T.openItemEditor(T.todayKey(), T.planOf(T.todayKey())[0].id); }); await shot('editor',false);
   await p.evaluate(()=>{ const x=document.querySelector('.backdrop'); if(x)x.click(); }); await p.waitForTimeout(300);
   const add=await p.$('[data-act="add-ex"],[data-act="add-today"],[data-act="add"]'); if(!add)throw new Error(name+': add-exercise button not found'); { await add.click(); await shot('picker',false); await p.evaluate(()=>{ const x=document.querySelector('.backdrop'); if(x)x.click(); }); await p.waitForTimeout(300); }
@@ -36,7 +38,7 @@ for(const [name,w,h,dpr] of VP){ const p=await b.newPage({viewport:{width:w,heig
   await p.locator('[data-p="setdone"]').first().click(); await p.waitForTimeout(200); await p.locator('[data-p="finish"]').first().click(); await p.locator('[data-p="next"]').first().waitFor({timeout:5000}); await shot('complete');
   report[name]._errors=errs; await p.close(); }
 fs.writeFileSync(OUT+'report.json',JSON.stringify(report,null,1)); await b.close();
-let fail=0; for(const [vp,sc] of Object.entries(report)){ for(const [s,m] of Object.entries(sc)){ if(s.startsWith('_'))continue; const bad=[]; if(m.docW>m.W)bad.push('horizontal scroll '+m.docW+'>'+m.W); if(m.off.length)bad.push('outside viewport: '+m.off.join(', ')); if(m.clipped.length)bad.push('clipped text: '+m.clipped.join(', ')); console.log((bad.length?'FAIL ':'ok   ')+vp.padEnd(17)+s.padEnd(9)+(bad.length?' '+bad.join(' | '):'')); if(bad.length)fail=1; }
+let fail=0; for(const [vp,sc] of Object.entries(report)){ for(const [s,m] of Object.entries(sc)){ if(s.startsWith('_'))continue; const bad=[]; if(m.docW>m.W)bad.push('horizontal scroll '+m.docW+'>'+m.W); if(m.off.length)bad.push('outside viewport: '+m.off.join(', ')); if(m.clipped.length)bad.push('clipped text: '+m.clipped.join(', ')); if(m.H<=500&&m.W>m.H&&['dash','week','month','report','settings'].includes(s)&&!m.navSide)bad.push('short landscape screen still uses the bottom tab bar'); console.log((bad.length?'FAIL ':'ok   ')+vp.padEnd(17)+s.padEnd(9)+(bad.length?' '+bad.join(' | '):'')); if(bad.length)fail=1; }
   if(sc._errors.length){ console.log('FAIL '+vp+' page errors: '+sc._errors.join(' | ')); fail=1; } }
 console.log(fail?'LAYOUT FAILED':'LAYOUT PASSED'); process.exit(fail);
 })().catch(e=>{ console.error(e); process.exit(1); });
