@@ -1,6 +1,29 @@
 // ---------- Body muscle map (front/back silhouettes) ----------
-// Body artwork: react-native-body-highlighter (https://github.com/HichamELBSI/react-native-body-highlighter), MIT License, Copyright (c) 2022 ELABBASSI Hicham.
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction, subject to the above copyright notice and this permission notice being included. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+/* Body artwork (front/back, male/female) from react-native-body-highlighter
+   https://github.com/HichamELBSI/react-native-body-highlighter
+
+   MIT License
+
+   Copyright (c) 2022 ELABBASSI Hicham
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+*/
 // Changes: hair and head pieces replaced by a plain head of uniform proportion (hair styles drawn separately); viewBoxes recomputed so both bodies share the same height, head top and feet.
 const BODY_VB={"m":{"f":"40 81 649 1298","b":"752 56 663 1325"},"f":{"f":"-28 79 696 1392","b":"785 42 715 1430"}};
 const BODY_HEAD={"m":{"f":[364.0,186.0,51.5,66.0],"b":[1083.5,163.6,52.6,67.4]},"f":{"f":[320.0,191.3,55.2,70.7],"b":[1142.5,157.3,56.7,72.7]}};

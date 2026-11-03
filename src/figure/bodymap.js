@@ -1,7 +1,28 @@
 // ---------- Body muscle map: front/back figure, primary (p) and secondary (s) muscles ----------
-// Male hair: "ShortHairShortFlat" from avataaars (https://github.com/fangpenlin/avataaars), MIT License,
-// Copyright (c) 2017 Pablo Stanley, Fang-Pen Lin. Permission is hereby granted, free of charge, to any person obtaining a copy of this
-// software, to deal in the Software without restriction, subject to this copyright and permission notice being included. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+/* Male hair: "ShortHairShortFlat" from avataaars, https://github.com/fangpenlin/avataaars
+
+   MIT License
+
+   Copyright (c) 2017 Pablo Stanley, Fang-Pen Lin
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+*/
 // Female hair (fringe + top bun) is drawn here in head units (head centre 0,0, radius 1).
 // Rules: key -> [view, slug, pick, clip]. pick: 'big' | 'small' piece by area. clip: ['y',from,to] horizontal band of the piece, ['x',from,to] from the midline outward.
 const BODY_RULES={
@@ -24,15 +45,18 @@ let _bodyUid=0;
 // opts: sex 'm'|'f', weights {key: 0..1} (opacity of primary keys, for the weekly map)
 function bodyMapSvg(view,prim,sec,size,opts){ opts=opts||{}; const sex=opts.sex==='f'?'f':'m'; const parts=BODY_PARTS[sex][view]; const vb=BODY_VB[sex][view]; const vbx=vb.split(' ').map(Number); const mid=vbx[0]+vbx[2]/2; const weights=opts.weights||null;
   const bySlug={}; parts.forEach(([slug,pieces])=>{ bySlug[slug]=pieces; });
-  const uid='bm'+(++_bodyUid); let defs=''; const overlays=[]; const base={};
-  const op=w=>w<1?` style="opacity:${w.toFixed(2)}"`:'';
+  const uid='bm'+(++_bodyUid); let defs=''; const overlays=[]; const base={}; const bands=[];
+  const alpha=(cls,w)=>(cls==='s'?.42:1)*w; const op=(cls,w)=>w<1?` style="opacity:${alpha(cls,w).toFixed(2)}"`:'';
   const apply=(key,cls)=>{ (BODY_RULES[key]||[]).forEach(([v,slug,pick,clip])=>{ if(v!==view)return; const slugs=slug==='*'?Object.keys(bySlug).filter(s=>!BODY_DECOR[s]):[slug]; slugs.forEach(sl=>{ const pieces=bySlug[sl]; if(!pieces)return; const maxA=Math.max(...pieces.map(p=>p[1][2]*p[1][3]));
-    pieces.forEach((p,i)=>{ const a=p[1][2]*p[1][3]; if(pick==='big'&&a<maxA*.5)return; if(pick==='small'&&a>=maxA*.5)return; const w=weights?(weights[key]||0):1;
-      if(!clip){ const k=sl+'#'+i; if(!base[k]||(base[k].cls==='s'&&cls==='p')||(base[k].cls===cls&&w>base[k].w))base[k]={cls,w}; return; }
+    pieces.forEach((p,i)=>{ const a=p[1][2]*p[1][3]; if(pick==='big'&&a<maxA*.5)return; if(pick==='small'&&a>=maxA*.5)return; const w=weights?(weights[key]||0):1; const k=sl+'#'+i;
+      if(!clip){ if(!base[k]||alpha(cls,w)>alpha(base[k].cls,base[k].w))base[k]={cls,w}; return; }
       const [x,y,bw,bh]=p[1]; let r; if(clip[0]==='y')r=[x-5,y+bh*clip[1],bw+10,bh*(clip[2]-clip[1])]; else { const lat=x+bw/2>mid; const x0=lat?x+bw*clip[1]:x+bw*(1-clip[2]); r=[x0,y-5,bw*(clip[2]-clip[1]),bh+10]; }
-      const id=uid+'c'+overlays.length; defs+=`<clipPath id="${id}"><rect x="${r[0].toFixed(1)}" y="${r[1].toFixed(1)}" width="${r[2].toFixed(1)}" height="${r[3].toFixed(1)}"/></clipPath>`; overlays.push(`<path d="${p[0]}" class="r ${cls}" clip-path="url(#${id})"${op(w)}/>`); }); }); }); };
+      bands.push({d:p[0],k,cls,w,r}); }); }); }); };
   (sec||[]).forEach(k=>apply(k,'s')); (prim||[]).forEach(k=>apply(k,'p'));
-  let body=''; parts.forEach(([slug,pieces])=>pieces.forEach((p,i)=>{ const b=base[slug+'#'+i]; const cls=BODY_DECOR[slug]?'d':b?b.cls:'n'; body+=`<path d="${p[0]}" class="r ${cls}"${b?op(b.w):''}/>`; }));
+  // a band drawn over an already coloured piece only adds what is needed to reach the larger of the two values
+  bands.forEach(c=>{ const b=base[c.k]; let style=op(c.cls,c.w); if(b){ const a1=alpha(b.cls,b.w), a2=alpha(c.cls,c.w); if(a2<=a1+1e-6||a1>=1)return; style=` style="opacity:${(1-(1-a2)/(1-a1)).toFixed(2)}"`; }
+    const id=uid+'c'+overlays.length; defs+=`<clipPath id="${id}"><rect x="${c.r[0].toFixed(1)}" y="${c.r[1].toFixed(1)}" width="${c.r[2].toFixed(1)}" height="${c.r[3].toFixed(1)}"/></clipPath>`; overlays.push(`<path d="${c.d}" class="r ${c.cls}" clip-path="url(#${id})"${style}/>`); });
+  let body=''; parts.forEach(([slug,pieces])=>pieces.forEach((p,i)=>{ const b=base[slug+'#'+i]; const cls=BODY_DECOR[slug]?'d':b?b.cls:'n'; body+=`<path d="${p[0]}" class="r ${cls}"${b?op(b.cls,b.w):''}/>`; }));
   const heart=(prim||[]).includes('heart')&&view==='f'?`<path d="M${mid} 470l-38-38a27 27 0 0 1 38-30a27 27 0 0 1 38 30z" class="r p"/>`:'';
   return `<svg viewBox="${vb}" width="${(size/2).toFixed(0)}" height="${size}" class="bm" aria-hidden="true"><defs>${defs}</defs>${body}${overlays.join('')}${heart}${bodyHairSvg(sex,view)}</svg>`; }
 // which side to show: the one holding the primary muscles (both when they span front and back, or for opts.both)
