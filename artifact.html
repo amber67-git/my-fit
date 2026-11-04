@@ -1936,7 +1936,7 @@ function loadLocal(){
 }
 function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify({exercises:S.exercises,routines:S.routines,settings:S.settings,plans:S.plans,logs:S.logs,body:S.body,notes:S.notes}));return true;}catch(e){return false;}}
 const clean=o=>JSON.parse(JSON.stringify(o));
-async function dbWrite(fn){ if(!DB)return; trackPending(); try{await fn(); if(S.lastError){S.lastError=null;renderStatus();}}catch(e){ if(e&&(e.code==='invalid_argument'||e.code==='permission-denied')){S.canWrite=false;} S.lastError=((e&&(e.code||e.message))||'error').toString().slice(0,60); renderStatus(); toast(t('save_failed')); } }
+async function dbWrite(fn){ if(!DB)return; try{ const pending=fn(); trackPending(); /* after the write is queued: waitForPendingWrites only covers writes issued before it */ await pending; if(S.lastError){S.lastError=null;renderStatus();}}catch(e){ if(e&&(e.code==='invalid_argument'||e.code==='permission-denied')){S.canWrite=false;} S.lastError=((e&&(e.code||e.message))||'error').toString().slice(0,60); renderStatus(); toast(t('save_failed')); } }
 const persist={
   exercises(){saveLocal();dbWrite(()=>DB.doc('app/exercises').set(clean(packExercises())));},
   settings(){saveLocal();dbWrite(()=>DB.doc('app/settings').set(clean(S.settings)));},
