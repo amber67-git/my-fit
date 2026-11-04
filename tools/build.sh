@@ -37,3 +37,5 @@ ver=$(grep -o "APP_VERSION='[^']*'" src/app.html | head -1 | cut -d"'" -f2)
 sw=$(grep -o "const VERSION = '[^']*'" sw.js | cut -d"'" -f2)
 echo "built index.html + artifact.html (APP_VERSION $ver, sw.js $sw)"
 [ "v$ver" = "$sw" ] || { echo "WARNING: sw.js VERSION ($sw) != APP_VERSION ($ver)"; exit 2; }
+grep -q "manifest.webmanifest?v=$ver\"" src/head.html || { echo "ERROR: src/head.html manifest link is not manifest.webmanifest?v=$ver"; exit 2; }
+grep -q "'./manifest.webmanifest?v=$ver'" sw.js || { echo "ERROR: sw.js SHELL_FILES does not cache manifest.webmanifest?v=$ver"; exit 2; }

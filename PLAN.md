@@ -643,3 +643,8 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 수정: `manifest.webmanifest`에 고정 `"id": "/my-fit/app"`, 아이콘 `purpose` 명시, `orientation: portrait` 제거(설치한 앱에서도 v0.25.1의 가로 배치가 보이도록).
 - 영향: id가 바뀌므로 이전 설치본은 별개의 옛 앱으로 남음. 안내는 README.
 
+## 39. v0.25.3: 설치 설정 파일이 오프라인 사본으로 남는 문제
+- 증상: v0.25.2(고정 id) 배포 뒤에도 예전 앱이 있던 휴대폰에서 다시 설치가 계속 실패. 서비스워커가 `manifest.webmanifest`를 캐시 우선으로 주고, 새 서비스워커도 설치할 때 브라우저 HTTP 캐시(GitHub Pages 10분)에서 옛 파일을 받아 저장할 수 있어서, 휴대폰이 id 없는 옛 매니페스트를 계속 봄.
+- 수정: 매니페스트 주소에 버전(`manifest.webmanifest?v=<APP_VERSION>`)을 붙여 옛 캐시와 겹치지 않게, 서비스워커는 매니페스트를 네트워크 우선(no-store)으로, 셸 파일은 `cache: 'reload'`로 설치. build.sh가 head.html 링크·sw.js 캐시 목록·APP_VERSION이 맞는지 확인.
+- 확인 수단: 설정의 버전 아래 "앱 id" 줄. 페이지가 실제로 받는 매니페스트(서비스워커 경유)의 id를 표시하고, 없으면 경고색으로 "없음(두 번 새로고침)".
+
