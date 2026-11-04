@@ -13,7 +13,10 @@ self.addEventListener('fetch', e => {
   if (/googleapis\.com|firebaseapp\.com|firebaseio\.com|google\.com|gstatic\.com\/firebasejs/.test(url.host + url.pathname) && !/gstatic\.com\/firebasejs/.test(url.href)) return;
   if (url.origin === location.origin && url.pathname.endsWith('/manifest.webmanifest')) {
     // the manifest decides how the app installs (its id): always network first, cache only as an offline fallback
-    e.respondWith(fetch(req, { cache: 'no-store' }).then(r => { if (r && r.ok) { const copy = r.clone(); caches.open(SHELL).then(c => c.put(req, copy)); } return r; }).catch(() => caches.match(req, { ignoreSearch: true })));
+    const net = fetch(req, { cache: 'no-store' }).then(r => ({ r, copy: r && r.ok ? r.clone() : null }));
+    e.respondWith(net.then(x => x.r).catch(() => caches.match(req, { ignoreSearch: true })));
+    // keep the worker alive until the fresh copy is stored for offline use
+    e.waitUntil(net.then(x => x.copy && caches.open(SHELL).then(c => c.put(req, x.copy))).catch(() => {}));
     return;
   }
   if (req.mode === 'navigate' || url.pathname.endsWith('/index.html')) {
