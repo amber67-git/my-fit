@@ -33,12 +33,12 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
-## 주소 (전용 origin으로 이사 중)
-- **새 주소**: Cloudflare Pages `https://<프로젝트명>.pages.dev/` — 프로젝트를 만든 뒤 여기에 실제 주소를 적습니다. 폰 설치는 새 주소에서 합니다.
-- **옛 주소**: https://amber67-git.github.io/my-fit/ — 계속 동작하지만, 같은 GitHub 주소에 다른 앱(ClassDesk·StudyDesk)이 있어 안드로이드 Chrome에서 앱 설치가 서로 막힙니다.
+## 주소
+- **새 주소(설치는 여기서)**: https://amber-my-fit.netlify.app/ — Netlify, `main`을 그대로 배포합니다. 안드로이드 Chrome ⋮ → 앱 설치, 아이폰 Safari 공유 → 홈 화면에 추가.
+- **옛 주소**: https://amber67-git.github.io/my-fit/ — 계속 동작하지만 이사 안내 띠가 뜨고 앱 설치를 권하지 않습니다. 같은 GitHub 주소에 ClassDesk·StudyDesk가 있어 현재 안드로이드 Chrome에서는 설치가 서로 막히기 때문입니다(Chromium 버그로 보고됨).
 - 이유·규칙·소유자 할 일·기기별 이사 순서: [`docs/own-origin.md`](docs/own-origin.md). manifest `id`(`/app`)는 앞으로 절대 바꾸지 않습니다.
 
-## 기능 (v0.26.0)
+## 기능 (v0.26.1)
 
 - 5탭: Dashboard / Weekly / Monthly / Report / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 351개 (맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외, 부위·도구 태그, 주동근·보조근 세부 자극 부위, 2~4단계 운동 방법), 추가·편집·숨기기

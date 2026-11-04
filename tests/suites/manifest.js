@@ -4,8 +4,8 @@ const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'
 const errors=[]; const check=(name,ok,info)=>{ console.log((ok?'ok   ':'FAIL ')+name+(info!==undefined?' — '+info:'')); if(!ok)errors.push(name); };
 check('fixed app id (never change it: phones identify the installed app by it)', m.id==='/app', m.id);
 check('no orientation lock (landscape layouts must be reachable)', !('orientation' in m), m.orientation);
-// the app runs at the site root of its own origin (Cloudflare Pages); the old GitHub Pages folder must keep working too
-for(const [label,base,root] of [['own origin','https://my-fit.example.pages.dev/manifest.webmanifest','https://my-fit.example.pages.dev/'],['old GitHub Pages folder','https://amber67-git.github.io/my-fit/manifest.webmanifest','https://amber67-git.github.io/my-fit/']]){
+// the app runs at the site root of its own origin (Netlify); the old GitHub Pages folder must keep working too
+for(const [label,base,root] of [['own origin','https://amber-my-fit.netlify.app/manifest.webmanifest','https://amber-my-fit.netlify.app/'],['old GitHub Pages folder','https://amber67-git.github.io/my-fit/manifest.webmanifest','https://amber67-git.github.io/my-fit/']]){
   const scope=new URL(m.scope||'./',base).href, start=new URL(m.start_url||'.',base).href, id=new URL(m.id,start).href;
   check(label+': scope is the site folder', scope===root, scope);
   check(label+': start_url resolves inside the scope', start.startsWith(scope), start);
