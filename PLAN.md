@@ -655,3 +655,8 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 옛 주소 안내 띠(`NEW_HOME`이 정해지고 hostname이 `amber67-git.github.io`일 때만): [백업 받기] [새 주소 열기], 새 주소는 저장소가 따로라 비어 있다는 안내. 옛 사이트는 막지 않고 데이터도 지우지 않음.
 - 검증 `tests/move.cjs`(CI 포함). 소유자 할 일·이사 순서는 `docs/own-origin.md`.
 
+## 41. v0.26.1: 새 주소 확정 — Netlify https://amber-my-fit.netlify.app/
+- 배포 서비스를 Cloudflare Pages가 아니라 Netlify로(소유자 계정, `amber-<앱이름>` 이름 규칙, 첫 사례 StudyDesk).
+- `NEW_HOME`에 새 주소. 옛 GitHub Pages 주소에서는 안내 띠가 뜨고, `src/head.html`이 manifest 링크를 빼서 Chrome이 그 주소에서 설치를 권하지 않음(그 주소의 ClassDesk 설치를 막지 않기 위해). 수동 "홈 화면에 추가"는 막을 수 없어 띠·문서로 안내.
+- 이사 순서에 아이폰(홈 화면 앱 저장소가 Safari와 따로)과 "새 주소에서 데이터 확인 후 옛 앱 삭제" 추가. 같은 origin 1앱 제한은 현재 Chrome 동작(버그로 보고됨)으로 표현.
+

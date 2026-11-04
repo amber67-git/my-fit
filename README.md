@@ -7,16 +7,17 @@
 | 방법 | 주소 | 데이터 |
 |---|---|---|
 | claude.ai 아티팩트 (기본) | https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j | 계정 저장소에 동기화, 자동 백업 |
-| GitHub Pages (메인) | https://amber67-git.github.io/my-fit/ | Firebase(Google 로그인 + Firestore)에 사용자별 저장, 모든 기기 동기화, 자동 백업 |
+| Netlify (메인, 앱 설치는 여기서) | https://amber-my-fit.netlify.app/ | Firebase(Google 로그인 + Firestore)에 사용자별 저장, 모든 기기 동기화, 자동 백업 |
+| GitHub Pages (옛 주소) | https://amber67-git.github.io/my-fit/ | 위와 같은 Firebase 저장. 이사 안내 띠만 보이고 앱 설치는 권하지 않음 |
 | 로컬 | `index.html`을 브라우저로 열기 | Firebase 설정이 있으면 동일, 없으면 기기 브라우저에만 저장 |
 
-claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각각 claude.ai 저장소 / Firebase). 한쪽만 메인으로 쓰고, 옮길 때는 Settings › JSON 내보내기/가져오기를 씁니다.
+claude.ai 링크와 Netlify·GitHub Pages 링크는 저장소가 서로 다릅니다(각각 claude.ai 저장소 / Firebase). 한쪽만 메인으로 쓰고, 옮길 때는 Settings › JSON 내보내기/가져오기를 씁니다.
 
 ## Firebase 설정 (처음 한 번)
 
 1. https://console.firebase.google.com 에서 프로젝트 추가 (예: `my-fit`). Google 애널리틱스는 꺼도 됩니다.
 2. 왼쪽 **빌드 › Authentication › 시작하기 › 로그인 방법**에서 **Google** 사용 설정 → 저장.
-3. **Authentication › 설정 › 승인된 도메인**에 `amber67-git.github.io` 추가. (localhost는 기본 포함)
+3. **Authentication › 설정 › 승인된 도메인**에 `amber-my-fit.netlify.app`과 `amber67-git.github.io`를 추가. (localhost는 기본 포함) 새 주소를 빼먹으면 그 주소에서 Google 로그인이 실패합니다.
 4. **빌드 › Firestore Database › 데이터베이스 만들기** → 프로덕션 모드 → 위치 선택(asia-northeast3 서울).
 5. Firestore **규칙** 탭에 이 저장소의 `firestore.rules` 내용을 붙여넣고 게시.
 6. **프로젝트 설정(톱니) › 일반 › 내 앱 › 웹 앱(</>) 추가** → 앱 닉네임 `my-fit` → 등록 → "구성(Config)"에 나오는 `firebaseConfig` 값을 이 저장소의 `firebase-config.js`에 붙여넣기.
@@ -26,19 +27,19 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 
 ## 파일
 
-- `index.html`: 독립 실행용 페이지 (GitHub Pages, 로컬). Firebase SDK와 `firebase-config.js`를 불러옴
+- `index.html`: 독립 실행용 페이지 (Netlify, GitHub Pages, 로컬). Firebase SDK와 `firebase-config.js`를 불러옴
 - `firebase-config.js`: Firebase 웹 앱 구성값 (직접 붙여넣기)
 - `firestore.rules`: Firestore 보안 규칙
 - `manifest.webmanifest`, `sw.js`, `icons/`: 홈 화면 설치(PWA)용 매니페스트·서비스 워커·아이콘
 - `artifact.html`: claude.ai 아티팩트에 게시하는 원본 (문서 골격 없이 본문만)
 - `PLAN.md`: 기획 문서 (화면 구조, 데이터 모델, 플로우, 스마트 모드 규칙, 변경 이력)
 
-## 주소 (전용 origin으로 이사 중)
-- **새 주소**: Cloudflare Pages `https://<프로젝트명>.pages.dev/` — 프로젝트를 만든 뒤 여기에 실제 주소를 적습니다. 폰 설치는 새 주소에서 합니다.
-- **옛 주소**: https://amber67-git.github.io/my-fit/ — 계속 동작하지만, 같은 GitHub 주소에 다른 앱(ClassDesk·StudyDesk)이 있어 안드로이드 Chrome에서 앱 설치가 서로 막힙니다.
+## 주소
+- **새 주소(설치는 여기서)**: https://amber-my-fit.netlify.app/ — Netlify, `main`을 그대로 배포합니다. 안드로이드 Chrome ⋮ → 앱 설치, 아이폰 Safari 공유 → 홈 화면에 추가.
+- **옛 주소**: https://amber67-git.github.io/my-fit/ — 계속 동작하지만 이사 안내 띠가 뜨고 앱 설치를 권하지 않습니다. 같은 GitHub 주소에 ClassDesk·StudyDesk가 있어 현재 안드로이드 Chrome에서는 설치가 서로 막히기 때문입니다(Chromium 버그로 보고됨).
 - 이유·규칙·소유자 할 일·기기별 이사 순서: [`docs/own-origin.md`](docs/own-origin.md). manifest `id`(`/app`)는 앞으로 절대 바꾸지 않습니다.
 
-## 기능 (v0.26.0)
+## 기능 (v0.26.1)
 
 - 5탭: Dashboard / Weekly / Monthly / Report / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 351개 (맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외, 부위·도구 태그, 주동근·보조근 세부 자극 부위, 2~4단계 운동 방법), 추가·편집·숨기기
@@ -71,7 +72,7 @@ claude.ai 링크와 GitHub Pages 링크는 저장소가 서로 다릅니다(각�
 ## 자동 검증 연결
 
 - **CodeRabbit (코드 리뷰)**: https://coderabbit.ai 에서 GitHub으로 로그인 → 이 저장소 추가. 설정은 `.coderabbit.yaml`(한국어 리뷰, 파일별 중점 항목). CodeRabbit은 **PR 단위**로 리뷰하므로 main 직접 푸시에는 달리지 않습니다. 브랜치에서 작업하고 PR을 열면 자동 리뷰가 붙습니다.
-- **작업 흐름**: 모든 변경은 브랜치 → PR → CodeRabbit 리뷰 반영 → 스쿼시 머지 → Pages 배포 순서로 진행합니다(규칙은 `CLAUDE.md`).
+- **작업 흐름**: 모든 변경은 브랜치 → PR → CodeRabbit 리뷰 반영 → 스쿼시 머지 → Netlify·GitHub Pages 배포 순서로 진행합니다(규칙은 `CLAUDE.md`).
 - **E2E 스모크 (Playwright)**: `.github/workflows/e2e.yml`이 PR과 main 푸시마다 저장소를 정적 서버로 띄우고 `tests/smoke.cjs`를 실행합니다(로컬 모드 진입 → 운동 추가 → 시작 → 세트 완료 → 완료 → 스와이프 취소/삭제 → 가로 스크롤·콘솔 오류 검사). 실패하면 Actions의 e2e-screenshots 아티팩트에서 화면을 볼 수 있습니다. 시나리오 전체 목록은 `docs/e2e-scenarios.md`.
 - **전용 주소 이사 점검**: `tests/move.cjs`가 저장소 루트를 `/`로 두 번 띄워(새 주소=localhost, 옛 주소=amber67-git.github.io 이름을 로컬로 연결) 페이지 로드·manifest id/start_url/scope(CDP)·설치 가능성 오류 0·안내 띠는 옛 주소에서만·옛 주소 백업 → 새 주소 가져오기 왕복을 확인합니다.
 - **화면 크기 점검**: `tests/layout.cjs`가 데스크톱(전체 1920×1080, 분할 960×1080), 갤럭시탭 S8(가로 1280×800, 세로 800×1280), 휴대폰(세로 384×854, 가로 854×384·812×375·780×360)에서 화면 10개를 캡처하고 가로 넘침·화면 밖 요소·잘린 글자·페이지 오류가 있으면 실패합니다. 캡처는 e2e-screenshots 아티팩트의 `layout/` 폴더.
