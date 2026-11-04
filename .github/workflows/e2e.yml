@@ -49,6 +49,10 @@ jobs:
         env:
           HARNESS: http://127.0.0.1:8080/build/test.html
           SHOT_DIR: e2e-out
+      - name: Own-origin move check (manifest at the root, banner on the old host only, backup round trip)
+        run: node tests/move.cjs
+        env:
+          SHOT_DIR: e2e-out
       - name: Layout check (desktop full/split, Galaxy Tab S8 landscape/portrait, phone portrait/landscape)
         run: node tests/layout.cjs
         env:

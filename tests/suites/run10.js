@@ -51,7 +51,7 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   const json = await page.evaluate(()=>document.querySelector('#exp').value); await page.mouse.click(10,10);
   await page.click('[data-act="reset"]'); await page.waitForTimeout(100); await page.click('#ok'); await page.waitForTimeout(150);
   log('after reset plans '+await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('wwt.state.v1')).plans).length));
-  await page.click('[data-act="import"]'); await page.waitForTimeout(100); await page.evaluate(j=>{document.querySelector('#imp').value=j}, json); await page.click('#ib'); await page.waitForTimeout(200);
+  await page.click('[data-act="import"]'); await page.waitForTimeout(100); await page.evaluate(j=>{document.querySelector('#imp').value=j}, json); await page.click('#ib'); await page.locator('#ok').click(); await page.waitForTimeout(200);
   log('after import plans '+await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('wwt.state.v1')).plans).length));
   // 7. KO + dark
   await page.click('[data-l="ko"]'); await page.waitForTimeout(100); await page.click('[data-tab="dash"]'); await page.waitForTimeout(100);
