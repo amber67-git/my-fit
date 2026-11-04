@@ -8,7 +8,7 @@ const {chromium}=require(process.env.PW_MODULE||'playwright'); const LAUNCH=proc
 const ROOT=path.resolve(__dirname,'..'); const A=Number(process.env.MOVE_PORT_A||8101), B=Number(process.env.MOVE_PORT_B||8102); const NEW_HOME=`http://localhost:${A}/`;
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.svg':'image/svg+xml','.css':'text/css'};
 const serve=(port,inject)=>http.createServer((req,res)=>{ let p=decodeURIComponent(req.url.split('?')[0]); if(p.endsWith('/'))p+='index.html'; const f=path.join(ROOT,p); if(!f.startsWith(ROOT)||!fs.existsSync(f)||fs.statSync(f).isDirectory()){res.writeHead(404);return res.end('not found');}
-  let body=fs.readFileSync(f); if(inject&&p==='/index.html'){ const s=body.toString('utf8'); if(!s.includes("const NEW_HOME='';"))throw new Error('NEW_HOME constant not found'); body=Buffer.from(s.replace("const NEW_HOME='';",`const NEW_HOME='${NEW_HOME}';`)); }
+  let body=fs.readFileSync(f); if(inject&&p==='/index.html'){ const s=body.toString('utf8'); const re=/const NEW_HOME='[^']*';/; if(!re.test(s))throw new Error('NEW_HOME constant not found'); body=Buffer.from(s.replace(re,`const NEW_HOME='${NEW_HOME}';`)); }
   res.writeHead(200,{'Content-Type':TYPES[path.extname(f)]||'application/octet-stream','Cache-Control':'no-cache'}); res.end(body); }).listen(port,'127.0.0.1');
 const APP_VER=(fs.readFileSync(path.join(ROOT,'src','app.html'),'utf8').match(/APP_VERSION='([^']+)'/)||[])[1];
 const fails=[]; const step=async(name,fn)=>{ try{ await fn(); console.log('ok   '+name); }catch(e){ console.log('FAIL '+name+' — '+String(e.message||e).split('\n')[0]); fails.push(name); } };
@@ -25,9 +25,9 @@ const today=()=>{ const d=new Date(); if(d.getHours()<4)d.setDate(d.getDate()-1)
   // new home
   const pn=await ctx.newPage(); watch(pn,'new');
   await step('new home: loads at the site root',async()=>{ await pn.goto(NEW_HOME); await enterLocal(pn); });
-  await step('new home: manifest id /app, start_url and scope at the root (CDP)',async()=>{ const c=await ctx.newCDPSession(pn); const m=await c.send('Page.getAppManifest'); if(m.errors&&m.errors.length)throw new Error('manifest errors '+JSON.stringify(m.errors)); const id=await c.send('Page.getAppId');
+  await step('new home: manifest id /app, start_url and scope at the root (CDP)',async()=>{ const c=await ctx.newCDPSession(pn); const m=await c.send('Page.getAppManifest'); if(m.errors&&m.errors.length)throw new Error('manifest errors '+JSON.stringify(m.errors)); const idr=await c.send('Page.getAppId').catch(()=>({}));
     const data=JSON.parse(m.data||'{}'); const start=new URL(data.start_url,m.url).href, scope=new URL(data.scope,m.url).href;
-    if(id.appId!==NEW_HOME+'app')throw new Error('appId '+id.appId); if(start!==NEW_HOME)throw new Error('start_url '+start); if(scope!==NEW_HOME)throw new Error('scope '+scope); await c.detach(); });
+    /* Page.getAppId is missing in some Chromium builds: fall back to resolving the parsed manifest id against start_url, as the spec does */ const appId=idr.appId||(data.id?new URL(data.id,start).href:start); if(appId!==NEW_HOME+'app')throw new Error('appId '+appId); if(start!==NEW_HOME)throw new Error('start_url '+start); if(scope!==NEW_HOME)throw new Error('scope '+scope); await c.detach(); });
   await step('new home: no installability errors',async()=>{ await pn.waitForFunction(()=>navigator.serviceWorker&&navigator.serviceWorker.controller,null,{timeout:15000}).catch(()=>{}); await pn.reload(); await enterLocal(pn); const c=await ctx.newCDPSession(pn); let last=null; for(let i=0;i<10;i++){ last=(await c.send('Page.getInstallabilityErrors')).installabilityErrors; if(!last.length)break; await pn.waitForTimeout(500); } await c.detach(); if(last.length)throw new Error(JSON.stringify(last)); });
   await step('new home: no moved banner',async()=>{ if(await pn.locator('#moved').count())throw new Error('banner shown on the new home'); });
 

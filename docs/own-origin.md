@@ -32,13 +32,18 @@
 2. **Firebase 승인 도메인 추가**: https://console.firebase.google.com/project/my-fit-aeac1/authentication/settings → Authorized domains → Add domain → `<이름>.pages.dev`
 3. Google Cloud 콘솔에 이 앱용 OAuth 클라이언트를 따로 만든 적이 있다면 https://console.cloud.google.com/apis/credentials 에서 그 클라이언트의 **Authorized JavaScript origins**에 `https://<이름>.pages.dev`를 추가(따로 만든 적이 없으면 건너뜀).
 
+## 알려진 위험: 설치한 앱의 구글 로그인
+설치한 앱(standalone)은 `signInWithRedirect`를 쓰고, `authDomain`은 `my-fit-aeac1.firebaseapp.com`이라 앱 주소와 다릅니다. 제3자 저장소를 막는 브라우저에서는 승인 도메인을 추가해도 redirect 로그인이 실패할 수 있습니다(옛 주소도 같은 구성). 새 주소가 생기면 설치한 앱에서 로그인을 실제로 확인하고, 실패하면 Firebase 안내의 대안(팝업 로그인으로 전환, 또는 `/__/auth/` 경로를 새 주소에서 제공)을 적용합니다.
+
 ## 주소를 받은 뒤 Claude가 할 일
 - `src/app.html`의 `const NEW_HOME=''`에 새 주소를 넣는다. 그때부터 **옛 주소에서만**(`location.hostname === 'amber67-git.github.io'`) "새 주소로 옮겼어요" 안내 띠가 [백업 받기] [새 주소 열기] 버튼과 함께 뜬다. 옛 사이트는 막지 않고, 데이터를 지우지 않는다.
 - README·이 문서·CLAUDE.md에 실제 주소를 적고, Cloudflare 배포 성공(커밋 상태의 Cloudflare Pages 체크)을 확인한다.
 
 ## 기기별 이사 순서 (기기마다 한 번, 데이터는 기기마다 따로)
 1. 옛 주소(`https://amber67-git.github.io/my-fit/`)에서 안내 띠의 **백업 받기**(또는 설정 → JSON 내보내기 → 파일로 받기).
-2. 새 주소를 열고 **설정 → JSON 가져오기 → 백업 파일 고르기 → 가져오기**. 구글 로그인을 쓰면 같은 계정으로 로그인해도 되지만, 동기화 안 된 데이터가 있을 수 있으니 백업도 옮긴다.
+2. 새 주소를 연다.
+   - **구글 로그인을 쓰면**: 같은 계정으로 **로그인만** 한다. 데이터는 계정에서 내려온다. **로그인한 상태에서 백업을 가져오지 않는다.** 가져오기는 계정 데이터를 백업 내용으로 바꾸고, 백업에 없는 날짜의 계획·기록·체크인·메모는 계정에서 지워진다(앱도 로그인 상태에서 가져오려 하면 한 번 더 확인한다). 1번 백업은 만일을 위한 보관용으로 둔다.
+   - **로그인 없이 썼다면**: **설정 → JSON 가져오기 → 백업 파일 고르기 → 가져오기**.
 3. 새 주소에서 Chrome ⋮ → **앱 설치**.
 4. 옛 주소로 설치된 My Fit이 있으면 폰 설정 → 애플리케이션에서 **앱만 삭제**. 이때 **"사이트 데이터 삭제"는 절대 누르지 않는다**(같은 origin의 ClassDesk·StudyDesk 데이터까지 지워짐).
 5. Chrome 주소창에 `chrome://webapks` → My Fit의 Manifest Id가 `https://<이름>.pages.dev/app`인지 확인.
