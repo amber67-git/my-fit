@@ -1,9 +1,9 @@
 {
-  "id": "/my-fit/app",
+  "id": "/app",
   "name": "My Fit",
   "short_name": "My Fit",
   "description": "Weekly workout planner and tracker",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",

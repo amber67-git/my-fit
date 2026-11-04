@@ -648,3 +648,10 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 수정: 매니페스트 주소에 버전(`manifest.webmanifest?v=<APP_VERSION>`)을 붙여 옛 캐시와 겹치지 않게, 서비스워커는 매니페스트를 네트워크 우선(no-store)으로, 셸 파일은 `cache: 'reload'`로 설치. build.sh가 head.html 링크·sw.js 캐시 목록·APP_VERSION이 맞는지 확인.
 - 확인 수단: 설정의 버전 아래 "앱 id" 줄. 페이지가 실제로 받는 매니페스트(서비스워커 경유)의 id를 표시하고, 없으면 경고색으로 "없음(두 번 새로고침)".
 
+## 40. v0.26.0: 전용 주소(origin)로 이사 준비
+- 배경: 같은 `amber67-git.github.io` origin에 ClassDesk·StudyDesk·My Fit이 있어 안드로이드 Chrome이 하나만 설치함(실측). v0.25.2~0.25.3의 id·캐시 수정으로는 풀리지 않는 문제.
+- manifest `id: "/app"`(고정, 바꾸지 않음), `start_url`·`scope` `"./"`. 절대 경로 없음.
+- 백업 파일에 `app: "my-fit"`, `version`, `exportedAt`. 가져오기에 파일 고르기, 옛 형식 허용, 다른 앱 백업 거부.
+- 옛 주소 안내 띠(`NEW_HOME`이 정해지고 hostname이 `amber67-git.github.io`일 때만): [백업 받기] [새 주소 열기], 새 주소는 저장소가 따로라 비어 있다는 안내. 옛 사이트는 막지 않고 데이터도 지우지 않음.
+- 검증 `tests/move.cjs`(CI 포함). 소유자 할 일·이사 순서는 `docs/own-origin.md`.
+
