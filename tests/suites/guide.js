@@ -17,6 +17,7 @@ check('history top entry is the current app line', mm(G.GUIDE_HISTORY[0].v)===mm
 check('history entries have both languages and ISO dates', G.GUIDE_HISTORY.every(h=>h.en&&h.ko&&/^\d{4}-\d{2}-\d{2}$/.test(h.date)));
 const text=JSON.stringify(G.GUIDE);
 check('guide names the live address (NEW_HOME)', !NEW_HOME||text.includes(NEW_HOME.replace(/\/$/,'')), NEW_HOME);
-check('guide never tells users to clear site data as a fix', !/clear site data(?! for this address: it also)/i.test(text)||/never|do not|하지 마세요|금지/i.test(text));
+// every passage that mentions clearing site data must itself say not to (a "never" elsewhere does not excuse a passage that recommends it)
+{ const passages=[]; G.GUIDE.forEach(s=>['en','ko'].forEach(l=>s[l].forEach(x=>{ const str=typeof x==='string'?x:x.q+' '+x.a; if(/clear site data|사이트 데이터 삭제/i.test(str))passages.push(str); }))); const bad=passages.filter(p=>!/never|do not|don't|하지 마세요|누르지 마|금지|절대/i.test(p)); check('every mention of clearing site data says not to ('+passages.length+' passages)', passages.length>0&&!bad.length, bad.join(' || ').slice(0,200)); }
 check('renderGuide builds a page with every section and the history', (()=>{ const view={innerHTML:''}; const F=new Function('S','APP_VERSION','esc','t','view','ICO',src+';renderGuide();return view.innerHTML;'); const html=F({settings:{lang:'en'}},APP,x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),k=>k,view,{back:''}); return G.GUIDE.every(s=>html.includes('id="g-'+s.id+'"'))&&html.includes('id="g-history"')&&html.includes('Guide written against version: v'+G.GUIDE_VERSION); })());
 console.log('errors',JSON.stringify(errors)); process.exit(errors.length?1:0);

@@ -77,13 +77,13 @@ const GUIDE=[
   '• 이 주소에 대해 브라우저의 "사이트 데이터 삭제"는 누르지 마세요. 같은 주소를 쓰는 다른 앱(예전 GitHub 주소의 ClassDesk·StudyDesk) 데이터까지 지워집니다.']},
  {id:'move',title:{en:'Moving from the old address',ko:'예전 주소에서 옮기기'},en:[
   'The old address (amber67-git.github.io/my-fit) shares its storage and its "installed app" slot with other apps, which is why installing there failed. Do this once per device:',
-  '• 1. Open the old address online where you used it (on iPhone, inside the home-screen app if that is where you worked) and wait for "Synced to Firebase". Download a backup from the notice as a safety copy.',
+  '• 1. Open the old address online where you used it (on iPhone, inside the home-screen app if that is where you worked). Signed in with Google: wait until the status line says "Synced to Firebase". Without an account: nothing to wait for. Either way, download a backup from the notice.',
   '• 2. Open the new address. With Google sign-in, just sign in — do not import. Without an account, Settings → Import JSON → choose the backup file.',
   '• 3. Check your data is there, then install the app from the new address. On iPhone, open the installed app and check again; signed-in users sign in inside it.',
   '• 4. Delete the old My Fit app from the phone (app only — never "Clear site data"). In Chrome, chrome://webapks should show My Fit with the new address.'],
   ko:[
   '예전 주소(amber67-git.github.io/my-fit)는 다른 앱과 저장소와 "설치된 앱" 자리를 같이 써서 설치가 막혔습니다. 기기마다 한 번씩 아래대로 합니다.',
-  '• 1. 데이터를 쓰던 곳(아이폰은 홈 화면 앱에서 썼다면 그 앱 안)에서 예전 주소를 인터넷 연결 상태로 열고 "Firebase에 동기화됨"을 기다립니다. 안내 띠에서 백업도 받아 둡니다.',
+  '• 1. 데이터를 쓰던 곳(아이폰은 홈 화면 앱에서 썼다면 그 앱 안)에서 예전 주소를 인터넷 연결 상태로 엽니다. 구글 로그인을 쓰면 상태 줄이 "Firebase에 동기화됨"이 될 때까지 기다리고, 계정 없이 썼다면 기다릴 것 없이 바로 진행합니다. 어느 쪽이든 안내 띠에서 백업을 받아 둡니다.',
   '• 2. 새 주소를 엽니다. 구글 로그인을 쓰면 로그인만 하고 가져오기는 하지 않습니다. 계정 없이 썼다면 설정 → JSON 가져오기 → 백업 파일 고르기.',
   '• 3. 데이터가 다 보이는지 확인한 뒤 새 주소에서 앱을 설치합니다. 아이폰은 설치한 앱을 열어 다시 확인하고, 로그인 사용자는 그 앱 안에서 로그인합니다.',
   '• 4. 예전 My Fit 앱을 휴대폰에서 지웁니다(앱만, "사이트 데이터 삭제"는 금지). 크롬 chrome://webapks에 My Fit이 새 주소로 나오면 성공입니다.']},
