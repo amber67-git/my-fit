@@ -1,0 +1,22 @@
+// In-app guide checks (no browser): the guide must stay in step with the app version, both languages, and the live address.
+const fs=require('fs'); const path=require('path'); const root=path.resolve(__dirname,'..','..');
+const app=fs.readFileSync(path.join(root,'src','app.html'),'utf8'); const src=fs.readFileSync(path.join(root,'src','guide.js'),'utf8');
+const G=new Function('S','APP_VERSION','esc','t','view','ICO',src+';return {GUIDE,GUIDE_HISTORY,GUIDE_VERSION,GUIDE_DATE,renderGuide};')({settings:{lang:'ko'}},'0',x=>String(x),k=>k,{innerHTML:''},{back:''});
+const APP=(app.match(/APP_VERSION='([^']+)'/)||[])[1]; const NEW_HOME=(app.match(/const NEW_HOME='([^']*)'/)||[])[1];
+const mm=v=>String(v).split('.').slice(0,2).join('.');
+const errors=[]; const check=(name,ok,info)=>{ console.log((ok?'ok   ':'FAIL ')+name+(info!==undefined?' — '+info:'')); if(!ok)errors.push(name); };
+check('guide written against the current app line (major.minor)', mm(G.GUIDE_VERSION)===mm(APP), G.GUIDE_VERSION+' vs app '+APP);
+check('FAQ date is a real date not in the future', /^\d{4}-\d{2}-\d{2}$/.test(G.GUIDE_DATE)&&!isNaN(Date.parse(G.GUIDE_DATE))&&Date.parse(G.GUIDE_DATE)<=Date.now()+86400000, G.GUIDE_DATE);
+check('at least 8 sections', G.GUIDE.length>=8, G.GUIDE.length);
+G.GUIDE.forEach(s=>{ const shape=a=>a.map(x=>typeof x==='string'?(x.startsWith('• ')?'li':'p'):(x&&x.q&&x.a?'qa':'bad')).join(',');
+  check(`section "${s.id}": title in both languages`, !!(s.title&&s.title.en&&s.title.ko));
+  check(`section "${s.id}": same structure in EN and KO`, Array.isArray(s.en)&&Array.isArray(s.ko)&&s.en.length===s.ko.length&&shape(s.en)===shape(s.ko)&&!/bad/.test(shape(s.en)), shape(s.en)+' | '+shape(s.ko)); });
+check('FAQ section exists with question/answer pairs', G.GUIDE.some(s=>s.id==='faq'&&s.en.every(x=>x.q&&x.a)));
+check('history newest first', G.GUIDE_HISTORY.every((h,i,a)=>i===0||a[i-1].date>=h.date), G.GUIDE_HISTORY.map(h=>h.date).join(' > '));
+check('history top entry is the current app line', mm(G.GUIDE_HISTORY[0].v)===mm(APP), G.GUIDE_HISTORY[0].v);
+check('history entries have both languages and ISO dates', G.GUIDE_HISTORY.every(h=>h.en&&h.ko&&/^\d{4}-\d{2}-\d{2}$/.test(h.date)));
+const text=JSON.stringify(G.GUIDE);
+check('guide names the live address (NEW_HOME)', !NEW_HOME||text.includes(NEW_HOME.replace(/\/$/,'')), NEW_HOME);
+check('guide never tells users to clear site data as a fix', !/clear site data(?! for this address: it also)/i.test(text)||/never|do not|하지 마세요|금지/i.test(text));
+check('renderGuide builds a page with every section and the history', (()=>{ const view={innerHTML:''}; const F=new Function('S','APP_VERSION','esc','t','view','ICO',src+';renderGuide();return view.innerHTML;'); const html=F({settings:{lang:'en'}},APP,x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),k=>k,view,{back:''}); return G.GUIDE.every(s=>html.includes('id="g-'+s.id+'"'))&&html.includes('id="g-history"')&&html.includes('Guide written against version: v'+G.GUIDE_VERSION); })());
+console.log('errors',JSON.stringify(errors)); process.exit(errors.length?1:0);

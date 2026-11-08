@@ -15,7 +15,8 @@
 - 소스는 `src/`(app.html, head.html, tail.html, figure/{figure,poses,figmap}.js)이고 `index.html`·`artifact.html`은 빌드 산출물이다. 앱을 고칠 때는 `src/`를 고치고 `tools/build.sh`로 빌드한다(그림 엔진 splice, dataset.js, 테스트 하네스 생성, 인라인 스크립트 블록별 `node --check`, sw.js VERSION 대조). CI가 빌드 결과와 커밋된 산출물이 같은지 확인한다.
 - `tools/run-suites.sh`로 `tests/suites/*.js`(run10/run11/run12/swipe/dash19/report) 통과. 이 세션에서는 `PW_MODULE=/opt/node22/lib/node_modules/playwright PW_CHROMIUM=/opt/pw-browsers/chromium` 환경변수를 준다. 스모크는 `python3 -m http.server 8080` 띄운 뒤 `NODE_PATH=/opt/node22/lib/node_modules APP_URL=http://127.0.0.1:8080/ node tests/smoke.cjs`. 서버를 끌 때 `pkill -f`를 쓰지 않는다(자기 셸을 죽인다).
 - 그림을 바꿨으면 `cd build && node ../tools/joints.js`(관절 각도)와 `node ../tools/audit.js`(바닥·겹침) 실행, 바뀐 그림은 `tools/zoom4.html?ids=…`(build/ 기준으로 열기)로 렌더해서 직접 본다.
-- 앱 코드(index.html, sw.js, manifest, icons)를 바꾼 PR은 APP_VERSION, CHANGELOG, sw.js의 VERSION, README의 버전·운동 개수를 함께 올린다. 문서·설정만 바꾼 PR(README, PLAN, CLAUDE.md, .github, .coderabbit.yaml, docs/)은 버전을 올리지 않는다.
+- 앱 코드(index.html, sw.js, manifest, icons)를 바꾼 PR은 APP_VERSION, CHANGELOG, sw.js의 VERSION, README의 버전·운동 개수를 함께 올린다.
+- **설정 → 가이드(`src/guide.js`)를 함께 갱신한다.** 사용자가 보는 동작·화면·주소·설치 방법이 바뀌는 PR은 해당 절(`GUIDE`)을 고치고, 큰 변경이면 `GUIDE_HISTORY` 맨 위에 한 줄을 추가하며, `GUIDE_VERSION`을 그 APP_VERSION으로, `GUIDE_DATE`를 그날로 바꾼다. 내부 수정만 있는 패치는 가이드를 안 건드려도 되지만 `tests/suites/guide.js`가 major.minor 일치와 이력 맨 위 버전을 검사하므로 minor가 오르면 반드시 갱신한다. EN·KO 두 언어를 같은 구조로 쓴다. 문서·설정만 바꾼 PR(README, PLAN, CLAUDE.md, .github, .coderabbit.yaml, docs/)은 버전을 올리지 않는다.
 
 ## 권한·한계
 - 이 세션은 외부 사이트 대부분(github.io 포함)에 접속할 수 없다. 라이브 페이지 확인은 워크플로 성공 여부로 대신한다.

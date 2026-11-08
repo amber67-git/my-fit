@@ -660,3 +660,8 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - `NEW_HOME`에 새 주소. 옛 GitHub Pages 주소에서는 안내 띠가 뜨고, `src/head.html`이 manifest 링크를 빼서 Chrome이 그 주소에서 설치를 권하지 않음(그 주소의 ClassDesk 설치를 막지 않기 위해). 수동 "홈 화면에 추가"는 막을 수 없어 띠·문서로 안내.
 - 이사 순서에 아이폰(홈 화면 앱 저장소가 Safari와 따로)과 "새 주소에서 데이터 확인 후 옛 앱 삭제" 추가. 같은 origin 1앱 제한은 현재 Chrome 동작(버그로 보고됨)으로 표현.
 
+## 42. v0.26.2: 설정 → 가이드
+- `src/guide.js`(빌드가 app.html에 스플라이스): `GUIDE`(절 10개: 시작하기, 대시보드, 주간 계획, 운동하기, 라이브러리, 보고서, 설정, 데이터 위치, 예전 주소에서 옮기기, FAQ 8개), `GUIDE_HISTORY`(버전별 핵심 변경, 최신 먼저), `GUIDE_VERSION`·`GUIDE_DATE`(머리에 "기준 버전 v… · FAQ 기준일 …" 표시, 앱 버전과 다르면 함께 표시).
+- 설정 첫 줄 "가이드" → `S.sub='guide'` 하위 화면(뒤로 버튼, 절 바로가기 칩, 맨 아래 "새로운 기능" 버튼).
+- 유지 규칙(CLAUDE.md): 사용자가 보는 변경이 있는 PR은 가이드를 같이 갱신. `tests/suites/guide.js`가 major.minor 일치, 이력 맨 위 버전, EN/KO 구조 일치, 주소(NEW_HOME) 포함, 렌더 결과를 검사하고 스모크가 열기/뒤로를 확인.
+
