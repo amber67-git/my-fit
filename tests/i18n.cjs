@@ -46,7 +46,7 @@ for(const lang of ['en','ko']){ const p=await b.newPage({viewport:{width:384,hei
     const found=new Set();
     for(const s of txt){ if(lang==='ko'){ if(IS_ADDR(s))continue; const s2=s.replace(/"[^"]*"/g,' '); /* quoted text is a verbatim citation (e.g. a Chrome message) */ for(const w of (s2.match(/[A-Za-z][A-Za-z.'-]*/g)||[])){ if(KO_ALLOW.has(w)||/^[A-Za-z]$/.test(w))continue; found.add(w+' ← '+s.slice(0,40)); } }
       else { if(/[ㄱ-ㆎ가-힣]/.test(s))found.add(s.slice(0,50)); } }
-    leaks[lang][screen]=[...found].slice(0,20); };
+    leaks[lang][screen]={n:found.size,list:[...found].slice(0,20)}; };
   for(const tab of ['dash','week','month','report','settings']){ await p.evaluate(t=>{ const T=window.__T; T.S.tab=t; T.S.sub=null; T.render(); },tab); await scan(tab); }
   for(const sub of ['guide','library']){ await p.evaluate(s=>{ const T=window.__T; T.S.tab='settings'; T.S.sub=s; T.render(); },sub); await scan(sub); }
   await p.evaluate(()=>{ const T=window.__T; T.S.sub=null; T.S.tab='settings'; T.render(); }); const rt=await p.$('[data-act="open-routines"]'); if(rt){ await rt.click(); await scan('routines'); await p.evaluate(()=>{ const x=document.querySelector('.backdrop'); if(x)x.click(); }); await p.waitForTimeout(250); }
@@ -59,6 +59,6 @@ for(const lang of ['en','ko']){ const p=await b.newPage({viewport:{width:384,hei
   if(errs.length)bad(lang+' page errors: '+errs.join(' | '));
   await p.close(); }
 await b.close();
-for(const lang of ['en','ko']){ for(const [screen,list] of Object.entries(leaks[lang])){ if(list.length)bad(lang.toUpperCase()+' screen "'+screen+'" shows '+(lang==='ko'?'English':'Korean')+' text: '+list.join(' ; ')); else ok(lang.toUpperCase()+' '+screen); } }
+for(const lang of ['en','ko']){ for(const [screen,{n,list}] of Object.entries(leaks[lang])){ if(n)bad(lang.toUpperCase()+' screen "'+screen+'" shows '+n+' '+(lang==='ko'?'English':'Korean')+' text'+(n>1?'s':'')+(n>list.length?' (first '+list.length+' shown)':'')+': '+list.join(' ; ')); else ok(lang.toUpperCase()+' '+screen); } }
 console.log(errors.length?'I18N FAILED ('+errors.length+')':'I18N PASSED'); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
