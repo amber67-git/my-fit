@@ -10,7 +10,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="My Fit">
-<link rel="manifest" href="manifest.webmanifest?v=0.26.1">
+<link rel="manifest" href="manifest.webmanifest?v=0.26.2">
 <script>/* old shared GitHub Pages origin: no install manifest, so Chrome does not offer an install there (it would block ClassDesk). Manual "Add to home screen" is not prevented; the in-app banner says to install from the new address. */ if(location.hostname==='amber67-git.github.io'){var ml=document.querySelector('link[rel="manifest"]');if(ml)ml.remove();}</script>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -108,6 +108,7 @@ nav.tabs button.on{color:var(--accent)}
 .bmtile{display:grid;place-items:center;width:140px;height:140px;border-radius:32px;background:var(--soft);--bm-gap:var(--soft);flex:none}
 .bm{display:inline-block;vertical-align:middle}.bm .r{fill:var(--bm-rest);stroke:var(--bm-gap,var(--card));stroke-width:1.5}.bm .r.d{fill:var(--bm-decor)}.bm .r.p{fill:var(--hl)}.bm .r.s{fill:var(--hl);opacity:.42}.bm .hair path,.bm .hair ellipse{fill:var(--bm-hair);stroke:none}.bmwrap{display:inline-flex;gap:4px;align-items:center}
 .bmsm{flex:none;margin-left:auto;--bm-gap:var(--card)}
+.guide h2{font-size:20px}.guide .rpt-sec{gap:6px;line-height:1.55}.guide .rpt-sec h3{font-size:16px;margin-bottom:2px}.guide p{margin:0}.guide ul{margin:0;padding-left:18px}.guide li{margin:3px 0}.guide .chips a{text-decoration:none}.guide .faq,.guide .hist{margin:0}.guide .faq dt{font-weight:600;margin-top:8px}.guide .faq dd,.guide .hist dd{margin:2px 0 0;color:var(--muted)}.guide .hist dt{font-weight:600;margin-top:8px}.guide .hist dd{color:var(--fg)}.guide section{scroll-margin-top:72px}
 .moved{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:var(--accent-soft);border-bottom:1px solid var(--line);font-size:14px}.moved .grow{flex:1 1 260px}.moved .row{flex:none;margin-left:auto}.moved .btn.sm{width:auto}.moved a.btn{text-decoration:none}.hero .bigico{margin:0}.rpt-map{display:flex;justify-content:center;margin:2px 0 4px;--bm-gap:var(--card)}
 .ptiles{grid-template-columns:1fr 1fr!important;max-width:440px;margin:0 auto;width:100%;text-align:center}
 .steps3{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}.steps3:empty{display:none}
@@ -363,8 +364,9 @@ nav.tabs button.on{color:var(--accent)}
 'use strict';
 // ---------- constants ----------
 const LS_KEY='wwt.state.v1';
-const APP_VERSION='0.26.1';
+const APP_VERSION='0.26.2';
 const CHANGELOG=[
+ {v:'0.26.2',date:'2026-11-08',en:['Settings → Guide: how to use the app, where your data lives, moving from the old address, FAQ, and the major changes by version'],ko:['설정 → 가이드: 앱 사용법, 데이터 위치, 예전 주소에서 옮기기, 자주 묻는 질문, 버전별 주요 변경 이력']},
  {v:'0.26.1',date:'2026-11-04',en:['My Fit\'s own address is https://amber-my-fit.netlify.app/ — install the app from there. The old GitHub address shows a moving banner and no longer offers to install'],ko:['My Fit 전용 주소는 https://amber-my-fit.netlify.app/ — 앱 설치는 여기서. 옛 GitHub 주소는 이사 안내 띠를 보여 주고 더 이상 설치를 권하지 않음']},
  {v:'0.26.0',date:'2026-11-04',en:['Getting ready to move My Fit to its own web address, so it installs as its own phone app instead of competing with other apps on the shared GitHub address','Backups now name the app and version, and Import can open a backup file directly'],ko:['My Fit을 자기 전용 주소로 옮길 준비: 같은 GitHub 주소의 다른 앱과 부딪히지 않고 휴대폰 앱으로 따로 설치되게','백업 파일에 앱 이름과 버전이 들어가고, 가져오기에서 백업 파일을 바로 고를 수 있음']},
  {v:'0.25.3',date:'2026-11-04',en:['Reinstalling works even on a phone that had the old app: the install settings file now always comes fresh from the network instead of the offline copy, so the new app id is what the phone sees','Settings shows the app id under the version ("/my-fit/app" means the phone has the new install settings)'],ko:['예전 앱이 있던 휴대폰에서도 다시 설치되게: 설치 설정 파일을 오프라인 사본이 아니라 항상 네트워크에서 새로 받아서, 휴대폰이 새 앱 id를 보게 함','설정의 버전 아래에 앱 id 표시("/my-fit/app"이면 새 설치 설정을 받은 것)']},
@@ -1092,6 +1094,137 @@ function bodyMapSvg(view,prim,sec,size,opts){ opts=opts||{}; const sex=opts.sex=
 function bodyViewsFor(prim,sec){ const has=(keys,v)=>(keys||[]).some(k=>(BODY_RULES[k]||[]).some(r=>r[0]===v)||(k==='heart'&&v==='f')); const pf=has(prim,'f'), pb=has(prim,'b'); if(pf!==pb)return [pf?'f':'b']; if(pf&&pb)return ['f','b']; const sf=has(sec,'f'), sb=has(sec,'b'); if(sf!==sb)return [sf?'f':'b']; return ['f','b']; }
 function muscleMapHtml(prim,sec,size,opts){ opts=opts||{}; const views=opts.both?['f','b']:bodyViewsFor(prim,sec); return `<span class="bmwrap">${views.map(v=>bodyMapSvg(v,prim,sec,size,opts)).join('')}</span>`; }
 const BODY_CSS='.bm{display:inline-block;vertical-align:middle}.bm .r{fill:var(--bm-rest,#d9dde3);stroke:var(--bm-gap,#fff);stroke-width:1.5}.bm .r.d{fill:var(--bm-decor,#e8ebef)}.bm .r.p{fill:var(--hl,#e5484d)}.bm .r.s{fill:var(--hl,#e5484d);opacity:.42}.bm .hair path,.bm .hair ellipse{fill:var(--bm-hair,#b8bfc9);stroke:none}.bmwrap{display:inline-flex;gap:4px;align-items:center}';
+// ---------- In-app guide (Settings → Guide) ----------
+// Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
+// GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
+const GUIDE_VERSION='0.26.2';   // the app version this guide was written against
+const GUIDE_DATE='2026-11-08';  // FAQ current as of
+// Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
+const GUIDE=[
+ {id:'start',title:{en:'Getting started',ko:'시작하기'},en:[
+  'My Fit is a weekly workout planner and tracker. It runs in the browser and can be installed on your phone like an app.',
+  '• Address: https://amber-my-fit.netlify.app/ — install from here. The older GitHub address still works but only shows a moving notice.',
+  '• Android: open the address in Chrome → ⋮ → Install app. iPhone: open it in Safari → Share → Add to Home Screen.',
+  '• First screen: choose Google sign-in (data saved to your account and synced across devices) or "Use without account" (data stays on this device only).',
+  '• Switch EN / KO with the toggle at the top right. The day starts at 04:00, so a workout finished after midnight still counts for that evening.'],
+  ko:[
+  'My Fit은 주간 운동 계획·기록 앱입니다. 브라우저에서 돌아가고, 휴대폰에 앱처럼 설치할 수 있습니다.',
+  '• 주소: https://amber-my-fit.netlify.app/ — 앱 설치는 여기서 합니다. 예전 GitHub 주소도 열리지만 이사 안내만 보여 줍니다.',
+  '• 안드로이드: 크롬으로 주소를 열고 ⋮ → 앱 설치. 아이폰: Safari로 열고 공유 → 홈 화면에 추가.',
+  '• 첫 화면에서 구글 로그인(계정에 저장, 모든 기기 동기화) 또는 "계정 없이 사용"(이 기기에만 저장)을 고릅니다.',
+  '• 오른쪽 위 토글로 EN / KO를 바꿉니다. 하루는 새벽 4시에 시작해서, 자정을 넘겨 끝낸 운동도 그날 저녁 기록으로 남습니다.']},
+ {id:'dash',title:{en:'Dashboard',ko:'대시보드'},en:[
+  '• This week: workout days done out of your weekly goal. Streak counts consecutive weeks that met the goal; the current week keeps the count until it ends short.',
+  '• Today: the exercises planned for today. Tap a card to start it, swipe left to delete it, or tap "+ Add exercise" to add one even after everything is done.',
+  '• "Start today\'s workout" runs the planned exercises one after another.'],
+  ko:[
+  '• 이번 주: 주간 목표 대비 운동한 날 수. 연속(streak)은 목표를 채운 연속 주 수이고, 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지합니다.',
+  '• 오늘: 오늘 계획된 운동 목록. 카드를 누르면 바로 시작, 왼쪽으로 밀면 삭제, "+ 운동 추가"로 다 끝낸 뒤에도 추가할 수 있습니다.',
+  '• "오늘 운동 시작"을 누르면 계획된 운동을 차례로 진행합니다.']},
+ {id:'week',title:{en:'Weekly plan',ko:'주간 계획'},en:[
+  '• Preset mode: place exercises on each day yourself. "Apply routine" fills the week from one of 6 presets (Push/Pull/Legs, Upper/Lower, Full body, Home, Dumbbell, Cardio + core) or a routine you saved with "Save as routine".',
+  '• Tick "Apply every week" when applying a routine and a new empty week is filled automatically (preset mode only, remaining days only). Turn it off in Settings.',
+  '• Smart mode: the app lays out the week for you — every other day when possible, a split that fits your days per week, and automatic progression once you complete a target. Deload weeks and a lighter first week back are in Settings → Smart mode.'],
+  ko:[
+  '• 프리셋 모드: 요일 칸에 운동을 직접 놓습니다. "루틴 적용"은 프리셋 6개(푸시/풀/레그, 상/하체, 전신, 홈트, 덤벨, 유산소+코어)나 "루틴으로 저장"해 둔 내 루틴으로 한 주를 채웁니다.',
+  '• 루틴을 적용할 때 "매주 자동 적용"을 켜면 새 주가 비어 있을 때 자동으로 채워집니다(프리셋 모드, 남은 요일만). 설정에서 끌 수 있습니다.',
+  '• 스마트 모드: 앱이 한 주를 짜 줍니다. 가능하면 격일로, 주당 일수에 맞는 분할로, 목표를 다 채우면 자동 증량. 디로드 주와 복귀 첫 주 감량은 설정 → 스마트 모드에서 켜고 끕니다.']},
+ {id:'workout',title:{en:'Doing a workout',ko:'운동하기'},en:[
+  '• Get-ready screen: the exercise picture, a muscle map (primary muscles red, secondary light red; only the side that works is shown), target sets × reps × weight, your last record, and 3 how-to steps. Tap the Target tile to change sets, reps or weight before you start.',
+  '• Sets screen: tick each set as you finish it, change reps or weight on the spot (later sets follow), add or remove sets, rest timer with ±15 s, add another exercise or skip one mid-workout.',
+  '• Timed exercises (stretching, cardio) use a countdown; on the completion screen you can correct the duration and, for cardio, enter distance and average heart rate.',
+  '• Completion: how it felt (1–5) and how hard it was (RPE 6–10) feed the report. You can leave a workout safely: save or discard, and resume after closing the app.'],
+  ko:[
+  '• 준비 화면: 운동 그림, 근육 지도(주동근 빨강·보조근 연한 빨강, 자극되는 쪽만 표시), 목표 세트×횟수×무게, 지난 기록, 운동 방법 3단계. 목표 타일을 누르면 시작 전에 세트·횟수·무게를 바꿀 수 있습니다.',
+  '• 세트 화면: 세트를 끝낼 때마다 체크, 횟수·무게 즉시 수정(뒤 세트가 따라감), 세트 추가/삭제, 휴식 타이머 ±15초, 운동 중 다른 운동 추가·건너뛰기.',
+  '• 시간형 운동(스트레칭·유산소)은 카운트다운으로 진행하고, 완료 화면에서 시간을 고치거나 유산소는 거리·평균 심박을 넣을 수 있습니다.',
+  '• 완료 화면의 컨디션(1~5)과 강도(RPE 6~10)는 보고서에 쓰입니다. 운동 중 나가도 저장/버리기를 고를 수 있고, 앱을 닫았다가 이어서 할 수 있습니다.']},
+ {id:'library',title:{en:'Exercise library',ko:'운동 라이브러리'},en:[
+  '• Settings → Exercise library: 351 built-in exercises (bodyweight, barbell, dumbbell, kettlebell, band, machine, cable, stability ball, yoga, stretching, sports & outdoor) with filters by type, muscle and equipment, and Korean search.',
+  '• Every exercise lists its primary and secondary muscles. You can add your own exercises, edit built-ins, or hide ones you never use.'],
+  ko:[
+  '• 설정 → 운동 라이브러리: 기본 운동 351개(맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외). 종류·부위·도구 필터와 한글 검색.',
+  '• 운동마다 주동근·보조근이 적혀 있습니다. 내 운동을 추가하거나 기본 운동을 고치고, 안 쓰는 운동은 숨길 수 있습니다.']},
+ {id:'report',title:{en:'Report',ko:'보고서'},en:[
+  '• Pick a period (4 wk / 12 wk / 1 yr / all). Sections: summary, week-by-week volume and minutes, growth by estimated 1RM, strength board (× body weight), muscle balance with a weekly muscle map and sets by specific muscle, consistency, effort & recovery, cardio, body, personal records, notes.',
+  '• Today\'s check-in (body weight, sleep, note) and the weekly note are entered at the top of the report.',
+  '• "Copy as text" and "Export CSV" give you the numbers for a spreadsheet. Sections that need more data say what is missing.'],
+  ko:[
+  '• 기간(4주/12주/1년/전체)을 고릅니다. 항목: 요약, 주별 볼륨·시간, 추정 1RM 성장 속도, 근력 보드(체중 대비), 부위 균형(주간 근육 지도와 세부 부위별 세트), 꾸준함, 강도·회복, 유산소, 신체, 개인 기록, 메모.',
+  '• 오늘 체크인(체중·수면·메모)과 주간 메모는 보고서 맨 위에서 적습니다.',
+  '• "텍스트 복사"와 "CSV 내보내기"로 숫자를 스프레드시트로 가져갈 수 있습니다. 데이터가 더 필요한 항목은 무엇이 부족한지 알려 줍니다.']},
+ {id:'settings',title:{en:'Settings',ko:'설정'},en:[
+  '• Goals: weekly goal (days), rest between sets. Smart mode: alternate days, split, auto progression and weight step, deload week (every 3/4/6 weeks, −5…20 %), lighter first week back (after 7/14/21+ days, −5…20 %).',
+  '• Language, unit (kg/lb converts every stored weight), body figure (male/female) for the muscle map.',
+  '• Data: Export JSON (copy or download a backup file), Import JSON (choose a file or paste; the app asks before replacing data), automatic daily backups (14 kept) and restore when signed in, reset.',
+  '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received.'],
+  ko:[
+  '• 목표: 주간 목표(일수), 세트 간 휴식. 스마트 모드: 격일 배치, 분할, 자동 증량과 무게 단위, 디로드 주(3/4/6주마다 −5~20%), 복귀 첫 주 감량(7/14/21일 이상 쉬면 −5~20%).',
+  '• 언어, 단위(kg/lb 전환 시 저장된 무게가 모두 변환), 근육 지도의 몸 그림(남성/여성).',
+  '• 데이터: JSON 내보내기(복사 또는 백업 파일 다운로드), JSON 가져오기(파일 고르기 또는 붙여넣기, 바꾸기 전에 한 번 확인), 로그인 시 하루 1회 자동 백업(14개 보관)과 복원, 초기화.',
+  '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다.']},
+ {id:'data',title:{en:'Where your data lives',ko:'데이터는 어디에 있나'},en:[
+  '• Signed in with Google: in your Firebase account, synced to every device you sign in on. The status line at the bottom of Settings says "Uploading changes…" until every change has reached the server, then "Synced to Firebase".',
+  '• Without an account: in this browser\'s storage on this device only. A different browser, device or address is a different storage — move data with Export / Import JSON.',
+  '• Never use the browser\'s "Clear site data" for this address: it also wipes other apps that share the address (on the old GitHub address, ClassDesk and StudyDesk).'],
+  ko:[
+  '• 구글 로그인: Firebase 계정에 저장되고 로그인한 모든 기기에 동기화됩니다. 설정 맨 아래 상태 줄이 "변경 올리는 중…"이면 아직 서버에 다 안 올라간 것이고, "Firebase에 동기화됨"이면 끝난 것입니다.',
+  '• 계정 없이 사용: 이 기기의 이 브라우저 저장소에만 있습니다. 다른 브라우저·기기·주소는 저장소가 다르므로 JSON 내보내기/가져오기로 옮깁니다.',
+  '• 이 주소에 대해 브라우저의 "사이트 데이터 삭제"는 누르지 마세요. 같은 주소를 쓰는 다른 앱(예전 GitHub 주소의 ClassDesk·StudyDesk) 데이터까지 지워집니다.']},
+ {id:'move',title:{en:'Moving from the old address',ko:'예전 주소에서 옮기기'},en:[
+  'The old address (amber67-git.github.io/my-fit) shares its storage and its "installed app" slot with other apps, which is why installing there failed. Do this once per device:',
+  '• 1. Open the old address online where you used it (on iPhone, inside the home-screen app if that is where you worked). Signed in with Google: wait until the status line says "Synced to Firebase" (it only means this device\'s changes were sent), then check that your records look complete, including days logged on other devices; if you cannot confirm that, put off signing in at the new address. Without an account: nothing to wait for. Either way, download a backup from the notice.',
+  '• 2. Open the new address. With Google sign-in, just sign in — do not import. Without an account, Settings → Import JSON → choose the backup file. If you already logged workouts at the new address without an account and now want to sign in, export them first: signing in loads the account\'s records and local ones are not merged.',
+  '• 3. Check your data is there, then install the app from the new address. On iPhone the home-screen app has its own storage, separate from Safari: open the installed app and check again — signed in with Google, sign in inside it; without an account, import the backup file again inside it. If Google sign-in does not complete inside the installed app (iOS can block it there), choose "Use without account" and import the backup file inside it. Workouts logged there stay on this device only and are not synced to the account; log workouts that must sync in Safari. Before you later sign in inside that app, export its data, and also export the account data from Safari: wait for "Synced to Firebase" (it only means your own changes were sent), check that the records look complete, then export; then sign in while online. If you cannot confirm the records are complete, put off the sign-in. Records are not merged: signing in loads the account\'s records, and on a bad connection local records can overwrite account records for the same dates.',
+  '• 4. Delete the old My Fit app from the phone (app only — never "Clear site data"). In Chrome, chrome://webapks should show My Fit with the new address.'],
+  ko:[
+  '예전 주소(amber67-git.github.io/my-fit)는 다른 앱과 저장소와 "설치된 앱" 자리를 같이 써서 설치가 막혔습니다. 기기마다 한 번씩 아래대로 합니다.',
+  '• 1. 데이터를 쓰던 곳(아이폰은 홈 화면 앱에서 썼다면 그 앱 안)에서 예전 주소를 인터넷 연결 상태로 엽니다. 구글 로그인을 쓰면 상태 줄이 "Firebase에 동기화됨"이 될 때까지 기다리고(이 기기의 변경이 전송됐다는 뜻일 뿐입니다), 다른 기기에서 기록한 날까지 기록이 빠짐없이 보이는지 확인합니다. 확인할 수 없으면 새 주소에서의 로그인을 미루세요. 계정 없이 썼다면 기다릴 것 없이 바로 진행합니다. 어느 쪽이든 안내 띠에서 백업을 받아 둡니다.',
+  '• 2. 새 주소를 엽니다. 구글 로그인을 쓰면 로그인만 하고 가져오기는 하지 않습니다. 계정 없이 썼다면 설정 → JSON 가져오기 → 백업 파일 고르기. 새 주소에서 이미 계정 없이 운동을 기록했는데 이제 로그인하려면 먼저 내보내 두세요. 로그인하면 계정의 기록을 불러오고 로컬 기록은 합쳐지지 않습니다.',
+  '• 3. 데이터가 다 보이는지 확인한 뒤 새 주소에서 앱을 설치합니다. 아이폰의 홈 화면 앱은 Safari와 저장소가 따로라서, 설치한 앱을 열어 다시 확인합니다. 구글 로그인은 그 앱 안에서 로그인하고, 계정 없이 쓰면 그 앱 안에서 백업 파일을 다시 가져옵니다. 설치한 앱 안에서 구글 로그인이 끝나지 않으면(iOS가 막을 수 있음) "계정 없이 사용"을 고르고 그 앱 안에서 백업 파일을 가져옵니다. 거기서 기록한 운동은 이 기기에만 남고 계정에 동기화되지 않으니, 동기화가 필요한 운동은 Safari에서 기록합니다. 나중에 그 앱 안에서 로그인하려면 먼저 그 앱의 데이터를 내보내고, Safari에서도 계정 데이터를 따로 내보냅니다. "Firebase에 동기화됨"은 내 변경이 전송됐다는 뜻일 뿐이니, 그 표시가 뜬 뒤 기록이 빠짐없이 보이는지 확인하고 내보내세요. 그런 다음 인터넷이 연결된 상태에서 로그인합니다. 기록이 다 있는지 확인할 수 없으면 로그인을 미루세요. 기록은 합쳐지지 않습니다. 로그인하면 계정의 기록을 불러오고, 연결이 나쁘면 같은 날짜의 계정 기록이 로컬 기록으로 덮어써질 수 있습니다.',
+  '• 4. 예전 My Fit 앱을 휴대폰에서 지웁니다(앱만, "사이트 데이터 삭제"는 금지). 크롬 chrome://webapks에 My Fit이 새 주소로 나오면 성공입니다.']},
+ {id:'faq',title:{en:'FAQ',ko:'자주 묻는 질문'},en:[
+  {q:'Chrome says "This app is already installed" and then "Could not open app".',a:'Another app on the same address is installed (current Android Chrome allows one web app per address). Install from the new address instead; then remove the old My Fit from Settings → Apps. Do not clear site data.'},
+  {q:'The new address is empty.',a:'Each address has its own storage. Sign in with the same Google account, or import the backup you downloaded at the old address.'},
+  {q:'My streak dropped although I worked out.',a:'Streak counts weeks that met the weekly goal, not days. Check the goal in Settings; a week in progress keeps the previous count until it ends.'},
+  {q:'A workout after midnight landed on the wrong day.',a:'The day starts at 04:00. Anything finished before 04:00 belongs to the previous day on purpose.'},
+  {q:'Weights look wrong after switching kg/lb.',a:'Switching converts every stored weight and body weight. Switch back if you did not mean to.'},
+  {q:'What does "Deload week" / "Back after a break" on the weekly card mean?',a:'Smart mode lowered this week\'s weights by your chosen percentage: after several weeks on goal, or after a break longer than the days you set. Both can be turned off in Settings.'},
+  {q:'The muscle map shows only the front (or only the back).',a:'It shows the side where the primary muscles are. Exercises that work both (e.g. squats) show both; the weekly map in the report always shows both.'},
+  {q:'Is the app updated automatically?',a:'Yes. When a new version is ready the app tells you; reload or reopen it. The version is at the bottom of Settings.'}],
+  ko:[
+  {q:'크롬이 "This app is already installed"라고 하고 누르면 "Could not open app"이 떠요.',a:'같은 주소의 다른 앱이 설치돼 있어서입니다(현재 안드로이드 크롬은 주소당 웹앱 하나만 설치). 새 주소에서 설치하고, 예전 My Fit은 설정 → 애플리케이션에서 지우세요. 사이트 데이터 삭제는 하지 마세요.'},
+  {q:'새 주소를 열었더니 비어 있어요.',a:'주소마다 저장소가 따로입니다. 같은 구글 계정으로 로그인하거나, 예전 주소에서 받은 백업을 가져오세요.'},
+  {q:'운동했는데 연속(streak)이 줄었어요.',a:'연속은 날이 아니라 주간 목표를 채운 주 수입니다. 설정의 주간 목표를 확인하세요. 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지합니다.'},
+  {q:'자정 넘겨 한 운동이 다른 날로 들어갔어요.',a:'하루는 새벽 4시에 시작합니다. 새벽 4시 전에 끝낸 운동은 일부러 전날로 기록합니다.'},
+  {q:'kg/lb를 바꿨더니 무게가 이상해요.',a:'전환하면 저장된 무게와 체중이 모두 변환됩니다. 실수였다면 다시 바꾸면 됩니다.'},
+  {q:'주간 카드의 "디로드 주" / "복귀 첫 주"가 뭔가요?',a:'스마트 모드가 이번 주 무게를 정한 비율만큼 낮춘 것입니다. 목표를 몇 주 연속 채운 뒤, 또는 정한 일수보다 오래 쉰 뒤에 적용됩니다. 둘 다 설정에서 끌 수 있습니다.'},
+  {q:'근육 지도가 앞(또는 뒤)만 보여요.',a:'주동근이 있는 쪽만 보여 줍니다. 스쿼트처럼 앞뒤 모두 쓰는 운동은 둘 다 보이고, 보고서의 주간 지도는 항상 앞뒤를 보여 줍니다.'},
+  {q:'앱은 자동으로 업데이트되나요?',a:'네. 새 버전이 준비되면 앱이 알려 주고, 새로고침하거나 다시 열면 적용됩니다. 버전은 설정 맨 아래에 있습니다.'}]}
+];
+// Curated major changes (newest first). The full list is in "What's new".
+const GUIDE_HISTORY=[
+ {v:'0.26',date:'2026-11-08',en:'My Fit moved to its own address (amber-my-fit.netlify.app) so it installs as its own app; backups name the app and version; every import asks before replacing data; this guide was added.',ko:'My Fit이 전용 주소(amber-my-fit.netlify.app)로 이사해 자기 앱으로 설치됨. 백업 파일에 앱 이름·버전, 모든 가져오기는 바꾸기 전에 확인, 이 가이드 추가.'},
+ {v:'0.25',date:'2026-11-03',en:'Muscle map on the get-ready screen, editor and report; male/female body figure; new app icon; layouts checked for desktop, tablet and phone landscape; reinstall fixes.',ko:'준비 화면·편집창·보고서에 근육 지도, 남성/여성 몸 그림, 새 앱 아이콘, 데스크톱·태블릿·휴대폰 가로 배치 점검, 다시 설치 문제 수정.'},
+ {v:'0.24',date:'2026-11-01',en:'Every exercise lists its primary and secondary muscles; report breaks sets down by specific muscle.',ko:'모든 운동에 주동근·보조근 표시, 보고서에 세부 부위별 세트.'},
+ {v:'0.23',date:'2026-10-31',en:'Smart mode: deload week and a lighter first week back, both adjustable in Settings.',ko:'스마트 모드: 디로드 주와 복귀 첫 주 감량, 설정에서 조절.'},
+ {v:'0.22',date:'2026-10-28',en:'Streak counts weeks that met the goal; routines can repeat every week; the day starts at 04:00; smart plan keeps your last weight after an incomplete session.',ko:'연속은 목표를 채운 주 수로, 루틴 매주 반복, 하루 시작 새벽 4시, 미완료 세션 뒤에도 마지막 무게 유지.'},
+ {v:'0.21',date:'2026-10-27',en:'Report tab (volume, growth, strength, balance, consistency, effort, cardio, body, records) with check-ins, RPE, cardio distance and heart rate, CSV export.',ko:'보고서 탭(볼륨·성장·근력·균형·꾸준함·강도·유산소·신체·기록)과 체크인, RPE, 유산소 거리·심박, CSV 내보내기.'},
+ {v:'0.20',date:'2026-10-22',en:'68 Samsung Health activity types under "Sports & outdoor"; figures obey ankle and knee range of motion.',ko:'삼성헬스 운동 68종("스포츠·야외"), 그림이 발목·무릎 가동범위를 지킴.'},
+ {v:'0.19',date:'2026-10-22',en:'28 machine and cable exercises; done exercises show a green check; "Add exercise" always available today.',ko:'머신·케이블 운동 28개, 완료는 초록 체크로, 오늘 운동 추가는 항상 가능.'},
+ {v:'0.17',date:'2026-10-22',en:'Installable home-screen app (offline, update notice); every dashboard card is tappable; swipe to delete.',ko:'홈 화면 설치 앱(오프라인, 업데이트 알림), 대시보드 카드 탭·스와이프 삭제.'},
+ {v:'0.10',date:'2026-10-19',en:'Phone-first workout screen: big set cards, change reps and weight on the spot, resume after closing the app.',ko:'폰 우선 운동 화면: 큰 세트 카드, 횟수·무게 즉시 수정, 앱을 닫아도 이어서 하기.'}
+];
+function renderGuide(){ const ko=S.settings.lang==='ko'; const L=k=>ko?k.ko:k.en;
+  const item=x=>typeof x==='string'?(x.startsWith('• ')?`<li>${esc(x.slice(2))}</li>`:`<p>${esc(x)}</p>`):`<dt>${esc(x.q)}</dt><dd>${esc(x.a)}</dd>`;
+  const body=arr=>{ let h='',list=false,dl=false; arr.forEach(x=>{ const isLi=typeof x==='string'&&x.startsWith('• '), isDl=typeof x!=='string'; if(list&&!isLi){h+='</ul>';list=false;} if(dl&&!isDl){h+='</dl>';dl=false;} if(isLi&&!list){h+='<ul>';list=true;} if(isDl&&!dl){h+='<dl class="faq">';dl=true;} h+=item(x); }); if(list)h+='</ul>'; if(dl)h+='</dl>'; return h; };
+  const stamp=(ko?'기준 버전: v':'Guide written against version: v')+GUIDE_VERSION+' · '+(ko?'FAQ 기준일: ':'FAQ current as of: ')+GUIDE_DATE+(GUIDE_VERSION!==APP_VERSION?' · '+(ko?'앱 버전 v'+APP_VERSION:'app is v'+APP_VERSION):'');
+  view.innerHTML=`<div class="stack guide">
+   <div class="row"><button class="icon-btn" data-act="back" aria-label="back">${ICO.back}</button><div class="grow"><h2>${esc(t('guide'))}</h2><div class="cap num">${esc(stamp)}</div></div></div>
+   <div class="chips">${GUIDE.map(s=>`<a class="chip" href="#g-${s.id}">${esc(L(s.title))}</a>`).join('')}<a class="chip" href="#g-history">${esc(t('guide_history'))}</a></div>
+   ${GUIDE.map(s=>`<section class="rpt-sec" id="g-${s.id}"><h3>${esc(L(s.title))}</h3>${body(ko?s.ko:s.en)}</section>`).join('')}
+   <section class="rpt-sec" id="g-history"><h3>${esc(t('guide_history'))}</h3><div class="cap">${esc(t('guide_history_sub'))}</div><dl class="hist">${GUIDE_HISTORY.map(h=>`<dt class="num">v${esc(h.v)} <span class="cap">${esc(h.date)}</span></dt><dd>${esc(L(h))}</dd>`).join('')}</dl><button class="btn sec" data-act="changelog">${esc(t('whats_new'))}</button></section>
+  </div>`; }
 
 const ICON_DEFS={}; const ICON_IDS=[]; const ICON_CREDIT='';
 function iconSvg(id,size){ return figSvg({id:'',icon:id,equip:'bodyweight',type:'strength',muscle:'full'},size); }
@@ -1115,7 +1248,7 @@ function defaultIconFor(e){ return (EX_FIG[e.id]||[])[0]||(e.type==='cardio'?'ru
 const ICONS=FIG_TEMPLATE_KEYS;
 const I18N={
 en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Settings',tab_report:'Report',rpt_4w:'4 wk',rpt_12w:'12 wk',rpt_1y:'1 yr',rpt_all:'All',rpt_summary:'Summary',rpt_sessions:'Sessions',rpt_tonnage:'Volume',rpt_tonnage_u:'kg·reps',rpt_minutes:'Minutes',rpt_adherence:'Plan kept',rpt_condition:'Avg feel',rpt_weekly:'Week by week',rpt_growth:'Growth (est. 1RM)',rpt_strength:'Strength board',rpt_rel:'× body weight',rpt_balance:'Muscle balance',rpt_consistency:'Consistency',rpt_recovery:'Effort & recovery',rpt_cardio:'Cardio',rpt_body:'Body',rpt_prs:'Personal records',rpt_notes:'Notes',rpt_checkin:'Today\'s check-in',rpt_weight:'Body weight',rpt_sleep:'Sleep (h)',rpt_note:'Note',rpt_weeknote:'This week\'s note',rpt_weeknote_w:'week of',rpt_csv:'Export CSV',rpt_text:'Copy report text',rpt_need:'Needs more data: {n}+ {what}',rpt_sessions_w:'logged sessions',rpt_points_w:'logged sessions of the same exercise, a week apart',rpt_days_w:'check-ins with body weight',rpt_none:'Nothing logged in this period yet.',rpt_up:'Improving',rpt_down:'Stalled or down',rpt_per_week:'/wk',rpt_push:'Push',rpt_pull:'Pull',rpt_legs:'Legs',rpt_core:'Core',rpt_zero:'No sets this period',rpt_sets:'sets',rpt_by_weekday:'By weekday',rpt_avg_session:'Avg session',rpt_skipped:'Skipped items',rpt_morning:'Morning',rpt_afternoon:'Afternoon',rpt_evening:'Evening',rpt_rest_actual:'Avg set interval',rpt_rest_planned:'planned rest',rpt_rpe_avg:'Avg RPE',rpt_distance:'Distance',rpt_hr:'Avg HR',rpt_latest:'latest',rpt_change:'change',rpt_sleep_avg:'Avg sleep',rpt_pr_note:'Best estimated 1RM or best reps per exercise in this period.',rpt_first_half:'first half',rpt_second_half:'second half',rpt_volume_growth:'Volume growth',rpe:'How hard? (RPE)',rpe_low:'Easy',rpe_high:'Max',distance:'Distance',avg_hr:'Avg HR',rpt_saved:'Saved',
- this_week:'This week',workout_days:'Workout days',total_time:'Total time',streak:'Streak',days:'days',d:'d',week:'week',weeks:'weeks',weeks_short:'wk',targets_primary:'Primary',body_figure:'Body figure',male:'Male',female:'Female',app_id:'App id',app_id_old:'missing (old install settings, reload twice)',app_id_err:'could not check (offline or server error)',art_credit:'Body art: react-native-body-highlighter (MIT) · Hair: avataaars (MIT)',targets_secondary:'Secondary',rpt_sub:'By specific muscle (primary, sets)',repeat_weekly:'Apply every week',repeat_routine:'Weekly routine',deload_on:'Deload week',deload_sub:'Lighter week after several weeks on goal',deload_every:'Every',deload_pct:'Deload by',return_on:'Lighter week after a break',return_sub:'First week back starts below your last weights',return_pct:'Reduce by',return_gap:'Break longer than',deload_week:'Deload week',return_week:'Back after a break',
+ this_week:'This week',workout_days:'Workout days',total_time:'Total time',streak:'Streak',days:'days',d:'d',week:'week',weeks:'weeks',weeks_short:'wk',targets_primary:'Primary',guide:'Guide',guide_sub:'How to use the app, FAQ, major changes',guide_history:'Major changes',guide_history_sub:'The headline changes by version. The full list is under What\'s new.',body_figure:'Body figure',male:'Male',female:'Female',app_id:'App id',app_id_old:'missing (old install settings, reload twice)',app_id_err:'could not check (offline or server error)',art_credit:'Body art: react-native-body-highlighter (MIT) · Hair: avataaars (MIT)',targets_secondary:'Secondary',rpt_sub:'By specific muscle (primary, sets)',repeat_weekly:'Apply every week',repeat_routine:'Weekly routine',deload_on:'Deload week',deload_sub:'Lighter week after several weeks on goal',deload_every:'Every',deload_pct:'Deload by',return_on:'Lighter week after a break',return_sub:'First week back starts below your last weights',return_pct:'Reduce by',return_gap:'Break longer than',deload_week:'Deload week',return_week:'Back after a break',
  today:'Today',rest_day:'Rest day',rest_day_sub:'Nothing planned today.',tomorrow:'Tomorrow',est:'Est.',min:'min',
  start_today:"Start today's workout",all_done:'All done for today',add_exercise:'Add exercise',copy_last_week:'Copy last week',
  empty_day:'No exercises on this day.',status_planned:'Planned',status_done:'Done',status_skipped:'Skipped',
@@ -1134,7 +1267,7 @@ en:{tab_dash:'Dashboard',tab_week:'Weekly',tab_month:'Monthly',tab_settings:'Set
  muscle:'Muscle',equipment:'Equipment',routines:'Routines',name:'Name',optional:'optional',credits:'Credits',deleted:'(deleted)',removed:'Removed',delete:'Delete',install:'Add to home screen',install_sub:'Open My Fit like an app',ios_1:'Open this page in Safari',ios_2:'Tap the Share button (square with an arrow)',ios_3:'Choose "Add to Home Screen"',update_ready:'Update ready. Reload to apply.',reload:'Reload',unit_converted:'All weights converted',start_day:'Start this day',feel_low:'Tough',feel_high:'Great',day:'day',preset_hint:'Preset: edit the week by hand',download:'Download .json',save_failed:'Save failed. Check the status line in Settings.',close:'Close',tap_howto:'Tap the picture for how-to',routine_default:'My routine',name_required:'Please enter a name.',resume_q:'Resume the workout you left?',resume:'Resume',no_sets_q:'No set was checked. Skip this exercise?',mark_done:'Mark as done',backup_failed:'Backup failed (too large or offline).',sync_error:'Sync error',add_set:'Add set',remove_set:'Remove set',skip_ex:'Skip exercise',add_ex_now:'Add exercise',leave_q:'Leave this exercise?',save_done:'Save what is done',discard_ex:'Discard',minus1:'−1 min',plus1:'+1 min',today_btn:'Today',rest_adj:'Rest',set_of:'of',remaining:'left',sign_in:'Sign in with Google',use_local:'Use without account (this device only)',account:'Account',sign_out:'Sign out',fb_synced:'Synced to Firebase',fb_uploading:'Uploading changes to Firebase…',fb_setup:'Firebase is not configured yet. See README.',login_sub:'Sign in to keep your workouts on every device.',mode_preset:'Preset',mode_smart:'Smart',smart_section:'Smart mode',alternate:'Every other day when possible',alternate_label:'every other day',split:'Split',split_auto:'Auto by days',split_full:'Full body',split_ul:'Upper / Lower',split_ppl:'Push / Pull / Legs',split_home:'Home (bodyweight)',split_db:'Dumbbell',progression_on:'Auto progression',weight_step:'Weight step',version:'Version',whats_new:"What's new",updated_to:'Updated to',on:'On',off:'Off',smart_title:'Smart plan',generate:'Generate this week',regenerate:'Regenerate',smart_starter:'No history yet, so this is a starter plan.',smart_based:'Based on your last 4 weeks.',progression:'Progression',no_progress:'Same targets as last time.',confirm_regen:'Replace this week with a new smart plan?',smart_empty:'Turn on Smart to fill this week automatically.',rest_rule:'Rest day between sessions',backups:'Backups',restore:'Restore',confirm_restore:'Replace all current data with this backup?',auto_backup_note:'A snapshot is saved automatically once a day while synced. The last 14 are kept.',no_backups:'No backups yet.',restored:'Restored',backup_now:'Back up now',backed_up:'Backed up',apply_routine:'Apply routine',apply_week:'Apply to this week',days_week:'days / week',save_week_routine:'Save as routine',routine_name:'Routine name',applied:'Applied',replace_week:'This week already has exercises.',replace:'Replace week',add_on:'Add on top',builtin_l:'Built-in',mine:'Mine',pick_routine:'Pick a routine',delete_routine:'Delete routine',week_empty_save:'Add exercises to the week first.',week_days:['M','T','W','T','F','S','S'],saved:'Saved',pick:'Pick an exercise',local_only:'Saved on this device only',
  synced:'Synced to your account',cannot_write:'Read-only view: changes are not saved',volume:'Volume',duration:'Duration',total_sets:'Sets'},
 ko:{tab_dash:'대시보드',tab_week:'주간',tab_month:'월간',tab_settings:'설정',tab_report:'보고서',rpt_4w:'4주',rpt_12w:'12주',rpt_1y:'1년',rpt_all:'전체',rpt_summary:'요약',rpt_sessions:'운동 세션',rpt_tonnage:'총 볼륨',rpt_tonnage_u:'kg·회',rpt_minutes:'운동 시간',rpt_adherence:'계획 이행률',rpt_condition:'평균 컨디션',rpt_weekly:'주별 추이',rpt_growth:'성장 속도 (추정 1RM)',rpt_strength:'근력 보드',rpt_rel:'× 체중',rpt_balance:'부위 균형',rpt_consistency:'꾸준함',rpt_recovery:'강도 · 회복',rpt_cardio:'유산소',rpt_body:'신체',rpt_prs:'개인 기록 (PR)',rpt_notes:'메모',rpt_checkin:'오늘 체크인',rpt_weight:'체중',rpt_sleep:'수면 (시간)',rpt_note:'메모',rpt_weeknote:'이번 주 메모',rpt_weeknote_w:'주',rpt_csv:'CSV 내보내기',rpt_text:'보고서 텍스트 복사',rpt_need:'데이터가 더 필요해요: {what} {n}개 이상',rpt_sessions_w:'세션',rpt_points_w:'같은 운동의 기록(일주일 이상 간격)',rpt_days_w:'체중 체크인',rpt_none:'이 기간에는 기록이 없어요.',rpt_up:'성장 중',rpt_down:'정체·하락',rpt_per_week:'/주',rpt_push:'푸시',rpt_pull:'풀',rpt_legs:'하체',rpt_core:'코어',rpt_zero:'이 기간 세트 없음',rpt_sets:'세트',rpt_by_weekday:'요일별',rpt_avg_session:'세션 평균',rpt_skipped:'건너뛴 항목',rpt_morning:'오전',rpt_afternoon:'오후',rpt_evening:'저녁',rpt_rest_actual:'세트 간격 평균',rpt_rest_planned:'계획 휴식',rpt_rpe_avg:'평균 RPE',rpt_distance:'거리',rpt_hr:'평균 심박',rpt_latest:'최근',rpt_change:'변화',rpt_sleep_avg:'평균 수면',rpt_pr_note:'이 기간의 운동별 최고 추정 1RM 또는 최고 횟수.',rpt_first_half:'전반',rpt_second_half:'후반',rpt_volume_growth:'볼륨 성장',rpe:'얼마나 힘들었나요? (RPE)',rpe_low:'쉬움',rpe_high:'한계',distance:'거리',avg_hr:'평균 심박',rpt_saved:'저장됨',
- this_week:'이번 주',workout_days:'운동일',total_time:'총 운동 시간',streak:'연속',days:'일',d:'일',week:'주',weeks:'주',weeks_short:'주',targets_primary:'주동근',body_figure:'몸 그림',male:'남성',female:'여성',app_id:'앱 id',app_id_old:'없음(예전 설치 설정, 두 번 새로고침)',app_id_err:'확인 못 함(오프라인 또는 서버 오류)',art_credit:'몸 그림: react-native-body-highlighter (MIT) · 머리: avataaars (MIT)',targets_secondary:'보조근',rpt_sub:'세부 부위별 (주동근, 세트)',repeat_weekly:'매주 자동 적용',repeat_routine:'매주 반복 루틴',deload_on:'디로드 주',deload_sub:'목표를 몇 주 연속 채우면 한 주 가볍게',deload_every:'주기',deload_pct:'감량',return_on:'복귀 첫 주 감량',return_sub:'쉬었다 돌아온 첫 주는 마지막 무게보다 낮게 제안',return_pct:'감량',return_gap:'휴식 기준',deload_week:'디로드 주',return_week:'복귀 첫 주',
+ this_week:'이번 주',workout_days:'운동일',total_time:'총 운동 시간',streak:'연속',days:'일',d:'일',week:'주',weeks:'주',weeks_short:'주',targets_primary:'주동근',guide:'가이드',guide_sub:'앱 사용법, 자주 묻는 질문, 주요 변경 이력',guide_history:'주요 변경 이력',guide_history_sub:'버전별 핵심 변경만 모았습니다. 전체 목록은 새로운 기능에 있습니다.',body_figure:'몸 그림',male:'남성',female:'여성',app_id:'앱 id',app_id_old:'없음(예전 설치 설정, 두 번 새로고침)',app_id_err:'확인 못 함(오프라인 또는 서버 오류)',art_credit:'몸 그림: react-native-body-highlighter (MIT) · 머리: avataaars (MIT)',targets_secondary:'보조근',rpt_sub:'세부 부위별 (주동근, 세트)',repeat_weekly:'매주 자동 적용',repeat_routine:'매주 반복 루틴',deload_on:'디로드 주',deload_sub:'목표를 몇 주 연속 채우면 한 주 가볍게',deload_every:'주기',deload_pct:'감량',return_on:'복귀 첫 주 감량',return_sub:'쉬었다 돌아온 첫 주는 마지막 무게보다 낮게 제안',return_pct:'감량',return_gap:'휴식 기준',deload_week:'디로드 주',return_week:'복귀 첫 주',
  today:'오늘',rest_day:'휴식일',rest_day_sub:'오늘은 계획된 운동이 없어요.',tomorrow:'내일',est:'예상',min:'분',
  start_today:'오늘 운동 시작',all_done:'오늘 운동 완료',add_exercise:'운동 추가',copy_last_week:'지난주 복사',
  empty_day:'이 날은 운동이 없어요.',status_planned:'계획',status_done:'완료',status_skipped:'건너뜀',
@@ -2093,7 +2226,7 @@ function trackPending(){ if(S.backend!=='firebase'||!FB.fs||typeof FB.fs.waitFor
 function renderStatus(){ const el=$('#status'); if(!el)return; el.textContent=S.lastError?t('sync_error')+': '+S.lastError:!S.canWrite?t('cannot_write'):(S.backend==='firebase'?(S.pendingSync?t('fb_uploading'):t('fb_synced'))+(FB.user&&FB.user.email?' · '+FB.user.email:''):S.backend==='db'?t('synced'):t('local_only')); }
 function render(){ ensureRepeatRoutine(); renderTabs();
   const title={dash:'tab_dash',week:'tab_week',month:'tab_month',report:'tab_report',settings:'tab_settings'}[S.tab];
-  $('#title').textContent=S.sub==='library'?t('library'):S.sub==='edit'?(S.editEx&&S.editEx.id?exName(S.editEx):t('new')):t(title);
+  $('#title').textContent=S.sub==='library'?t('library'):S.sub==='guide'?t('guide'):S.sub==='edit'?(S.editEx&&S.editEx.id?exName(S.editEx):t('new')):t(title);
   if(S.tab==='dash')renderDash(); else if(S.tab==='week')renderWeek(); else if(S.tab==='month')renderMonth(); else if(S.tab==='report')renderReport(); else renderSettings();
   if(P.active)renderPerform(true); }
 
@@ -2369,9 +2502,10 @@ function saveWeekAsRoutine(){ const ws=parseKey(S.weekStart); const wd=t('week_d
 
 // ---------- Settings ----------
 function renderSettings(){
-  if(S.sub==='library')return renderLibrary(); if(S.sub==='edit')return renderEdit();
+  if(S.sub==='library')return renderLibrary(); if(S.sub==='guide')return renderGuide(); if(S.sub==='edit')return renderEdit();
   const s=S.settings;
   view.innerHTML=`<div class="stack">
+   <div class="list"><button class="li" data-act="open-guide"><span class="grow"><div class="nm">${esc(t('guide'))}</div><div class="sub">${esc(t('guide_sub'))}</div></span>${ICO.chev}</button></div>
    <div class="list"><button class="li" data-act="open-lib"><span class="grow"><div class="nm">${esc(t('library'))}</div><div class="sub">${S.exercises.filter(e=>!e.hidden).length} ${esc(t('exercises'))}</div></span>${ICO.chev}</button>
    <button class="li" data-act="open-routines"><span class="grow"><div class="nm">${esc(t('routines'))}</div><div class="sub">${BUILTIN_ROUTINES().length+S.routines.length}</div></span>${ICO.chev}</button>
    ${(()=>{ const rr=s.repeatRoutine&&allRoutines().find(x=>x.id===s.repeatRoutine.id); return rr?`<div class="li"><span class="grow"><div class="nm">${esc(t('repeat_routine'))}</div><div class="sub">${esc(rtName(rr))}</div></span><button class="btn sm sec" data-act="repeat-off">${esc(t('off'))}</button></div>`:''; })()}</div>
@@ -2618,6 +2752,7 @@ view.addEventListener('click',e=>{
     case 'month-next': { const m=parseKey(S.month); S.month=keyOf(new Date(m.getFullYear(),m.getMonth()+1,1)); render(); break; }
     case 'day-detail': openDayDetail(a.dataset.k); break;
     case 'open-lib': S.sub='library'; render(); break;
+    case 'open-guide': S.sub='guide'; render(); view.scrollTop=0; break;
     case 'back': S.sub=null; render(); break;
     case 'new-ex': S.editEx=blankExercise(); S.editDirty=false; S.sub='edit'; render(); break;
     case 'edit-ex': S.editEx=JSON.parse(JSON.stringify(exById(a.dataset.id))); S.editDirty=false; S.sub='edit'; render(); break;

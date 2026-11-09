@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Build My Fit from sources:
-#   src/figure/{figure,poses,figmap,bodymap-data,bodymap}.js -> spliced into src/app.html (between the renderer markers)
+#   src/figure/{figure,poses,figmap,bodymap-data,bodymap}.js + src/guide.js -> spliced into src/app.html (between the renderer markers)
 #   src/app.html                         -> artifact.html (claude.ai artifact) and, with src/head.html + src/tail.html, index.html (GitHub Pages / PWA)
 #   build/dataset.js, build/figall.js    -> inputs for tools/joints.js, tools/audit.js, tools/review.html, tools/zoom4.html
 #   build/test.html                      -> Playwright harness used by tests/suites/*.js
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p build
-cat src/figure/figure.js src/figure/poses.js src/figure/figmap.js src/figure/bodymap-data.js src/figure/bodymap.js > build/figall.js
+cat src/figure/figure.js src/figure/poses.js src/figure/figmap.js src/figure/bodymap-data.js src/figure/bodymap.js src/guide.js > build/figall.js
 node --check build/figall.js
 python3 -I - <<'PY'
 import re
