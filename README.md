@@ -39,7 +39,7 @@ claude.ai 링크와 Netlify·GitHub Pages 링크는 저장소가 서로 다릅�
 - **옛 주소**: https://amber67-git.github.io/my-fit/ — 계속 동작하지만 이사 안내 띠가 뜨고 앱 설치를 권하지 않습니다. 같은 GitHub 주소에 ClassDesk·StudyDesk가 있어 현재 안드로이드 Chrome에서는 설치가 서로 막히기 때문입니다(Chromium 버그로 보고됨).
 - 이유·규칙·소유자 할 일·기기별 이사 순서: [`docs/own-origin.md`](docs/own-origin.md). manifest `id`(`/app`)는 앞으로 절대 바꾸지 않습니다.
 
-## 기능 (v0.26.2)
+## 기능 (v0.26.3)
 
 - 5탭: Dashboard / Weekly / Monthly / Report / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 351개 (맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외, 부위·도구 태그, 주동근·보조근 세부 자극 부위, 2~4단계 운동 방법), 추가·편집·숨기기
@@ -76,6 +76,7 @@ claude.ai 링크와 Netlify·GitHub Pages 링크는 저장소가 서로 다릅�
 - **작업 흐름**: 모든 변경은 브랜치 → PR → CodeRabbit 리뷰 반영 → 스쿼시 머지 → Netlify·GitHub Pages 배포 순서로 진행합니다(규칙은 `CLAUDE.md`).
 - **E2E 스모크 (Playwright)**: `.github/workflows/e2e.yml`이 PR과 main 푸시마다 저장소를 정적 서버로 띄우고 `tests/smoke.cjs`를 실행합니다(로컬 모드 진입 → 운동 추가 → 시작 → 세트 완료 → 완료 → 스와이프 취소/삭제 → 가로 스크롤·콘솔 오류 검사). 실패하면 Actions의 e2e-screenshots 아티팩트에서 화면을 볼 수 있습니다. 시나리오 전체 목록은 `docs/e2e-scenarios.md`.
 - **전용 주소 이사 점검**: `tests/move.cjs`가 저장소 루트를 `/`로 두 번 띄워(새 주소=localhost, 옛 주소=amber67-git.github.io 이름을 로컬로 연결) 페이지 로드·manifest id/start_url/scope(CDP)·설치 가능성 오류 0·안내 띠는 옛 주소에서만·옛 주소 백업 → 새 주소 가져오기 왕복을 확인합니다.
+- **언어 교차검증**: `tests/i18n.cjs`가 I18N 사전의 EN/KO 키·자리표시자 일치, 운동 351개의 EN/KO 이름·단계 문구를 확인하고, 모든 화면(탭 5개, 가이드, 라이브러리, 루틴, 편집, 고르기, 준비, 수행, 완료)을 EN과 KO로 렌더해 다른 언어 글자가 섞이면 실패한다(단위·약어·주소·인용문은 허용).
 - **화면 크기 점검**: `tests/layout.cjs`가 데스크톱(전체 1920×1080, 분할 960×1080), 갤럭시탭 S8(가로 1280×800, 세로 800×1280), 휴대폰(세로 384×854, 가로 854×384·812×375·780×360)에서 화면 10개를 캡처하고 가로 넘침·화면 밖 요소·잘린 글자·페이지 오류가 있으면 실패합니다. 캡처는 e2e-screenshots 아티팩트의 `layout/` 폴더.
 - **PageSpeed Insights**: https://pagespeed.web.dev 에 배포 URL을 넣으면 PWA·성능·접근성 점수를 외부에서 확인할 수 있습니다.
 
