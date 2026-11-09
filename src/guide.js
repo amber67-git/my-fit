@@ -63,12 +63,12 @@ const GUIDE=[
   '• Goals: weekly goal (days), rest between sets. Smart mode: alternate days, split, auto progression and weight step, deload week (every 3/4/6 weeks, −5…20 %), lighter first week back (after 7/14/21+ days, −5…20 %).',
   '• Language, unit (kg/lb converts every stored weight), body figure (male/female) for the muscle map.',
   '• Data: Export JSON (copy or download a backup file), Import JSON (choose a file or paste; the app asks before replacing data), automatic daily backups (14 kept) and restore when signed in, reset.',
-  '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received.'],
+  '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received. On a tablet or desktop the side menu also shows the version and its release date at the bottom left — tap it for the same list.'],
   ko:[
   '• 목표: 주간 목표(일수), 세트 간 휴식. 스마트 모드: 격일 배치, 분할, 자동 증량과 무게 단위, 디로드 주(3/4/6주마다 −5~20%), 복귀 첫 주 감량(7/14/21일 이상 쉬면 −5~20%).',
   '• 언어, 단위(kg/lb 전환 시 저장된 무게가 모두 변환), 근육 지도의 몸 그림(남성/여성).',
   '• 데이터: JSON 내보내기(복사 또는 백업 파일 다운로드), JSON 가져오기(파일 고르기 또는 붙여넣기, 바꾸기 전에 한 번 확인), 로그인 시 하루 1회 자동 백업(14개 보관)과 복원, 초기화.',
-  '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다.']},
+  '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다. 태블릿·데스크톱에서는 옆 메뉴 왼쪽 아래에도 버전과 업데이트 날짜가 보이고, 누르면 같은 목록이 열립니다.']},
  {id:'data',title:{en:'Where your data lives',ko:'데이터는 어디에 있나'},en:[
   '• Signed in with Google: in your Firebase account, synced to every device you sign in on. The status line at the bottom of Settings says "Uploading changes…" until every change has reached the server, then "Synced to Firebase".',
   '• Without an account: in this browser\'s storage on this device only. A different browser, device or address is a different storage — move data with Export / Import JSON.',
