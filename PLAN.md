@@ -665,3 +665,4 @@ Exercise.instructions: [{ order, title, cue, mistake?, mediaUrl? }]
 - 설정 첫 줄 "가이드" → `S.sub='guide'` 하위 화면(뒤로 버튼, 절 바로가기 칩, 맨 아래 "새로운 기능" 버튼).
 - 유지 규칙(CLAUDE.md): 사용자가 보는 변경이 있는 PR은 가이드를 같이 갱신. `tests/suites/guide.js`가 major.minor 일치, 이력 맨 위 버전, EN/KO 구조 일치, 주소(NEW_HOME) 포함, 렌더 결과를 검사하고 스모크가 열기/뒤로를 확인.
 
+- 리뷰에서 나온 후속 항목(별도 PR): `subscribeAll`의 plans/logs 첫 스냅샷이 비어 있을 때 로컬을 한 번 올리는 경로는 캐시 스냅샷(`fromCache`)도 조건을 만족할 수 있다. 첫 업로드 전에 서버 스냅샷을 기다리도록 보강한다. 그때까지는 가이드 3단계가 "양쪽 데이터 내보내기 후 온라인에서 로그인"으로 안내한다.
