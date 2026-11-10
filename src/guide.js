@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.33.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.34.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-10';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -22,10 +22,12 @@ const GUIDE=[
  {id:'dash',title:{en:'Dashboard',ko:'대시보드'},en:[
   '• This week: workout days done out of your weekly goal. Streak counts consecutive weeks that met the goal; the current week keeps the count until it ends short.',
   '• Today: the exercises planned for today. Tap a card to start it, swipe left to delete it, or tap "+ Add exercise" to add one even after everything is done.',
+  '• Weekly review: on Monday to Wednesday the dashboard shows last week in one card — sessions, volume and minutes with the change from the week before, new personal records and the most-trained muscles. "Save as image" downloads it as a picture (in the claude.ai preview it copies the text instead); "Close" hides it until next week.',
   '• "Start today\'s workout" runs the planned exercises one after another. On a day with nothing planned, "Log a workout now" lets you pick an exercise and start it straight away; the picker lists the exercises you did in the last 4 weeks first.'],
   ko:[
   '• 이번 주: 주간 목표 대비 운동한 날 수. 연속(streak)은 목표를 채운 연속 주 수이고, 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지합니다.',
   '• 오늘: 오늘 계획된 운동 목록. 카드를 누르면 바로 시작, 왼쪽으로 밀면 삭제, "+ 운동 추가"로 다 끝낸 뒤에도 추가할 수 있습니다.',
+  '• 주간 리뷰: 월~수요일에는 대시보드에 지난주가 한 장으로 나옵니다. 세션·볼륨·시간과 그 전 주 대비 변화, 새 개인 기록, 많이 한 부위가 보이고, "이미지로 저장"으로 사진 파일로 받을 수 있습니다(claude.ai 미리보기에서는 텍스트 복사). "닫기"를 누르면 다음 주까지 숨겨집니다.',
   '• "오늘 운동 시작"을 누르면 계획된 운동을 차례로 진행합니다. 계획이 없는 날은 "지금 운동 기록하기"로 운동을 골라 바로 시작할 수 있고, 운동 고르기 맨 위에는 최근 4주 동안 한 운동이 먼저 나옵니다.']},
  {id:'week',title:{en:'Weekly plan',ko:'주간 계획'},en:[
   '• Preset mode: place exercises on each day yourself. "Apply routine" fills the week from one of 6 presets (Push/Pull/Legs, Upper/Lower, Full body, Home, Dumbbell, Cardio + core) or a routine you saved with "Save as routine".',
@@ -130,6 +132,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.34',date:'2026-11-10',en:'Weekly review card on the dashboard for the first days of a new week, savable as an image.',ko:'새 주 첫 며칠 동안 대시보드에 지난주 리뷰 카드, 이미지로 저장 가능.'},
  {v:'0.33',date:'2026-11-10',en:'Optional warm-up sets before heavy lifts (50 % × 8, 70 % × 5), kept out of volume and records.',ko:'무거운 운동 앞 선택형 워밍업 세트(50%×8, 70%×5), 볼륨·기록에서 제외.'},
  {v:'0.32',date:'2026-11-10',en:'When Smart mode adjusts a target from your history, the get-ready screen says why (up, same, deload, first week back); targets without a stored reason show no line.',ko:'스마트 모드가 기록을 보고 목표를 조정하면 준비 화면에서 그 이유를 알려 줌(증량·유지·디로드·복귀 첫 주). 이유가 저장되지 않은 목표에는 나오지 않음.'},
  {v:'0.31',date:'2026-11-10',en:'Swap an exercise for one that works the same main muscles, from the get-ready screen.',ko:'준비 화면에서 같은 주동근을 쓰는 운동으로 바꾸기(대체).'},
