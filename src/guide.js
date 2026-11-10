@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.29.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.30.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-10';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -71,19 +71,23 @@ const GUIDE=[
   '• Goals: weekly goal (days), rest between sets. Smart mode: alternate days, split, auto progression and weight step, deload week (every 3/4/6 weeks, −5…20 %), lighter first week back (after 7/14/21+ days, −5…20 %).',
   '• Language, unit (kg/lb converts every stored weight), body figure (male/female) for the muscle map.',
   '• Data: Export JSON (copy or download a backup file), Import JSON (choose a file or paste; the app asks before replacing data), automatic daily backups (14 kept) and restore when signed in, reset.',
+  '• Theme: Auto follows the phone\'s light / dark setting; Light or Dark keeps one look. The first time you open the app it asks how many days you train and which routine to start with — you can skip it.',
   '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received. On a tablet or desktop the side menu also shows the version and its release date at the bottom left — tap it for the same list.'],
   ko:[
   '• 목표: 주간 목표(일수), 세트 간 휴식. 스마트 모드: 격일 배치, 분할, 자동 증량과 무게 단위, 디로드 주(3/4/6주마다 −5~20%), 복귀 첫 주 감량(7/14/21일 이상 쉬면 −5~20%).',
   '• 언어, 단위(kg/lb 전환 시 저장된 무게가 모두 변환), 근육 지도의 몸 그림(남성/여성).',
   '• 데이터: JSON 내보내기(복사 또는 백업 파일 다운로드), JSON 가져오기(파일 고르기 또는 붙여넣기, 바꾸기 전에 한 번 확인), 로그인 시 하루 1회 자동 백업(14개 보관)과 복원, 초기화.',
+  '• 화면 테마: 자동은 휴대폰의 밝게·어둡게 설정을 따르고, 밝게·어둡게는 한 가지로 고정합니다. 앱을 처음 열면 주당 운동 일수와 시작할 루틴을 묻는 안내가 나오며 건너뛸 수 있습니다.',
   '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다. 태블릿·데스크톱에서는 옆 메뉴 왼쪽 아래에도 버전과 업데이트 날짜가 보이고, 누르면 같은 목록이 열립니다.']},
  {id:'data',title:{en:'Where your data lives',ko:'데이터는 어디에 있나'},en:[
   '• Signed in with Google: in your Firebase account, synced to every device you sign in on. The status line at the bottom of Settings says "Uploading changes…" until every change has reached the server, then "Synced to Firebase".',
   '• Without an account: in this browser\'s storage on this device only. A different browser, device or address is a different storage — move data with Export / Import JSON.',
+  '• Privacy: My Fit has no ads and no tracking. It keeps your plans, workout logs, check-ins (body weight, sleep, notes) and settings — in this browser, or in your own Firebase account if you sign in with Google. Nothing is sent anywhere else. Export JSON or CSV any time; to delete everything, sign out and remove the app, or delete the data from your Firebase account.',
   '• Never use the browser\'s "Clear site data" for this address: it also wipes other apps that share the address (on the old GitHub address, ClassDesk and StudyDesk).'],
   ko:[
   '• 구글 로그인: Firebase 계정에 저장되고 로그인한 모든 기기에 동기화됩니다. 설정 맨 아래 상태 줄이 "변경 올리는 중…"이면 아직 서버에 다 안 올라간 것이고, "Firebase에 동기화됨"이면 끝난 것입니다.',
   '• 계정 없이 사용: 이 기기의 이 브라우저 저장소에만 있습니다. 다른 브라우저·기기·주소는 저장소가 다르므로 JSON 내보내기/가져오기로 옮깁니다.',
+  '• 개인정보: My Fit에는 광고와 추적이 없습니다. 계획·운동 기록·체크인(체중·수면·메모)·설정만 이 브라우저에, 또는 구글로 로그인하면 내 Firebase 계정에 둡니다. 다른 곳으로는 보내지 않습니다. JSON·CSV로 언제든 내보낼 수 있고, 모두 지우려면 로그아웃 후 앱을 지우거나 Firebase 계정의 데이터를 삭제하세요.',
   '• 이 주소에 대해 브라우저의 "사이트 데이터 삭제"는 누르지 마세요. 같은 주소를 쓰는 다른 앱(예전 GitHub 주소의 ClassDesk·StudyDesk) 데이터까지 지워집니다.']},
  {id:'move',title:{en:'Moving from the old address',ko:'예전 주소에서 옮기기'},en:[
   'The old address (amber67-git.github.io/my-fit) shares its storage and its "installed app" slot with other apps, which is why installing there failed. Do this once per device:',
@@ -118,6 +122,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.30',date:'2026-11-10',en:'First-run setup (days a week → routine → start), Settings → Theme (auto, light, dark), privacy notes in this guide.',ko:'첫 실행 안내(주당 일수 → 루틴 → 시작), 설정 → 화면 테마(자동·밝게·어둡게), 이 가이드에 개인정보 안내.'},
  {v:'0.29',date:'2026-11-10',en:'Exercise history screen (best, change, trend, recent sessions) from the report, the get-ready screen, the item editor and the dashboard; report summary first; last-workout card.',ko:'운동별 기록 화면(최고 기록, 변화, 추이, 최근 세션)을 보고서·준비 화면·항목 편집·대시보드에서 열 수 있음. 보고서 요약을 맨 위로. 지난 운동 카드.'},
  {v:'0.28',date:'2026-11-10',en:'Faster logging: type values into the set card, see and copy last time\'s set, personal-record badge, recent exercises at the top of the picker, "Log a workout now" on empty days.',ko:'빠른 기록: 세트 카드에 값 바로 입력, 지난번 세트 보기·복사, 개인 기록 배지, 운동 고르기 맨 위 최근 운동, 빈 날 "지금 운동 기록하기".'},
  {v:'0.27',date:'2026-11-10',en:'Hold exercises (dead hang, flexed-arm hang) log seconds per set with a stopwatch on the set card; pull-up progression exercises added; step cards show the common mistake, or a tip for stretches and cool-downs.',ko:'버티기 운동(데드 행, 굽힌 팔 매달리기)은 세트 카드의 스톱워치로 초를 기록. 풀업 단계별 운동 추가. 단계 카드에 흔한 실수(스트레칭·쿨다운은 팁) 표시.'},
