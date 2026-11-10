@@ -1,8 +1,8 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.26.3';   // the app version this guide was written against
-const GUIDE_DATE='2026-11-09';  // FAQ current as of
+const GUIDE_VERSION='0.27.0';   // the app version this guide was written against
+const GUIDE_DATE='2026-11-10';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
  {id:'start',title:{en:'Getting started',ko:'시작하기'},en:[
@@ -39,17 +39,21 @@ const GUIDE=[
   '• Get-ready screen: the exercise picture, a muscle map (primary muscles red, secondary light red; only the side that works is shown), target sets × reps × weight, your last record, and 3 how-to steps. Tap the Target tile to change sets, reps or weight before you start.',
   '• Sets screen: tick each set as you finish it, change reps or weight on the spot (later sets follow), add or remove sets, rest timer with ±15 s, add another exercise or skip one mid-workout.',
   '• Timed exercises (stretching, cardio) use a countdown; on the completion screen you can correct the duration and, for cardio, enter distance and average heart rate.',
+  '• Hold exercises (dead hang, flexed-arm hang): the set card has a stopwatch instead of a weight — tap "Start hold", hang, tap again when you let go. The seconds are saved as that set, the rest timer starts, and the phone buzzes once you pass your target. You can also type the seconds with the − / + buttons.',
+  '• Under every step the card shows the common mistake to avoid; for stretches, cool-downs and warm-ups it shows a tip (breathing, how long to hold) instead.',
   '• Completion: how it felt (1–5) and how hard it was (RPE 6–10) feed the report. You can leave a workout safely: save or discard, and resume after closing the app.'],
   ko:[
   '• 준비 화면: 운동 그림, 근육 지도(주동근 빨강·보조근 연한 빨강, 자극되는 쪽만 표시), 목표 세트×횟수×무게, 지난 기록, 운동 방법 3단계. 목표 타일을 누르면 시작 전에 세트·횟수·무게를 바꿀 수 있습니다.',
   '• 세트 화면: 세트를 끝낼 때마다 체크, 횟수·무게 즉시 수정(뒤 세트가 따라감), 세트 추가/삭제, 휴식 타이머 ±15초, 운동 중 다른 운동 추가·건너뛰기.',
   '• 시간형 운동(스트레칭·유산소)은 카운트다운으로 진행하고, 완료 화면에서 시간을 고치거나 유산소는 거리·평균 심박을 넣을 수 있습니다.',
+  '• 버티기 운동(데드 행, 굽힌 팔 매달리기): 세트 카드에 무게 대신 스톱워치가 있습니다. "버티기 시작"을 누르고 매달렸다가 손을 놓을 때 다시 누르면 그 초가 세트로 저장되고 휴식 타이머가 시작되며, 목표 초를 넘기면 진동이 한 번 옵니다. − / + 버튼으로 초를 직접 넣어도 됩니다.',
+  '• 단계 카드마다 동작 설명 아래에 피해야 할 흔한 실수가 보이고, 스트레칭·쿨다운·워밍업은 실수 대신 팁(호흡, 유지 시간)이 보입니다.',
   '• 완료 화면의 컨디션(1~5)과 강도(RPE 6~10)는 보고서에 쓰입니다. 운동 중 나가도 저장/버리기를 고를 수 있고, 앱을 닫았다가 이어서 할 수 있습니다.']},
  {id:'library',title:{en:'Exercise library',ko:'운동 라이브러리'},en:[
-  '• Settings → Exercise library: 351 built-in exercises (bodyweight, barbell, dumbbell, kettlebell, band, machine, cable, stability ball, yoga, stretching, sports & outdoor) with filters by type, muscle and equipment, and Korean search.',
+  '• Settings → Exercise library: 355 built-in exercises (bodyweight, barbell, dumbbell, kettlebell, band, machine, cable, stability ball, yoga, stretching, sports & outdoor) with filters by type, muscle and equipment, and Korean search.',
   '• Every exercise lists its primary and secondary muscles. You can add your own exercises, edit built-ins, or hide ones you never use.'],
   ko:[
-  '• 설정 → 운동 라이브러리: 기본 운동 351개(맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외). 종류·부위·도구 필터와 한글 검색.',
+  '• 설정 → 운동 라이브러리: 기본 운동 355개(맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외). 종류·부위·도구 필터와 한글 검색.',
   '• 운동마다 주동근·보조근이 적혀 있습니다. 내 운동을 추가하거나 기본 운동을 고치고, 안 쓰는 운동은 숨길 수 있습니다.']},
  {id:'report',title:{en:'Report',ko:'보고서'},en:[
   '• Pick a period (4 wk / 12 wk / 1 yr / all). Sections: summary, week-by-week volume and minutes, growth by estimated 1RM, strength board (× body weight), muscle balance with a weekly muscle map and sets by specific muscle, consistency, effort & recovery, cardio, body, personal records, notes.',
@@ -110,6 +114,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.27',date:'2026-11-10',en:'Hold exercises (dead hang, flexed-arm hang) log seconds per set with a stopwatch on the set card; pull-up progression exercises added; step cards show the common mistake, or a tip for stretches and cool-downs.',ko:'버티기 운동(데드 행, 굽힌 팔 매달리기)은 세트 카드의 스톱워치로 초를 기록. 풀업 단계별 운동 추가. 단계 카드에 흔한 실수(스트레칭·쿨다운은 팁) 표시.'},
  {v:'0.26',date:'2026-11-08',en:'My Fit moved to its own address (amber-my-fit.netlify.app) so it installs as its own app; backups name the app and version; every import asks before replacing data; this guide was added.',ko:'My Fit이 전용 주소(amber-my-fit.netlify.app)로 이사해 자기 앱으로 설치됨. 백업 파일에 앱 이름·버전, 모든 가져오기는 바꾸기 전에 확인, 이 가이드 추가.'},
  {v:'0.25',date:'2026-11-03',en:'Muscle map on the get-ready screen, editor and report; male/female body figure; new app icon; layouts checked for desktop, tablet and phone landscape; reinstall fixes.',ko:'준비 화면·편집창·보고서에 근육 지도, 남성/여성 몸 그림, 새 앱 아이콘, 데스크톱·태블릿·휴대폰 가로 배치 점검, 다시 설치 문제 수정.'},
  {v:'0.24',date:'2026-11-01',en:'Every exercise lists its primary and secondary muscles; report breaks sets down by specific muscle.',ko:'모든 운동에 주동근·보조근 표시, 보고서에 세부 부위별 세트.'},
