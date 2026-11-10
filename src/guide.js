@@ -7,14 +7,14 @@ const GUIDE_DATE='2026-11-09';  // FAQ current as of
 const GUIDE=[
  {id:'start',title:{en:'Getting started',ko:'시작하기'},en:[
   'My Fit is a weekly workout planner and tracker. It runs in the browser and can be installed on your phone like an app.',
-  'What it is for — three things: ① Log with ease: tick off sets with one hand while you train and fix weight or reps on the spot. ② Train correctly: every exercise starts with step-by-step figures, a map of the muscles it works, and your target next to your last result. ③ Track by looking back: the weekly, monthly and report views show volume, estimated 1RM, muscle balance and consistency so you can set the next target. Your records are yours — export them as JSON any time from Settings, and as CSV from the Report tab when you use the app in a browser (the claude.ai preview offers copy-as-text instead).',
+  'What it is for — three things: ① Log with ease: tick off sets with one hand while you train and fix weight or reps on the spot. ② Train correctly: every built-in exercise starts with step-by-step figures, a map of the muscles it works, and your target next to your last result. ③ Track by looking back: the weekly, monthly and report views show volume, estimated 1RM, muscle balance and consistency so you can set the next target. Your records are yours — export them as JSON any time from Settings, and as CSV from the Report tab when you use the app in a browser (the claude.ai preview offers copy-as-text instead).',
   '• Address: https://amber-my-fit.netlify.app/ — install from here. The older GitHub address still works but only shows a moving notice.',
   '• Android: open the address in Chrome → ⋮ → Install app. iPhone: open it in Safari → Share → Add to Home Screen.',
   '• First screen: choose Google sign-in (data saved to your account and synced across devices) or "Use without account" (data stays on this device only).',
   '• Switch EN / KO with the toggle at the top right. The day starts at 04:00, so a workout finished after midnight still counts for that evening.'],
   ko:[
   'My Fit은 주간 운동 계획·기록 앱입니다. 브라우저에서 돌아가고, 휴대폰에 앱처럼 설치할 수 있습니다.',
-  '이 앱의 목적은 세 가지입니다. ① 편하게 기록하기: 운동 중 한 손으로 세트를 체크하고 무게·횟수를 그 자리에서 고칩니다. ② 올바르게 운동하기: 운동마다 동작 단계 그림, 자극되는 근육 지도, 지난 기록 옆의 목표를 보고 시작합니다. ③ 기록을 보며 추적하기: 주간·월간·보고서에서 볼륨, 추정 1RM, 부위 균형, 꾸준함을 확인하고 다음 목표를 정합니다. 기록은 내 것입니다. 설정에서 언제든 JSON으로, 브라우저에서 쓸 때는 보고서 탭에서 CSV로 내보낼 수 있습니다(claude.ai 미리보기에서는 CSV 대신 텍스트 복사).',
+  '이 앱의 목적은 세 가지입니다. ① 편하게 기록하기: 운동 중 한 손으로 세트를 체크하고 무게·횟수를 그 자리에서 고칩니다. ② 올바르게 운동하기: 기본 운동마다 동작 단계 그림, 자극되는 근육 지도, 지난 기록 옆의 목표를 보고 시작합니다. ③ 기록을 보며 추적하기: 주간·월간·보고서에서 볼륨, 추정 1RM, 부위 균형, 꾸준함을 확인하고 다음 목표를 정합니다. 기록은 내 것입니다. 설정에서 언제든 JSON으로, 브라우저에서 쓸 때는 보고서 탭에서 CSV로 내보낼 수 있습니다(claude.ai 미리보기에서는 CSV 대신 텍스트 복사).',
   '• 주소: https://amber-my-fit.netlify.app/ — 앱 설치는 여기서 합니다. 예전 GitHub 주소도 열리지만 이사 안내만 보여 줍니다.',
   '• 안드로이드: 크롬으로 주소를 열고 ⋮ → 앱 설치. 아이폰: Safari로 열고 공유 → 홈 화면에 추가.',
   '• 첫 화면에서 구글 로그인(계정에 저장, 모든 기기 동기화) 또는 "계정 없이 사용"(이 기기에만 저장)을 고릅니다.',

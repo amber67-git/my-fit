@@ -30,7 +30,7 @@ const errors=[]; const ok=(m)=>console.log('ok   '+m); const bad=(m)=>{console.l
   noName.length?bad('exercises without distinct EN/KO names: '+noName.join(',')):ok('exercises: '+rows.length+', every one has EN and KO names');
   const halfSteps=rows.filter(r=>r.steps.some(s=>(!!s[0])!==(!!s[1])||(!!s[2])!==(!!s[3])||(!!s[4])!==(!!s[5]))).map(r=>r.id);
   halfSteps.length?bad('exercise steps with text in one language only: '+halfSteps.join(',')):ok('exercise steps: every cue and mistake has both EN and KO');
-  const incomplete=rows.filter(r=>r.steps.length<2||r.steps.length>4||r.steps.some(s=>!s[2]||!s[3])).map(r=>r.id);
+  const incomplete=rows.filter(r=>r.steps.length<2||r.steps.length>4||r.steps.some(s=>!String(s[2]||'').trim()||!String(s[3]||'').trim())).map(r=>r.id);
   incomplete.length?bad('built-in exercises with missing steps or cues: '+incomplete.join(',')):ok('exercise steps: every built-in exercise has 2-4 steps with EN and KO cues');
 }
 // ---- rendered screens ----------------------------------------------------------------------------------------
