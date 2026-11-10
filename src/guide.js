@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.28.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.29.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-10';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -59,11 +59,13 @@ const GUIDE=[
   '• 운동마다 주동근·보조근이 적혀 있습니다. 내 운동을 추가하거나 기본 운동을 고치고, 안 쓰는 운동은 숨길 수 있습니다.']},
  {id:'report',title:{en:'Report',ko:'보고서'},en:[
   '• Pick a period (4 wk / 12 wk / 1 yr / all). Sections: summary, week-by-week volume and minutes, growth by estimated 1RM, strength board (× body weight), muscle balance with a weekly muscle map and sets by specific muscle, consistency, effort & recovery, cardio, body, personal records, notes.',
-  '• Today\'s check-in (body weight, sleep, note) and the weekly note are entered at the top of the report.',
+  '• Today\'s check-in (body weight, sleep, note) and the weekly note are entered just below the summary.',
+  '• Tap an exercise in growth, strength board or personal records to open its history: best, change since the first session, a trend line (estimated 1RM, or most reps / seconds / minutes) and the last 12 sessions. The same screen opens from the "Last" tile before an exercise, "History" in the item editor and the last-workout card on the dashboard.',
   '• "Copy as text" and "Export CSV" give you the numbers for a spreadsheet. Sections that need more data say what is missing.'],
   ko:[
   '• 기간(4주/12주/1년/전체)을 고릅니다. 항목: 요약, 주별 볼륨·시간, 추정 1RM 성장 속도, 근력 보드(체중 대비), 부위 균형(주간 근육 지도와 세부 부위별 세트), 꾸준함, 강도·회복, 유산소, 신체, 개인 기록, 메모.',
-  '• 오늘 체크인(체중·수면·메모)과 주간 메모는 보고서 맨 위에서 적습니다.',
+  '• 오늘 체크인(체중·수면·메모)과 주간 메모는 요약 바로 아래에서 적습니다.',
+  '• 성장 속도·근력 보드·개인 기록에서 운동을 누르면 그 운동의 기록이 열립니다. 최고 기록, 첫 세션 대비 변화, 추이 그래프(추정 1RM, 또는 최다 횟수·초·분), 최근 세션 12개가 보입니다. 운동 전 준비 화면의 "지난번" 칸, 항목 편집의 "기록 보기", 대시보드의 지난 운동 카드에서도 같은 화면이 열립니다.',
   '• "텍스트 복사"와 "CSV 내보내기"로 숫자를 스프레드시트로 가져갈 수 있습니다. 데이터가 더 필요한 항목은 무엇이 부족한지 알려 줍니다.']},
  {id:'settings',title:{en:'Settings',ko:'설정'},en:[
   '• Goals: weekly goal (days), rest between sets. Smart mode: alternate days, split, auto progression and weight step, deload week (every 3/4/6 weeks, −5…20 %), lighter first week back (after 7/14/21+ days, −5…20 %).',
@@ -116,6 +118,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.29',date:'2026-11-10',en:'Exercise history screen (best, change, trend, recent sessions) from the report, the get-ready screen, the item editor and the dashboard; report summary first; last-workout card.',ko:'운동별 기록 화면(최고 기록, 변화, 추이, 최근 세션)을 보고서·준비 화면·항목 편집·대시보드에서 열 수 있음. 보고서 요약을 맨 위로. 지난 운동 카드.'},
  {v:'0.28',date:'2026-11-10',en:'Faster logging: type values into the set card, see and copy last time\'s set, personal-record badge, recent exercises at the top of the picker, "Log a workout now" on empty days.',ko:'빠른 기록: 세트 카드에 값 바로 입력, 지난번 세트 보기·복사, 개인 기록 배지, 운동 고르기 맨 위 최근 운동, 빈 날 "지금 운동 기록하기".'},
  {v:'0.27',date:'2026-11-10',en:'Hold exercises (dead hang, flexed-arm hang) log seconds per set with a stopwatch on the set card; pull-up progression exercises added; step cards show the common mistake, or a tip for stretches and cool-downs.',ko:'버티기 운동(데드 행, 굽힌 팔 매달리기)은 세트 카드의 스톱워치로 초를 기록. 풀업 단계별 운동 추가. 단계 카드에 흔한 실수(스트레칭·쿨다운은 팁) 표시.'},
  {v:'0.26',date:'2026-11-08',en:'My Fit moved to its own address (amber-my-fit.netlify.app) so it installs as its own app; backups name the app and version; every import asks before replacing data; this guide was added.',ko:'My Fit이 전용 주소(amber-my-fit.netlify.app)로 이사해 자기 앱으로 설치됨. 백업 파일에 앱 이름·버전, 모든 가져오기는 바꾸기 전에 확인, 이 가이드 추가.'},
