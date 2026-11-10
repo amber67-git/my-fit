@@ -42,6 +42,13 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   await page.locator('.it.hist[data-id="ex_bench"]').first().focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(100);
   check('Enter on a focused report row opens the history', await page.locator('#histlist').count()===1);
   await page.keyboard.press('Escape');
+  // mixed records: a bodyweight bench session (40 reps) and an old timed one must not become the "best" of a weighted history
+  await page.evaluate(()=>{ const T=window.__T; const S=T.S; const k=Object.keys(S.logs).sort()[0]; S.logs[k].entries.push({id:'mixbw',planItemId:'pmixbw',exId:'ex_bench',mode:'sets',startedAt:1,endedAt:2,duration:300,sets:[{reps:40,weight:0,done:true}],memo:'',condition:3,rpe:7},{id:'mixt',planItemId:'pmixt',exId:'ex_bench',mode:'time',startedAt:1,endedAt:2,duration:900,sets:[],memo:'',condition:3,rpe:7}); });
+  await page.evaluate(()=>{ const T=window.__T; T.S.tab='report'; T.render(); });
+  await page.locator('.it.hist[data-id="ex_bench"]').first().click(); await page.locator('#histlist').waitFor({timeout:3000});
+  const mix=await page.evaluate(()=>document.querySelector('#sheet').innerText.replace(/\s+/g,' '));
+  check('best stays the weighted e1RM when bodyweight and timed records are mixed in', /최고 기록 57 kg e1RM/.test(mix)&&!/최고 기록 40/.test(mix), mix.slice(0,160));
+  await page.keyboard.press('Escape');
   // from the prepare screen "Last" tile
   await page.evaluate(()=>{ const T=window.__T; T.S.tab='dash'; const ex=T.S.exercises.find(e=>e.id==='ex_deadhang'); const it=T.addPlanItem(T.todayKey(),ex); T.render(); T.startQueue([{date:T.todayKey(),id:it.id}]); });
   await page.locator('[data-p="history"]').waitFor({timeout:3000}); await page.click('[data-p="history"]'); await page.locator('#histlist').waitFor({timeout:3000});
