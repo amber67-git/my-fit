@@ -31,6 +31,9 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   await page.evaluate(()=>{ window.__origSet=Storage.prototype.setItem; Storage.prototype.setItem=function(){ throw new Error('QuotaExceeded'); }; });
   await page.locator('#swaplist [data-swap]').first().click(); await page.waitForTimeout(100);
   const toastTxt=await page.evaluate(()=>{ Storage.prototype.setItem=window.__origSet; return [...document.querySelectorAll('.toast')].map(x=>x.textContent).join(' | '); });
+  const st=await page.evaluate(()=>{ const T=window.__T; T.P.active=false; document.querySelector('#perf')?.remove(); Storage.prototype.setItem=function(){ throw new Error('QuotaExceeded'); }; T.persist.plan(T.todayKey()); T.S.tab='settings'; T.S.sub=null; T.render(); const s=document.querySelector('#status')?.textContent||''; Storage.prototype.setItem=window.__origSet; T.persist.plan(T.todayKey()); T.render(); return {fail:s,after:document.querySelector('#status')?.textContent||''}; });
+  check('the Settings status line explains the local save failure and how to back up', /이 기기에 저장하지 못했어요/.test(st.fail)&&/JSON 내보내기/.test(st.fail), st.fail);
+  check('the status line recovers after the next successful save', !/저장하지 못했어요/.test(st.after), st.after);
   check('a failed local save shows 저장 실패 instead of the success message', /저장 실패/.test(toastTxt)&&!/바꿨어요/.test(toastTxt), toastTxt);
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
