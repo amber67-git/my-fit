@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.30.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.31.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-10';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -41,6 +41,7 @@ const GUIDE=[
   '• Timed exercises (stretching, cardio) use a countdown; on the completion screen you can correct the duration and, for cardio, enter distance and average heart rate.',
   '• Hold exercises (dead hang, flexed-arm hang): the set card has a stopwatch instead of a weight — tap "Start hold", hang, tap again when you let go. The seconds are saved as that set, the rest timer starts, and the phone buzzes once you pass your target. You can also type the seconds with the − / + buttons.',
   '• Under every step the card shows the common mistake to avoid; for stretches, cool-downs and warm-ups it shows a tip (breathing, how long to hold) instead.',
+  '• Swap: on the get-ready screen, "Swap" lists exercises that work the same main muscles, best matches first. Pick one and it replaces the planned exercise with its own targets — useful when a machine is taken or you have different equipment.',
   '• Faster logging: tap a number on a set card to type reps, weight or seconds (later sets follow). Under each set you see what you did last time — tap that line to copy it. Beating your best shows a "New personal record" badge on the completion screen.',
   '• Completion: how it felt (1–5) and how hard it was (RPE 6–10) feed the report. You can leave a workout safely: save or discard, and resume after closing the app.'],
   ko:[
@@ -49,6 +50,7 @@ const GUIDE=[
   '• 시간형 운동(스트레칭·유산소)은 카운트다운으로 진행하고, 완료 화면에서 시간을 고치거나 유산소는 거리·평균 심박을 넣을 수 있습니다.',
   '• 버티기 운동(데드 행, 굽힌 팔 매달리기): 세트 카드에 무게 대신 스톱워치가 있습니다. "버티기 시작"을 누르고 매달렸다가 손을 놓을 때 다시 누르면 그 초가 세트로 저장되고 휴식 타이머가 시작되며, 목표 초를 넘기면 진동이 한 번 옵니다. − / + 버튼으로 초를 직접 넣어도 됩니다.',
   '• 단계 카드마다 동작 설명 아래에 피해야 할 흔한 실수가 보이고, 스트레칭·쿨다운·워밍업은 실수 대신 팁(호흡, 유지 시간)이 보입니다.',
+  '• 대체: 준비 화면에서 "대체"를 누르면 같은 주동근을 쓰는 운동이 잘 맞는 순서로 나옵니다. 고르면 그 운동의 기본 목표로 계획이 바뀝니다. 기구가 사용 중이거나 다른 도구밖에 없을 때 쓰세요.',
   '• 빠른 기록: 세트 카드의 숫자를 누르면 횟수·무게·초를 바로 입력할 수 있고(뒤 세트가 따라감), 세트마다 지난번 기록이 한 줄 보여 누르면 그 값으로 채워집니다. 최고 기록을 넘기면 완료 화면에 "개인 기록 갱신" 배지가 뜹니다.',
   '• 완료 화면의 컨디션(1~5)과 강도(RPE 6~10)는 보고서에 쓰입니다. 운동 중 나가도 저장/버리기를 고를 수 있고, 앱을 닫았다가 이어서 할 수 있습니다.']},
  {id:'library',title:{en:'Exercise library',ko:'운동 라이브러리'},en:[
@@ -124,6 +126,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.31',date:'2026-11-10',en:'Swap an exercise for one that works the same main muscles, from the get-ready screen.',ko:'준비 화면에서 같은 주동근을 쓰는 운동으로 바꾸기(대체).'},
  {v:'0.30',date:'2026-11-10',en:'First-run setup (days a week → routine → start), Settings → Theme (auto, light, dark), privacy notes in this guide.',ko:'첫 실행 안내(주당 일수 → 루틴 → 시작), 설정 → 화면 테마(자동·밝게·어둡게), 이 가이드에 개인정보 안내.'},
  {v:'0.29',date:'2026-11-10',en:'Exercise history screen (best, change, trend, recent sessions) from the report, the get-ready screen, the item editor and the dashboard; report summary first; last-workout card.',ko:'운동별 기록 화면(최고 기록, 변화, 추이, 최근 세션)을 보고서·준비 화면·항목 편집·대시보드에서 열 수 있음. 보고서 요약을 맨 위로. 지난 운동 카드.'},
  {v:'0.28',date:'2026-11-10',en:'Faster logging: type values into the set card, see and copy last time\'s set, personal-record badge, recent exercises at the top of the picker, "Log a workout now" on empty days.',ko:'빠른 기록: 세트 카드에 값 바로 입력, 지난번 세트 보기·복사, 개인 기록 배지, 운동 고르기 맨 위 최근 운동, 빈 날 "지금 운동 기록하기".'},

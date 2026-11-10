@@ -25,7 +25,7 @@ assert nX==1 and nT==1, 'dataset.js: X/T constructor rewrite did not match (sign
 assert 'defaultIconFor' not in d, 'dataset.js must not depend on the app (X/T rewrite failed)'
 open('build/dataset.js','w',encoding='utf8').write(d)
 # test harness: expose internals on window.__T
-h=app.replace("\n})();\n","\nwindow.__T={S,P,persist,render,planOf,addPlanItem,openItemEditor,applySmart,startQueue,todayKey,logOf,packExercises,unpackExercises,rptBuild,rptText,rptCsv};\n})();\n",1)
+h=app.replace("\n})();\n","\nwindow.__T={S,P,persist,render,targetsOf,exName,planOf,addPlanItem,openItemEditor,applySmart,startQueue,todayKey,logOf,packExercises,unpackExercises,rptBuild,rptText,rptCsv};\n})();\n",1)
 assert 'window.__T' in h, 'harness hook not inserted'
 open('build/test.html','w',encoding='utf8').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>\n'+h)
 PY
