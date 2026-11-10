@@ -80,14 +80,14 @@ const GUIDE=[
   '• 화면 테마: 자동은 휴대폰의 밝게·어둡게 설정을 따르고, 밝게·어둡게는 한 가지로 고정합니다. 앱을 처음 열면 주당 운동 일수와 시작할 루틴을 묻는 안내가 나오며 건너뛸 수 있습니다.',
   '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다. 태블릿·데스크톱에서는 옆 메뉴 왼쪽 아래에도 버전과 업데이트 날짜가 보이고, 누르면 같은 목록이 열립니다.']},
  {id:'data',title:{en:'Where your data lives',ko:'데이터는 어디에 있나'},en:[
-  '• Signed in with Google: in your Firebase account, synced to every device you sign in on. The status line at the bottom of Settings says "Uploading changes…" until every change has reached the server, then "Synced to Firebase".',
+  '• Signed in with Google: in the app\'s Firebase project under your user ID, synced to every device you sign in on. The status line at the bottom of Settings says "Uploading changes…" until every change has reached the server, then "Synced to Firebase".',
   '• Without an account: in this browser\'s storage on this device only. A different browser, device or address is a different storage — move data with Export / Import JSON.',
-  '• Privacy: My Fit has no ads and no tracking. It keeps your plans, workout logs, check-ins (body weight, sleep, notes) and settings — in this browser, or in your own Firebase account if you sign in with Google. Nothing is sent anywhere else. Export JSON or CSV any time; to delete everything, sign out and remove the app, or delete the data from your Firebase account.',
+  '• Privacy: My Fit has no ads and no tracking. It keeps your plans, workout logs, check-ins (body weight, sleep, notes) and settings — in this browser and, if you sign in with Google, in the app\'s Firebase project under your user ID. Nothing is sent anywhere else. Export JSON or CSV any time; to delete everything, sign out and remove the app, or ask for the data linked to your account to be deleted.',
   '• Never use the browser\'s "Clear site data" for this address: it also wipes other apps that share the address (on the old GitHub address, ClassDesk and StudyDesk).'],
   ko:[
-  '• 구글 로그인: Firebase 계정에 저장되고 로그인한 모든 기기에 동기화됩니다. 설정 맨 아래 상태 줄이 "변경 올리는 중…"이면 아직 서버에 다 안 올라간 것이고, "Firebase에 동기화됨"이면 끝난 것입니다.',
+  '• 구글 로그인: 앱의 Firebase 프로젝트에 사용자별로 저장되고 로그인한 모든 기기에 동기화됩니다. 설정 맨 아래 상태 줄이 "변경 올리는 중…"이면 아직 서버에 다 안 올라간 것이고, "Firebase에 동기화됨"이면 끝난 것입니다.',
   '• 계정 없이 사용: 이 기기의 이 브라우저 저장소에만 있습니다. 다른 브라우저·기기·주소는 저장소가 다르므로 JSON 내보내기/가져오기로 옮깁니다.',
-  '• 개인정보: My Fit에는 광고와 추적이 없습니다. 계획·운동 기록·체크인(체중·수면·메모)·설정만 이 브라우저에, 또는 구글로 로그인하면 내 Firebase 계정에 둡니다. 다른 곳으로는 보내지 않습니다. JSON·CSV로 언제든 내보낼 수 있고, 모두 지우려면 로그아웃 후 앱을 지우거나 Firebase 계정의 데이터를 삭제하세요.',
+  '• 개인정보: My Fit에는 광고와 추적이 없습니다. 계획·운동 기록·체크인(체중·수면·메모)·설정만 이 브라우저에 저장하고, 구글로 로그인하면 앱의 Firebase 프로젝트에도 사용자별로 저장합니다. 다른 곳으로는 보내지 않습니다. JSON·CSV로 언제든 내보낼 수 있고, 모두 지우려면 로그아웃 후 앱을 지우거나 계정에 연결된 데이터 삭제를 요청하세요.',
   '• 이 주소에 대해 브라우저의 "사이트 데이터 삭제"는 누르지 마세요. 같은 주소를 쓰는 다른 앱(예전 GitHub 주소의 ClassDesk·StudyDesk) 데이터까지 지워집니다.']},
  {id:'move',title:{en:'Moving from the old address',ko:'예전 주소에서 옮기기'},en:[
   'The old address (amber67-git.github.io/my-fit) shares its storage and its "installed app" slot with other apps, which is why installing there failed. Do this once per device:',

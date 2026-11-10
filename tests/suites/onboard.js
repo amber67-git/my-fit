@@ -17,6 +17,8 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   await page.locator('#ob [data-obd="4"]').click(); await page.locator('#ob [data-ob="next"]').click();
   const rts=await page.evaluate(()=>[...document.querySelectorAll('#ob [data-obr]')].map(b=>b.dataset.obr));
   check('step 2 lists the preset routines plus "plan it myself"', rts.length===7&&rts.includes('rt_ul')&&rts.includes('none'), JSON.stringify(rts));
+  const firstDays=await page.evaluate(()=>document.querySelector('#ob [data-obr]').innerText);
+  check('routines matching the chosen 4 days come first and show their days', /주 4일|4 days/.test(firstDays), firstDays.replace(/\s+/g,' ').slice(0,80));
   await page.locator('#ob [data-obr="rt_ul"]').click();
   const st=await page.evaluate(()=>{ const T=window.__T; let n=0; Object.keys(T.S.plans).forEach(k=>n+=T.planOf(k).length); return {goal:T.S.settings.weeklyGoal,items:n,step3:!!document.querySelector('#ob [data-ob="week"]')}; });
   check('picking Upper / Lower sets the weekly goal to 4 and fills the week', st.goal===4&&st.items>0&&st.step3, JSON.stringify(st));
