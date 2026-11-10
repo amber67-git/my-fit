@@ -128,7 +128,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
- {v:'0.32',date:'2026-11-10',en:'Targets planned by Smart mode show why they changed on the get-ready screen (up, same, deload, first week back).',ko:'스마트 모드가 정한 목표는 준비 화면에서 바뀐 이유를 알려 줌(증량·유지·디로드·복귀 첫 주).'},
+ {v:'0.32',date:'2026-11-10',en:'When Smart mode adjusts a target from your history, the get-ready screen says why (up, same, deload, first week back); targets without a stored reason show no line.',ko:'스마트 모드가 기록을 보고 목표를 조정하면 준비 화면에서 그 이유를 알려 줌(증량·유지·디로드·복귀 첫 주). 이유가 저장되지 않은 목표에는 나오지 않음.'},
  {v:'0.31',date:'2026-11-10',en:'Swap an exercise for one that works the same main muscles, from the get-ready screen.',ko:'준비 화면에서 같은 주동근을 쓰는 운동으로 바꾸기(대체).'},
  {v:'0.30',date:'2026-11-10',en:'First-run setup (days a week → routine → start), Settings → Theme (auto, light, dark), privacy notes in this guide.',ko:'첫 실행 안내(주당 일수 → 루틴 → 시작), 설정 → 화면 테마(자동·밝게·어둡게), 이 가이드에 개인정보 안내.'},
  {v:'0.29',date:'2026-11-10',en:'Exercise history screen (best, change, trend, recent sessions) from the report, the get-ready screen, the item editor and the dashboard; report summary first; last-workout card.',ko:'운동별 기록 화면(최고 기록, 변화, 추이, 최근 세션)을 보고서·준비 화면·항목 편집·대시보드에서 열 수 있음. 보고서 요약을 맨 위로. 지난 운동 카드.'},
