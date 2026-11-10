@@ -41,6 +41,13 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('stopping saves 12 seconds as set 1 and marks it done', after.reps===12&&after.done===true, JSON.stringify(after));
   check('rest timer starts after the hold', after.rest>0&&after.restShown, JSON.stringify(after));
   check('no stopwatch left running; next set still offers to start', !after.hold&&/버티기 시작/.test(after.next));
+  // removing the set whose hold is running stops that stopwatch
+  await page.locator('[data-p="hold"][data-i="2"]').click(); await page.clock.runFor(3000);
+  await page.click('[data-p="rmset"]'); await page.waitForTimeout(80);
+  const afterRm=await page.evaluate(()=>({hold:!!window.__T.P.hold,n:window.__T.P.sets.length}));
+  check('removing the running set stops its stopwatch', !afterRm.hold&&afterRm.n===2, JSON.stringify(afterRm));
+  await page.click('[data-p="addset"]'); await page.waitForTimeout(80);
+  check('a re-added set starts idle', await page.evaluate(()=>!window.__T.P.hold&&/버티기 시작/.test(document.querySelector('[data-p="hold"][data-i="2"]').textContent)));
   // manual entry still works: − on set 2 lowers the seconds
   await page.locator('[data-sp="reps"][data-i="1"][data-d="-1"]').click(); const s2=await page.evaluate(()=>window.__T.P.sets[1].reps); check('− button still edits the seconds by hand', s2===19, s2);
   await page.locator('[data-p="finish"]').first().click(); await page.locator('[data-p="next"]').first().waitFor({timeout:5000});

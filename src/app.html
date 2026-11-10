@@ -2622,7 +2622,7 @@ function restTick(){ P.restRemaining=Math.max(0,Math.round((P.restEndAt-Date.now
 function startRest(sec){ P.restRemaining=sec; P.restEndAt=Date.now()+sec*1000; if(P.restTimer)clearInterval(P.restTimer); P.restTimer=setInterval(restTick,500); }
 function stopTimers(){ if(P.timer){clearInterval(P.timer);P.timer=null;} if(P.restTimer){clearInterval(P.restTimer);P.restTimer=null;} stopHold(); }
 function stopHold(){ if(P.hold){ if(P.hold.timer)clearInterval(P.hold.timer); P.hold=null; } }
-function holdTick(){ if(!P.hold)return; const el=document.querySelector('.holdbtn.pri'); const sec=Math.round((Date.now()-P.hold.at)/1000); if(el)el.textContent='■ '+mmss(sec); if(!P.hold.buzzed&&P.hold.target>0&&sec>=P.hold.target){ P.hold.buzzed=true; buzz([200,80,200]); } }
+function holdTick(){ if(!P.hold)return; const el=document.querySelector('#perf [data-p="hold"][data-i="'+P.hold.i+'"]'); const sec=Math.round((Date.now()-P.hold.at)/1000); if(el)el.textContent='■ '+mmss(sec); if(!P.hold.buzzed&&P.hold.target>0&&sec>=P.hold.target){ P.hold.buzzed=true; buzz([200,80,200]); } }
 function holdToggle(i){ const {it}=curItem(); const s=P.sets[i]; if(!s||s.done)return;
   if(P.hold&&P.hold.i===i){ const sec=Math.max(1,Math.round((Date.now()-P.hold.at)/1000)); stopHold(); s.reps=sec; s.done=true; s.t=Date.now(); if(it&&it.rest>0&&i<P.sets.length-1)startRest(it.rest); }
   else { stopHold(); P.hold={i,at:Date.now(),target:s.reps||0,buzzed:false}; P.hold.timer=setInterval(holdTick,250); }
@@ -2698,7 +2698,7 @@ function onPerfClick(e){ const b=e.target.closest('[data-p],[data-c],[data-sp],[
   else if(a==='hold'){ holdToggle(+b.dataset.i); }
   else if(a==='setdone'){ const i=+b.dataset.i; const s=P.sets[i]; if(P.hold&&P.hold.i===i)stopHold(); s.done=!s.done; if(s.done)s.t=Date.now(); else delete s.t; if(s.done&&it&&it.rest>0&&i<P.sets.length-1){ startRest(it.rest); } const sc=$('#perf .body')?.scrollTop||0; renderPerform(); const bd=$('#perf .body'); if(bd)bd.scrollTop=sc; saveP(); }
   else if(a==='addset'){ const last=P.sets[P.sets.length-1]||{reps:it.reps,weight:it.weight}; P.sets.push({reps:last.reps,weight:last.weight,done:false}); renderPerform(); saveP(); }
-  else if(a==='rmset'){ for(let i=P.sets.length-1;i>=0;i--){ if(!P.sets[i].done){P.sets.splice(i,1);break;} } renderPerform(); saveP(); }
+  else if(a==='rmset'){ for(let i=P.sets.length-1;i>=0;i--){ if(!P.sets[i].done){ if(P.hold&&P.hold.i===i)stopHold(); P.sets.splice(i,1); break; } } renderPerform(); saveP(); }
   else if(a==='rest-15'||a==='rest+15'){ const d=a==='rest+15'?15:-15; P.restEndAt+=d*1000; if(P.restEndAt<Date.now())P.restEndAt=Date.now(); restTick(); }
   else if(a==='skiprest'){ P.restRemaining=0; if(P.restTimer){clearInterval(P.restTimer);P.restTimer=null;} $('#restbox').hidden=true; }
   else if(a==='finish')finishPerform();

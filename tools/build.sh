@@ -19,8 +19,9 @@ open('src/app.html','w',encoding='utf8').write(app)
 # dataset.js: exercise definitions only (plain objects), for the figure tools
 i=app.index('const MUSCLE_META='); j=app.index('\n];}',app.index('function DEFAULT_EXERCISES'))+4
 d=app[i:j]
-d=re.sub(r"function X\(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps,x\)\{.*?\n","function X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps,x){const e={id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'sets',sets,reps,weight,rest,steps:stepsOf(steps)}; if(x)Object.assign(e,x); e.minutes=Math.max(1,Math.round(sets*((e.hold?reps:reps*3)+rest)/60)); return e;}\n",d,count=1)
-d=re.sub(r"function T\(id,en,ko,icon,type,muscle,equip,minutes,steps\)\{.*?\n","function T(id,en,ko,icon,type,muscle,equip,minutes,steps){return {id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'time',sets:1,reps:1,weight:0,rest:0,minutes,steps:stepsOf(steps)}}\n",d,count=1)
+d,nX=re.subn(r"function X\(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps,x\)\{.*?\n","function X(id,en,ko,icon,type,muscle,equip,sets,reps,weight,rest,steps,x){const e={id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'sets',sets,reps,weight,rest,steps:stepsOf(steps)}; if(x)Object.assign(e,x); e.minutes=Math.max(1,Math.round(sets*((e.hold?reps:reps*3)+rest)/60)); return e;}\n",d,count=1)
+d,nT=re.subn(r"function T\(id,en,ko,icon,type,muscle,equip,minutes,steps\)\{.*?\n","function T(id,en,ko,icon,type,muscle,equip,minutes,steps){return {id,builtin:true,nameEn:en,nameKo:ko,icon,type,muscle,equip,mode:'time',sets:1,reps:1,weight:0,rest:0,minutes,steps:stepsOf(steps)}}\n",d,count=1)
+assert nX==1 and nT==1, 'dataset.js: X/T constructor rewrite did not match (signature changed?)'
 assert 'defaultIconFor' not in d, 'dataset.js must not depend on the app (X/T rewrite failed)'
 open('build/dataset.js','w',encoding='utf8').write(d)
 # test harness: expose internals on window.__T
