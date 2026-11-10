@@ -23,15 +23,24 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('heavy lift starts with 50 % × 8 and 70 % × 5 warm-ups', JSON.stringify(c.sets.slice(0,2))==='["W20x8","W27.5x5"]'&&c.sets.length===5, JSON.stringify(c.sets));
   check('cards read 워밍업 1, 워밍업 2, 세트 1…3 and warm-ups are dashed', c.labels.join('|')==='워밍업 1|워밍업 2|세트 1|세트 2|세트 3'&&c.dashed===2, c.labels.join('|'));
   check('warm-up cards have no "last time" line', await page.evaluate(()=>!document.querySelector('.setcard.warm .lastln')));
-  await page.evaluate(()=>{ const T=window.__T; T.P.prevSets=[{reps:6,weight:35,done:true}]; }); await page.evaluate(()=>{ const b=document.querySelector('[data-p="start"]'); }); 
-  const lastIdx=await page.evaluate(()=>{ const T=window.__T; /* rerender so the last-time line is computed with warm-ups present */ return [...document.querySelectorAll('.setcard')].findIndex(c=>c.querySelector('.lastln')); });
-  check('the first last-time line sits on 세트 1, not on a warm-up', lastIdx===-1||lastIdx===2, lastIdx);
+  // a previous bench session so the last-time line has data
+  await page.evaluate(()=>{ const T=window.__T; const d=new Date(); d.setDate(d.getDate()-3); const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); T.S.logs[k]={entries:[{id:'old',planItemId:'pold',exId:'ex_bench',mode:'sets',startedAt:1,endedAt:2,duration:300,sets:[{reps:6,weight:35,done:true}],memo:'',condition:3,rpe:7}]}; });
   await page.click('[data-sp="weight"][data-i="0"][data-d="1"]'); await page.waitForTimeout(60);
   const w=await page.evaluate(()=>window.__T.P.sets.map(s=>s.weight)); check('changing a warm-up weight does not change the working sets', w[2]===40&&w[3]===40&&w[4]===40, JSON.stringify(w));
+  const lastIdx=await page.evaluate(()=>[...document.querySelectorAll('.setcard')].findIndex(c=>c.querySelector('.lastln')));
+  check('the first last-time line sits on 세트 1 (card index 2), not on a warm-up', lastIdx===2, lastIdx);
   await page.click('[data-p="setdone"][data-i="0"]'); await page.waitForTimeout(60); await page.click('[data-p="setdone"][data-i="2"]'); await page.waitForTimeout(60);
   await page.locator('[data-p="finish"]').first().click(); await page.locator('[data-p="next"]').first().waitFor({timeout:3000}); await page.click('[data-p="next"]'); await page.waitForTimeout(200);
   const log=await page.evaluate(()=>{ const T=window.__T; const e=T.logOf(T.todayKey())[0]; return e&&{n:e.sets.length,warm:e.sets.some(s=>s.warm),warmups:e.warmups,done:e.sets.filter(s=>s.done).length}; });
   check('the log keeps only working sets and counts the warm-ups separately', log&&log.n===3&&!log.warm&&log.warmups===1&&log.done===1, JSON.stringify(log));
+  const planned=await page.evaluate(()=>{ const T=window.__T; const it=T.planOf(T.todayKey())[0]; return {sets:it.sets,weight:it.weight}; });
+  check('the plan keeps 3 working sets and the working weight after a session with warm-ups', planned.sets===3&&planned.weight===40, JSON.stringify(planned));
+  // only warm-ups done, then leave with "save": the session is saved, not lost
+  await start('ex_bench',40,true);
+  await page.click('[data-p="setdone"][data-i="0"]'); await page.waitForTimeout(60);
+  await page.click('[data-p="exit"]'); await page.locator('#lv-save').waitFor({timeout:3000}); await page.click('#lv-save'); await page.waitForTimeout(200);
+  const saved=await page.evaluate(()=>{ const T=window.__T; const e=T.logOf(T.todayKey())[0]; return {active:T.P.active,entry:!!e,warmups:e&&e.warmups,sheet:!!document.querySelector('#sheet')}; });
+  check('leaving with Save after only warm-ups stores the session (warm-ups counted) and closes it', saved.entry&&saved.warmups===1&&!saved.active&&!saved.sheet, JSON.stringify(saved));
   // light weight: none
   await start('ex_curl',10,true);
   check('light lifts (under 20 kg) get no warm-up', await page.evaluate(()=>!window.__T.P.sets.some(s=>s.warm)));
