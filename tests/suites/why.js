@@ -28,10 +28,13 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   await page.evaluate(()=>{ const T=window.__T; const S=T.S; let date=null,id=null; Object.keys(S.plans).sort().forEach(k=>T.planOf(k).forEach(x=>{ if(!id&&x.exId==='ex_goblet'){date=k;id=x.id;} })); T.startQueue([{date,id}]); });
   await page.locator('[data-p="start"]').waitFor({timeout:3000});
   const why=await page.evaluate(()=>document.querySelector('#why')?.innerText||'');
-  check('get-ready screen explains the target in Korean', /지난번 모든 세트에서 99회를 채워서 오늘은 \+2\.5kg예요/.test(why), why);
+  check('get-ready screen explains the target in Korean', /지난번 평균 99회로 목표를 채워서 오늘은 \+2\.5kg예요/.test(why), why);
   // editing the target removes the explanation
   await page.click('[data-p="edit-target"]'); await page.locator('[data-act="save-item"]').waitFor({timeout:3000}); await page.click('[data-act="save-item"]'); await page.waitForTimeout(200);
   check('saving a manual target removes the explanation', await page.locator('#why').count()===0);
+  // reasons do not survive a unit change
+  const gone=await page.evaluate(()=>{ const T=window.__T; const S=T.S; T.P.active=false; document.querySelector('#perf')?.remove(); let any=0; Object.keys(S.plans).forEach(k=>T.planOf(k).forEach(x=>{ if(x.why)any++; })); S.tab='settings'; S.sub=null; T.render(); document.querySelector('[data-unit="lb"]').click(); let after=0; Object.keys(S.plans).forEach(k=>T.planOf(k).forEach(x=>{ if(x.why)after++; })); return {before:any,after}; });
+  check('converting kg → lb drops the stored reasons (their step was in kg)', gone.before>0&&gone.after===0, JSON.stringify(gone));
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
