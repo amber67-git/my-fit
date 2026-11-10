@@ -21,6 +21,8 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('estimated minutes use seconds, not reps×3', seeded&&seeded.minutes===Math.max(1,Math.round(3*(20+90)/60)), seeded&&seeded.minutes);
   const dashTxt=await page.evaluate(()=>document.querySelector('main').innerText);
   check('dashboard shows the hold target as 20초 × 3', /20초\s*×\s*3/.test(dashTxt.replace(/ /g,' ')));
+  // freeze the clock so the stopwatch advances only through runFor (CI machines are slow between clicks)
+  await page.clock.pauseAt(new Date('2026-11-10T10:00:05'));
   await page.click('[data-act="start-today"]'); await page.locator('[data-p="start"]').waitFor({timeout:5000});
   const prep=await page.evaluate(()=>({t:document.querySelector('#perf').innerText.replace(/ /g,' '),mis:document.querySelectorAll('#perf .smis').length}));
   check('prepare shows target 20초 × 3', /20초 × 3/.test(prep.t));
