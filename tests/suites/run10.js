@@ -29,7 +29,7 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   // 4. sets exercise with editing
   await page.click('[data-p="start"]'); await page.waitForTimeout(150); await page.screenshot({ path: 'r10-sets.png' });
   await page.click('[data-sp="weight"][data-i="0"][data-d="1"]'); await page.waitForTimeout(80); await page.click('[data-sp="weight"][data-i="0"][data-d="1"]'); await page.waitForTimeout(80);
-  const w = await page.evaluate(()=>[...document.querySelectorAll('.setcard .stp:nth-child(2) .v')].map(x=>x.textContent.trim()).join('|')); log('weights after +2 steps '+w);
+  const w = await page.evaluate(()=>[...document.querySelectorAll('.setcard .stp:nth-child(2) .svi')].map(x=>x.value).join('|')); log('weights after +2 steps '+w);
   await page.click('[data-p="addset"]'); await page.waitForTimeout(80); log('sets after add '+await page.evaluate(()=>document.querySelectorAll('.setcard').length));
   await page.click('[data-p="setdone"][data-i="0"]'); await page.waitForTimeout(150); await page.screenshot({ path: 'r10-rest.png' });
   log('rest visible '+await page.evaluate(()=>!document.querySelector('#restbox').hidden+' '+document.querySelector('#restt').textContent));
