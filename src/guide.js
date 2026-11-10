@@ -1,18 +1,20 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.26.2';   // the app version this guide was written against
-const GUIDE_DATE='2026-11-08';  // FAQ current as of
+const GUIDE_VERSION='0.26.3';   // the app version this guide was written against
+const GUIDE_DATE='2026-11-09';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
  {id:'start',title:{en:'Getting started',ko:'시작하기'},en:[
   'My Fit is a weekly workout planner and tracker. It runs in the browser and can be installed on your phone like an app.',
+  'What it is for — three things: ① Log with ease: tick off sets with one hand while you train and fix weight or reps on the spot. ② Train correctly: every built-in exercise starts with step-by-step figures, a map of the muscles it works, and your target next to your last result. ③ Track by looking back: the weekly, monthly and report views show volume, estimated 1RM, muscle balance and consistency so you can set the next target. Your records are yours — export them as JSON any time from Settings, and as CSV from the Report tab when you use the app in a browser (the claude.ai preview offers copy-as-text instead).',
   '• Address: https://amber-my-fit.netlify.app/ — install from here. The older GitHub address still works but only shows a moving notice.',
   '• Android: open the address in Chrome → ⋮ → Install app. iPhone: open it in Safari → Share → Add to Home Screen.',
   '• First screen: choose Google sign-in (data saved to your account and synced across devices) or "Use without account" (data stays on this device only).',
   '• Switch EN / KO with the toggle at the top right. The day starts at 04:00, so a workout finished after midnight still counts for that evening.'],
   ko:[
   'My Fit은 주간 운동 계획·기록 앱입니다. 브라우저에서 돌아가고, 휴대폰에 앱처럼 설치할 수 있습니다.',
+  '이 앱의 목적은 세 가지입니다. ① 편하게 기록하기: 운동 중 한 손으로 세트를 체크하고 무게·횟수를 그 자리에서 고칩니다. ② 올바르게 운동하기: 기본 운동마다 동작 단계 그림, 자극되는 근육 지도, 지난 기록 옆의 목표를 보고 시작합니다. ③ 기록을 보며 추적하기: 주간·월간·보고서에서 볼륨, 추정 1RM, 부위 균형, 꾸준함을 확인하고 다음 목표를 정합니다. 기록은 내 것입니다. 설정에서 언제든 JSON으로, 브라우저에서 쓸 때는 보고서 탭에서 CSV로 내보낼 수 있습니다(claude.ai 미리보기에서는 CSV 대신 텍스트 복사).',
   '• 주소: https://amber-my-fit.netlify.app/ — 앱 설치는 여기서 합니다. 예전 GitHub 주소도 열리지만 이사 안내만 보여 줍니다.',
   '• 안드로이드: 크롬으로 주소를 열고 ⋮ → 앱 설치. 아이폰: Safari로 열고 공유 → 홈 화면에 추가.',
   '• 첫 화면에서 구글 로그인(계정에 저장, 모든 기기 동기화) 또는 "계정 없이 사용"(이 기기에만 저장)을 고릅니다.',
@@ -61,12 +63,12 @@ const GUIDE=[
   '• Goals: weekly goal (days), rest between sets. Smart mode: alternate days, split, auto progression and weight step, deload week (every 3/4/6 weeks, −5…20 %), lighter first week back (after 7/14/21+ days, −5…20 %).',
   '• Language, unit (kg/lb converts every stored weight), body figure (male/female) for the muscle map.',
   '• Data: Export JSON (copy or download a backup file), Import JSON (choose a file or paste; the app asks before replacing data), automatic daily backups (14 kept) and restore when signed in, reset.',
-  '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received.'],
+  '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received. On a tablet or desktop the side menu also shows the version and its release date at the bottom left — tap it for the same list.'],
   ko:[
   '• 목표: 주간 목표(일수), 세트 간 휴식. 스마트 모드: 격일 배치, 분할, 자동 증량과 무게 단위, 디로드 주(3/4/6주마다 −5~20%), 복귀 첫 주 감량(7/14/21일 이상 쉬면 −5~20%).',
   '• 언어, 단위(kg/lb 전환 시 저장된 무게가 모두 변환), 근육 지도의 몸 그림(남성/여성).',
   '• 데이터: JSON 내보내기(복사 또는 백업 파일 다운로드), JSON 가져오기(파일 고르기 또는 붙여넣기, 바꾸기 전에 한 번 확인), 로그인 시 하루 1회 자동 백업(14개 보관)과 복원, 초기화.',
-  '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다.']},
+  '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다. 태블릿·데스크톱에서는 옆 메뉴 왼쪽 아래에도 버전과 업데이트 날짜가 보이고, 누르면 같은 목록이 열립니다.']},
  {id:'data',title:{en:'Where your data lives',ko:'데이터는 어디에 있나'},en:[
   '• Signed in with Google: in your Firebase account, synced to every device you sign in on. The status line at the bottom of Settings says "Uploading changes…" until every change has reached the server, then "Synced to Firebase".',
   '• Without an account: in this browser\'s storage on this device only. A different browser, device or address is a different storage — move data with Export / Import JSON.',
@@ -124,7 +126,7 @@ function renderGuide(){ const ko=S.settings.lang==='ko'; const L=k=>ko?k.ko:k.en
   const body=arr=>{ let h='',list=false,dl=false; arr.forEach(x=>{ const isLi=typeof x==='string'&&x.startsWith('• '), isDl=typeof x!=='string'; if(list&&!isLi){h+='</ul>';list=false;} if(dl&&!isDl){h+='</dl>';dl=false;} if(isLi&&!list){h+='<ul>';list=true;} if(isDl&&!dl){h+='<dl class="faq">';dl=true;} h+=item(x); }); if(list)h+='</ul>'; if(dl)h+='</dl>'; return h; };
   const stamp=(ko?'기준 버전: v':'Guide written against version: v')+GUIDE_VERSION+' · '+(ko?'FAQ 기준일: ':'FAQ current as of: ')+GUIDE_DATE+(GUIDE_VERSION!==APP_VERSION?' · '+(ko?'앱 버전 v'+APP_VERSION:'app is v'+APP_VERSION):'');
   view.innerHTML=`<div class="stack guide">
-   <div class="row"><button class="icon-btn" data-act="back" aria-label="back">${ICO.back}</button><div class="grow"><h2>${esc(t('guide'))}</h2><div class="cap num">${esc(stamp)}</div></div></div>
+   <div class="row"><button class="icon-btn" data-act="back" aria-label="${esc(t('a11y_back'))}">${ICO.back}</button><div class="grow"><h2>${esc(t('guide'))}</h2><div class="cap num">${esc(stamp)}</div></div></div>
    <div class="chips">${GUIDE.map(s=>`<a class="chip" href="#g-${s.id}">${esc(L(s.title))}</a>`).join('')}<a class="chip" href="#g-history">${esc(t('guide_history'))}</a></div>
    ${GUIDE.map(s=>`<section class="rpt-sec" id="g-${s.id}"><h3>${esc(L(s.title))}</h3>${body(ko?s.ko:s.en)}</section>`).join('')}
    <section class="rpt-sec" id="g-history"><h3>${esc(t('guide_history'))}</h3><div class="cap">${esc(t('guide_history_sub'))}</div><dl class="hist">${GUIDE_HISTORY.map(h=>`<dt class="num">v${esc(h.v)} <span class="cap">${esc(h.date)}</span></dt><dd>${esc(L(h))}</dd>`).join('')}</dl><button class="btn sec" data-act="changelog">${esc(t('whats_new'))}</button></section>

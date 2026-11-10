@@ -53,6 +53,10 @@ jobs:
         run: node tests/move.cjs
         env:
           SHOT_DIR: e2e-out
+      - name: Language cross-check (I18N dictionary, exercise EN/KO, every screen rendered in EN and KO)
+        run: node tests/i18n.cjs
+        env:
+          HARNESS: http://127.0.0.1:8080/build/test.html
       - name: Layout check (desktop full/split, Galaxy Tab S8 landscape/portrait, phone portrait/landscape)
         run: node tests/layout.cjs
         env:
