@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.27.1';   // the app version this guide was written against
+const GUIDE_VERSION='0.28.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-10';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -22,11 +22,11 @@ const GUIDE=[
  {id:'dash',title:{en:'Dashboard',ko:'대시보드'},en:[
   '• This week: workout days done out of your weekly goal. Streak counts consecutive weeks that met the goal; the current week keeps the count until it ends short.',
   '• Today: the exercises planned for today. Tap a card to start it, swipe left to delete it, or tap "+ Add exercise" to add one even after everything is done.',
-  '• "Start today\'s workout" runs the planned exercises one after another.'],
+  '• "Start today\'s workout" runs the planned exercises one after another. On a day with nothing planned, "Log a workout now" lets you pick an exercise and start it straight away; the picker lists the exercises you did in the last 4 weeks first.'],
   ko:[
   '• 이번 주: 주간 목표 대비 운동한 날 수. 연속(streak)은 목표를 채운 연속 주 수이고, 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지합니다.',
   '• 오늘: 오늘 계획된 운동 목록. 카드를 누르면 바로 시작, 왼쪽으로 밀면 삭제, "+ 운동 추가"로 다 끝낸 뒤에도 추가할 수 있습니다.',
-  '• "오늘 운동 시작"을 누르면 계획된 운동을 차례로 진행합니다.']},
+  '• "오늘 운동 시작"을 누르면 계획된 운동을 차례로 진행합니다. 계획이 없는 날은 "지금 운동 기록하기"로 운동을 골라 바로 시작할 수 있고, 운동 고르기 맨 위에는 최근 4주 동안 한 운동이 먼저 나옵니다.']},
  {id:'week',title:{en:'Weekly plan',ko:'주간 계획'},en:[
   '• Preset mode: place exercises on each day yourself. "Apply routine" fills the week from one of 6 presets (Push/Pull/Legs, Upper/Lower, Full body, Home, Dumbbell, Cardio + core) or a routine you saved with "Save as routine".',
   '• Tick "Apply every week" when applying a routine and a new empty week is filled automatically (preset mode only, remaining days only). Turn it off in Settings.',
@@ -41,6 +41,7 @@ const GUIDE=[
   '• Timed exercises (stretching, cardio) use a countdown; on the completion screen you can correct the duration and, for cardio, enter distance and average heart rate.',
   '• Hold exercises (dead hang, flexed-arm hang): the set card has a stopwatch instead of a weight — tap "Start hold", hang, tap again when you let go. The seconds are saved as that set, the rest timer starts, and the phone buzzes once you pass your target. You can also type the seconds with the − / + buttons.',
   '• Under every step the card shows the common mistake to avoid; for stretches, cool-downs and warm-ups it shows a tip (breathing, how long to hold) instead.',
+  '• Faster logging: tap a number on a set card to type reps, weight or seconds (later sets follow). Under each set you see what you did last time — tap that line to copy it. Beating your best shows a "New personal record" badge on the completion screen.',
   '• Completion: how it felt (1–5) and how hard it was (RPE 6–10) feed the report. You can leave a workout safely: save or discard, and resume after closing the app.'],
   ko:[
   '• 준비 화면: 운동 그림, 근육 지도(주동근 빨강·보조근 연한 빨강, 자극되는 쪽만 표시), 목표 세트×횟수×무게, 지난 기록, 운동 방법 3단계. 목표 타일을 누르면 시작 전에 세트·횟수·무게를 바꿀 수 있습니다.',
@@ -48,6 +49,7 @@ const GUIDE=[
   '• 시간형 운동(스트레칭·유산소)은 카운트다운으로 진행하고, 완료 화면에서 시간을 고치거나 유산소는 거리·평균 심박을 넣을 수 있습니다.',
   '• 버티기 운동(데드 행, 굽힌 팔 매달리기): 세트 카드에 무게 대신 스톱워치가 있습니다. "버티기 시작"을 누르고 매달렸다가 손을 놓을 때 다시 누르면 그 초가 세트로 저장되고 휴식 타이머가 시작되며, 목표 초를 넘기면 진동이 한 번 옵니다. − / + 버튼으로 초를 직접 넣어도 됩니다.',
   '• 단계 카드마다 동작 설명 아래에 피해야 할 흔한 실수가 보이고, 스트레칭·쿨다운·워밍업은 실수 대신 팁(호흡, 유지 시간)이 보입니다.',
+  '• 빠른 기록: 세트 카드의 숫자를 누르면 횟수·무게·초를 바로 입력할 수 있고(뒤 세트가 따라감), 세트마다 지난번 기록이 한 줄 보여 누르면 그 값으로 채워집니다. 최고 기록을 넘기면 완료 화면에 "개인 기록 갱신" 배지가 뜹니다.',
   '• 완료 화면의 컨디션(1~5)과 강도(RPE 6~10)는 보고서에 쓰입니다. 운동 중 나가도 저장/버리기를 고를 수 있고, 앱을 닫았다가 이어서 할 수 있습니다.']},
  {id:'library',title:{en:'Exercise library',ko:'운동 라이브러리'},en:[
   '• Settings → Exercise library: 355 built-in exercises (bodyweight, barbell, dumbbell, kettlebell, band, machine, cable, stability ball, yoga, stretching, sports & outdoor) with filters by type, muscle and equipment, and Korean search.',
@@ -114,6 +116,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.28',date:'2026-11-10',en:'Faster logging: type values into the set card, see and copy last time\'s set, personal-record badge, recent exercises at the top of the picker, "Log a workout now" on empty days.',ko:'빠른 기록: 세트 카드에 값 바로 입력, 지난번 세트 보기·복사, 개인 기록 배지, 운동 고르기 맨 위 최근 운동, 빈 날 "지금 운동 기록하기".'},
  {v:'0.27',date:'2026-11-10',en:'Hold exercises (dead hang, flexed-arm hang) log seconds per set with a stopwatch on the set card; pull-up progression exercises added; step cards show the common mistake, or a tip for stretches and cool-downs.',ko:'버티기 운동(데드 행, 굽힌 팔 매달리기)은 세트 카드의 스톱워치로 초를 기록. 풀업 단계별 운동 추가. 단계 카드에 흔한 실수(스트레칭·쿨다운은 팁) 표시.'},
  {v:'0.26',date:'2026-11-08',en:'My Fit moved to its own address (amber-my-fit.netlify.app) so it installs as its own app; backups name the app and version; every import asks before replacing data; this guide was added.',ko:'My Fit이 전용 주소(amber-my-fit.netlify.app)로 이사해 자기 앱으로 설치됨. 백업 파일에 앱 이름·버전, 모든 가져오기는 바꾸기 전에 확인, 이 가이드 추가.'},
  {v:'0.25',date:'2026-11-03',en:'Muscle map on the get-ready screen, editor and report; male/female body figure; new app icon; layouts checked for desktop, tablet and phone landscape; reinstall fixes.',ko:'준비 화면·편집창·보고서에 근육 지도, 남성/여성 몸 그림, 새 앱 아이콘, 데스크톱·태블릿·휴대폰 가로 배치 점검, 다시 설치 문제 수정.'},
