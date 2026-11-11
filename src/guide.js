@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.36.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.37.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-11';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -22,11 +22,13 @@ const GUIDE=[
  {id:'dash',title:{en:'Dashboard',ko:'대시보드'},en:[
   '• This week: workout days done out of your weekly goal. Streak counts consecutive weeks that met the goal; the current week keeps the count until it ends short.',
   '• Today: the exercises planned for today. Tap a card to start it, swipe left to delete it, or tap "+ Add exercise" to add one even after everything is done.',
+  '• Goals: open an exercise\'s history (from the report, the "Last" tile or the item editor) and tap "Set a goal". Pick a target for one set — weight for weighted exercises, reps or seconds otherwise — and a deadline of 4–16 weeks. The dashboard lists each goal with your best so far, a progress bar and the days left; tap one to open its history, where you can also remove it.',
   '• Weekly review: on Monday to Wednesday the dashboard shows last week in one card — sessions, volume and minutes with the change from the week before, new personal records and the most-trained muscles. "Save as image" downloads it as a picture (in the claude.ai preview it copies the text instead); "Close" hides it until next week.',
   '• "Start today\'s workout" runs the planned exercises one after another. On a day with nothing planned, "Log a workout now" lets you pick an exercise and start it straight away; the picker lists the exercises you did in the last 4 weeks first.'],
   ko:[
   '• 이번 주: 주간 목표 대비 운동한 날 수. 연속(streak)은 목표를 채운 연속 주 수이고, 진행 중인 주는 끝나기 전까지 지난 연속 수를 유지합니다.',
   '• 오늘: 오늘 계획된 운동 목록. 카드를 누르면 바로 시작, 왼쪽으로 밀면 삭제, "+ 운동 추가"로 다 끝낸 뒤에도 추가할 수 있습니다.',
+  '• 목표: 운동 기록 화면(보고서, 준비 화면의 "지난번" 칸, 항목 편집에서 열기)에서 "목표 정하기"를 누릅니다. 한 세트 기준 목표(무게 운동은 무게, 아니면 횟수나 초)와 기한(4~16주)을 고르면 대시보드에 지금까지 최고, 진행 막대, 남은 날이 보입니다. 누르면 기록 화면이 열리고 거기서 목표를 지울 수 있습니다.',
   '• 주간 리뷰: 월~수요일에는 대시보드에 지난주가 한 장으로 나옵니다. 세션·볼륨·시간과 그 전 주 대비 변화, 새 개인 기록, 많이 한 부위가 보이고, "이미지로 저장"으로 사진 파일로 받을 수 있습니다(claude.ai 미리보기에서는 텍스트 복사). "닫기"를 누르면 다음 주까지 숨겨집니다.',
   '• "오늘 운동 시작"을 누르면 계획된 운동을 차례로 진행합니다. 계획이 없는 날은 "지금 운동 기록하기"로 운동을 골라 바로 시작할 수 있고, 운동 고르기 맨 위에는 최근 4주 동안 한 운동이 먼저 나옵니다.']},
  {id:'week',title:{en:'Weekly plan',ko:'주간 계획'},en:[
@@ -136,6 +138,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.37',date:'2026-11-11',en:'Goals per exercise with progress on the dashboard.',ko:'운동별 목표와 대시보드 진행률.'},
  {v:'0.36',date:'2026-11-11',en:'Tempo and breathing hint, and muscles already worked today, on the get-ready screen.',ko:'준비 화면에 템포·호흡 힌트와 오늘 이미 한 부위 표시.'},
  {v:'0.35',date:'2026-11-11',en:'Optional set details: RPE per set and drop / to-failure marks.',ko:'선택형 세트 상세 기록: 세트별 RPE와 드롭세트·실패까지 표시.'},
  {v:'0.34',date:'2026-11-10',en:'Weekly review card on the dashboard for the first days of a new week, savable as an image.',ko:'새 주 첫 며칠 동안 대시보드에 지난주 리뷰 카드, 이미지로 저장 가능.'},
