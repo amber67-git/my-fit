@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.39.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.40.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-11';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -140,6 +140,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.40',date:'2026-11-11',en:'Every exercise now has a common-mistake or tip line under each step (616 new lines).',ko:'모든 운동의 단계마다 흔한 실수 또는 팁 문구가 생김(616줄 추가).'},
  {v:'0.39',date:'2026-11-11',en:'Warm-up steps and starting weight are adjustable; a swap starts from your last weight for the new exercise, or an estimate.',ko:'워밍업 단계 수·시작 무게 조절, 대체하면 새 운동의 지난번 무게나 어림 무게로 시작.'},
  {v:'0.38',date:'2026-11-11',en:'Large text option and larger tap areas.',ko:'글자 크기 "크게" 설정과 더 넓은 누르는 영역.'},
  {v:'0.37',date:'2026-11-11',en:'Goals per exercise with progress on the dashboard.',ko:'운동별 목표와 대시보드 진행률.'},
