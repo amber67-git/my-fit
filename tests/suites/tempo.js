@@ -28,6 +28,15 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('a hold exercise gets the breathing hint', /숨 참지 않기/.test(r.tempo), r.tempo);
   r=await prep('ex_hamstring',false);
   check('a stretch shows no tempo hint', r.tempo==='', r.tempo);
+  // review fixes: timed entries are minutes, stretches do not count, other days name the date
+  const prep2=async(id,date,entries)=>{ await page.evaluate(([id,date,entries])=>{ const T=window.__T; const S=T.S; T.P.active=false; document.querySelector('#perf')?.remove(); S.plans={}; S.logs={}; const k=date||T.todayKey(); S.logs[k]={entries}; const it=T.addPlanItem(k,S.exercises.find(e=>e.id===id)); T.startQueue([{date:k,id:it.id}]); },[id,date,entries]); await page.locator('[data-p="start"]').waitFor({timeout:3000}); return page.evaluate(()=>({used:document.querySelector('#usedtoday')?.innerText||'',warn:!!document.querySelector('#usedtoday.warn')})); };
+  const tm=(id,sec)=>({id:'t'+id,planItemId:'pt'+id,exId:id,mode:'time',startedAt:1,endedAt:2,duration:sec,sets:[],memo:'',condition:3,rpe:0});
+  r=await prep2('ex_legcurl',null,[tm('ex_hamstring',120)]);
+  check('a hamstring stretch done today does not count as worked (no line, no warning)', r.used===''&&!r.warn, r.used);
+  r=await prep2('ex_crunch',null,[tm('ex_plank',150)]);
+  check('a plank done today shows as minutes, not sets', /오늘 이미 한 부위/.test(r.used)&&/3분/.test(r.used)&&!/세트/.test(r.used), r.used);
+  r=await prep2('ex_incline','2026-01-05',[{id:'b',planItemId:'pb',exId:'ex_bench',mode:'sets',startedAt:1,endedAt:2,duration:300,sets:[{reps:8,weight:40,done:true},{reps:8,weight:40,done:true}],memo:'',condition:3,rpe:7}]);
+  check('a plan on another day names that date instead of 오늘', /1월 5일에 이미 한 부위/.test(r.used)&&/1월 5일에 앞서 한 운동과 같은 주동근/.test(r.used)&&!/오늘/.test(r.used)&&/2세트/.test(r.used), r.used);
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
