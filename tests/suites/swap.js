@@ -21,8 +21,8 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('the exercise itself is not offered', !c.ids.includes('ex_legpress'));
   const pick=c.ids.find(id=>/goblet|squat/.test(id));
   await page.locator(`#swaplist [data-swap="${pick}"]`).click(); await page.waitForTimeout(150);
-  const after=await page.evaluate((pick)=>{ const T=window.__T; const it=T.planOf(T.todayKey())[0]; const sn=T.P.queue[0].snap; const ex=T.S.exercises.find(e=>e.id===pick); const same=o=>o&&o.exId===pick&&o.sets===ex.sets&&o.reps===ex.reps&&o.weight===ex.weight; return {plan:same(it),snap:same(sn),title:document.querySelector('#perf h1')?.textContent||'',want:T.exName(ex)}; },pick);
-  check('picking an alternative sets the plan item and the queued snapshot to its default targets', after.plan&&after.snap, JSON.stringify(after));
+  const after=await page.evaluate((pick)=>{ const T=window.__T; const it=T.planOf(T.todayKey())[0]; const sn=T.P.queue[0].snap; const ex=T.S.exercises.find(e=>e.id===pick); const lp=T.S.exercises.find(e=>e.id==='ex_legpress'); const st=T.S.settings.weightStep||2.5; const wantW=(lp.weight>0&&ex.weight>0)?Math.max(st,Math.round(lp.weight*ex.weight/lp.weight/st)*st):ex.weight; const same=o=>o&&o.exId===pick&&o.sets===ex.sets&&o.reps===ex.reps&&o.weight===wantW; return {plan:same(it),snap:same(sn),title:document.querySelector('#perf h1')?.textContent||'',want:T.exName(ex)}; },pick);
+  check('picking an alternative sets the plan item and the queued snapshot to its targets (weight scaled from the current one)', after.plan&&after.snap, JSON.stringify(after));
   check('the get-ready screen shows the new exercise name', after.title===after.want, after.title+' vs '+after.want);
   // local save failure (no account): the toast says the save failed
   await page.evaluate(()=>{ const T=window.__T; T.P.active=false; document.querySelector('#perf')?.remove(); const ex=T.S.exercises.find(e=>e.id==='ex_legpress'); const it=T.addPlanItem(T.todayKey(),ex); T.startQueue([{date:T.todayKey(),id:it.id}]); });
@@ -35,6 +35,25 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('the Settings status line explains the local save failure and how to back up', /이 기기에 저장하지 못했어요/.test(st.fail)&&/JSON 내보내기/.test(st.fail), st.fail);
   check('the status line recovers after the next successful save', !/저장하지 못했어요/.test(st.after), st.after);
   check('a failed local save shows 저장 실패 instead of the success message', /저장 실패/.test(toastTxt)&&!/바꿨어요/.test(toastTxt), toastTxt);
+  // v0.39: starting weight after a swap — estimate from the current weight, or the new exercise's last session
+  const openSwap=async(w,hist)=>{ await page.evaluate(([w,hist])=>{ const T=window.__T; T.P.active=false; document.querySelector('#perf')?.remove(); document.querySelectorAll('.toast').forEach(x=>x.remove()); T.S.plans={}; T.S.logs={}; if(hist){ const d=new Date(); d.setDate(d.getDate()-4); const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); T.S.logs[k]={entries:[{id:'h',planItemId:'ph',exId:'ex_dbbench',mode:'sets',startedAt:1,endedAt:2,duration:300,sets:[{reps:12,weight:18,done:true},{reps:10,weight:20,done:true},{reps:9,weight:20,done:true},{reps:15,weight:22,done:false}],memo:'',condition:3,rpe:7}]}; } const ex=T.S.exercises.find(e=>e.id==='ex_bench'); const it=T.addPlanItem(T.todayKey(),ex); it.weight=w; T.startQueue([{date:T.todayKey(),id:it.id}]); },[w,hist]); await page.locator('[data-p="swap"]').waitFor({timeout:3000}); await page.click('[data-p="swap"]'); await page.locator('#swaplist').waitFor({timeout:3000}); };
+  await openSwap(60,false);
+  const estSub=await page.evaluate(()=>document.querySelector('#swaplist [data-swap="ex_dbbench"] .swapw')?.textContent||'');
+  check('bench 60 kg: dumbbell bench shows an estimated start (60 × 12/40 → 17.5 kg)', estSub==='약 17.5kg(어림)', estSub);
+  await page.locator('#swaplist [data-swap="ex_dbbench"]').click(); await page.waitForTimeout(120);
+  const est=await page.evaluate(()=>{ const T=window.__T; const it=T.planOf(T.todayKey())[0]; return {w:it.weight,snap:T.P.queue[T.P.idx].snap.weight,toast:[...document.querySelectorAll('.toast')].map(x=>x.textContent).join('|')}; });
+  check('picking it plans 17.5 kg and the toast says so', est.w===17.5&&est.snap===17.5&&/약 17\.5kg/.test(est.toast), JSON.stringify(est));
+  await openSwap(60,true);
+  const lastSub=await page.evaluate(()=>document.querySelector('#swaplist [data-swap="ex_dbbench"] .swapw')?.textContent||'');
+  check('with a dumbbell bench session on record the option shows last time\'s top done set (20 kg)', lastSub==='지난번 20kg', lastSub);
+  await page.locator('#swaplist [data-swap="ex_dbbench"]').click(); await page.waitForTimeout(120);
+  const last=await page.evaluate(()=>{ const T=window.__T; const it=T.planOf(T.todayKey())[0]; return {w:it.weight,reps:it.reps}; });
+  check('picking it plans 20 kg × 10 (the best reps at that weight; undone sets ignored)', last.w===20&&last.reps===10, JSON.stringify(last));
+  await openSwap(60,false);
+  const bw=await page.evaluate(()=>{ const T=window.__T; const ids=[...document.querySelectorAll('#swaplist [data-swap]')]; const b=ids.find(x=>{ const e=T.S.exercises.find(y=>y.id===x.dataset.swap); return e&&!(e.weight>0); }); return b?{id:b.dataset.swap,sub:!!b.querySelector('.swapw')}:null; });
+  check('a bodyweight option is offered and shows no estimated weight', !!bw&&!bw.sub, JSON.stringify(bw));
+  const row=await page.evaluate(()=>document.querySelector('#swaplist [data-swap="ex_dbbench"] .sub')?.textContent||'');
+  check('the row\'s targets use the start weight that will be applied (17.5kg), not the library default', /17\.5kg/.test(row)&&!/(^|[^.\d])12kg/.test(row), row);
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
