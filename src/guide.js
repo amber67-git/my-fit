@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.37.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.38.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-11';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -85,12 +85,14 @@ const GUIDE=[
   '• Goals: weekly goal (days), rest between sets. Smart mode: alternate days, split, auto progression and weight step, deload week (every 3/4/6 weeks, −5…20 %), lighter first week back (after 7/14/21+ days, −5…20 %).',
   '• Language, unit (kg/lb converts every stored weight), body figure (male/female) for the muscle map.',
   '• Data: Export JSON (copy or download a backup file), Import JSON (choose a file or paste; the app asks before replacing data), automatic daily backups (14 kept) and restore when signed in, reset.',
+  '• Text size: Large makes everything in the app 15 % bigger — text, buttons and pictures — for easier reading at arm\'s length during a workout.',
   '• Theme: Auto follows the phone\'s light / dark setting; Light or Dark keeps one look. The first time you open the app it asks how many days you train and which routine to start with — you can skip it.',
   '• The version row opens "What\'s new"; the app id line under it shows which install settings your phone received. On a tablet or desktop the side menu also shows the version and its release date at the bottom left — tap it for the same list.'],
   ko:[
   '• 목표: 주간 목표(일수), 세트 간 휴식. 스마트 모드: 격일 배치, 분할, 자동 증량과 무게 단위, 디로드 주(3/4/6주마다 −5~20%), 복귀 첫 주 감량(7/14/21일 이상 쉬면 −5~20%).',
   '• 언어, 단위(kg/lb 전환 시 저장된 무게가 모두 변환), 근육 지도의 몸 그림(남성/여성).',
   '• 데이터: JSON 내보내기(복사 또는 백업 파일 다운로드), JSON 가져오기(파일 고르기 또는 붙여넣기, 바꾸기 전에 한 번 확인), 로그인 시 하루 1회 자동 백업(14개 보관)과 복원, 초기화.',
+  '• 글자 크기: "크게"를 고르면 글자·버튼·그림이 모두 15% 커져서, 운동 중 팔 길이 거리에서도 잘 보입니다.',
   '• 화면 테마: 자동은 휴대폰의 밝게·어둡게 설정을 따르고, 밝게·어둡게는 한 가지로 고정합니다. 앱을 처음 열면 주당 운동 일수와 시작할 루틴을 묻는 안내가 나오며 건너뛸 수 있습니다.',
   '• 버전 줄을 누르면 "새로운 기능"이 열리고, 그 아래 앱 id 줄은 휴대폰이 받은 설치 설정을 보여 줍니다. 태블릿·데스크톱에서는 옆 메뉴 왼쪽 아래에도 버전과 업데이트 날짜가 보이고, 누르면 같은 목록이 열립니다.']},
  {id:'data',title:{en:'Where your data lives',ko:'데이터는 어디에 있나'},en:[
@@ -138,6 +140,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.38',date:'2026-11-11',en:'Large text option and larger tap areas.',ko:'글자 크기 "크게" 설정과 더 넓은 누르는 영역.'},
  {v:'0.37',date:'2026-11-11',en:'Goals per exercise with progress on the dashboard.',ko:'운동별 목표와 대시보드 진행률.'},
  {v:'0.36',date:'2026-11-11',en:'Tempo and breathing hint, and muscles already worked today, on the get-ready screen.',ko:'준비 화면에 템포·호흡 힌트와 오늘 이미 한 부위 표시.'},
  {v:'0.35',date:'2026-11-11',en:'Optional set details: RPE per set and drop / to-failure marks.',ko:'선택형 세트 상세 기록: 세트별 RPE와 드롭세트·실패까지 표시.'},
