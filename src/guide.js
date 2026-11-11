@@ -1,7 +1,7 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.38.0';   // the app version this guide was written against
+const GUIDE_VERSION='0.39.0';   // the app version this guide was written against
 const GUIDE_DATE='2026-11-11';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
@@ -46,10 +46,10 @@ const GUIDE=[
   '• Hold exercises (dead hang, flexed-arm hang): the set card has a stopwatch instead of a weight — tap "Start hold", hang, tap again when you let go. The seconds are saved as that set, the rest timer starts, and the phone buzzes once you pass your target. You can also type the seconds with the − / + buttons.',
   '• Under every step the card shows the common mistake to avoid; for stretches, cool-downs and warm-ups it shows a tip (breathing, how long to hold) instead.',
   '• Set details (Settings → Goals, off by default): each working set gets a type chip (Normal → Drop set → To failure) and, once ticked, RPE buttons 6–10. The workout\'s RPE on the completion screen is pre-filled from the average of the set RPEs, and the CSV export includes set_rpe and set_kind.',
-  '• Warm-up sets (Settings → Goals, off by default): exercises at 20 kg / 45 lb or more start with two dashed warm-up cards, 8 reps at 50 % and 5 at 70 % of the working weight. Tick them like any set; they are not counted in volume, records or progression.',
+  '• Warm-up sets (Settings → Goals, off by default): heavy lifts start with dashed warm-up cards at a share of the working weight. Choose 1, 2 or 3 of them (60 % × 5 / 50 % × 8 · 70 % × 5 / 40 % × 10 · 60 % × 5 · 80 % × 3) and from which working weight they appear (20, 40 or 60 kg; 45, 95 or 135 lb). Tick them like any set; they are not counted in volume, records or progression.',
   '• When Smart mode changed a target (from v0.32 on), a line under it says why: weight up because last time\'s average reps reached the target, the same because they fell short, or lighter in a deload week or the first week back. Exercises with no history, preset-mode plans and targets you change yourself (or swap, copy, or convert to another unit) show no line.',
   '• The get-ready screen of a strength exercise done in sets also shows a tempo and breathing hint (timed holds such as the plank or wall sit have their step tips instead). It lists the main muscles your strength exercises already worked that day — sets, or minutes for timed holds; for a plan on another day the line names that date. If this exercise uses one of them as a main muscle, the line turns orange so you can swap or go lighter.',
-  '• Swap: on the get-ready screen, "Swap" lists exercises that work the same main muscles, best matches first. Pick one and it replaces the planned exercise with its own targets — useful when a machine is taken or you have different equipment.',
+  '• Swap: on the get-ready screen, "Swap" lists exercises that work the same main muscles, best matches first. Each shows the weight it will start from: your last session of that exercise, or an estimate scaled from the current weight. Pick one and it replaces the planned exercise — useful when a machine is taken or you have different equipment.',
   '• Faster logging: tap a number on a set card to type reps, weight or seconds (later sets follow). Under each set you see what you did last time — tap that line to copy it. Beating your best shows a "New personal record" badge on the completion screen.',
   '• Completion: how it felt (1–5) and how hard it was (RPE 6–10) feed the report. You can leave a workout safely: save or discard, and resume after closing the app.'],
   ko:[
@@ -59,10 +59,10 @@ const GUIDE=[
   '• 버티기 운동(데드 행, 굽힌 팔 매달리기): 세트 카드에 무게 대신 스톱워치가 있습니다. "버티기 시작"을 누르고 매달렸다가 손을 놓을 때 다시 누르면 그 초가 세트로 저장되고 휴식 타이머가 시작되며, 목표 초를 넘기면 진동이 한 번 옵니다. − / + 버튼으로 초를 직접 넣어도 됩니다.',
   '• 단계 카드마다 동작 설명 아래에 피해야 할 흔한 실수가 보이고, 스트레칭·쿨다운·워밍업은 실수 대신 팁(호흡, 유지 시간)이 보입니다.',
   '• 세트 상세 기록(설정 → 목표, 기본은 꺼짐): 본 세트마다 유형 칩(일반 → 드롭세트 → 실패까지)이 생기고, 체크한 세트에는 RPE 6~10 버튼이 나옵니다. 완료 화면의 운동 RPE는 세트 RPE 평균으로 미리 채워지고, CSV 내보내기에 세트별 RPE와 세트 유형 열이 들어갑니다.',
-  '• 워밍업 세트(설정 → 목표, 기본은 꺼짐): 20kg·45lb 이상 운동은 점선 카드 두 장으로 시작합니다. 작업 무게의 50%로 8회, 70%로 5회입니다. 다른 세트처럼 체크하면 되고, 볼륨·기록·자동 증량에는 들어가지 않습니다.',
+  '• 워밍업 세트(설정 → 목표, 기본은 꺼짐): 무거운 운동은 작업 무게의 일부로 하는 점선 카드로 시작합니다. 장 수는 1·2·3 중에서 고르고(60%×5 / 50%×8·70%×5 / 40%×10·60%×5·80%×3), 어느 작업 무게부터 붙일지도 고릅니다(20·40·60kg, 45·95·135lb). 다른 세트처럼 체크하면 되고, 볼륨·기록·자동 증량에는 들어가지 않습니다.',
   '• 스마트 모드가 목표를 바꾼 경우(v0.32부터) 목표 아래 한 줄로 그 이유가 나옵니다. 지난번 평균 횟수가 목표를 채워 무게가 올랐는지, 못 채워 그대로인지, 디로드 주나 복귀 첫 주라 가벼운지 알려 줍니다. 기록이 없는 운동, 프리셋 모드 계획, 직접 고치거나 대체·복사·단위 변환한 목표에는 나오지 않습니다.',
   '• 세트로 하는 근력 운동의 준비 화면에는 템포·호흡 힌트가 나옵니다(플랭크·월싯 같은 시간 버티기는 대신 단계 팁). 그날 근력 운동으로 이미 쓴 주동근도 세트 수(시간 버티기는 분)로 나오고, 다른 날짜의 계획이면 그 날짜를 붙여 보여 줍니다. 이 운동의 주동근이 그중에 있으면 주황색으로 바뀌니, 대체하거나 가볍게 하세요.',
-  '• 대체: 준비 화면에서 "대체"를 누르면 같은 주동근을 쓰는 운동이 잘 맞는 순서로 나옵니다. 고르면 그 운동의 기본 목표로 계획이 바뀝니다. 기구가 사용 중이거나 다른 도구밖에 없을 때 쓰세요.',
+  '• 대체: 준비 화면에서 "대체"를 누르면 같은 주동근을 쓰는 운동이 잘 맞는 순서로 나옵니다. 각 운동 아래에 시작 무게가 보입니다. 그 운동을 해 본 적이 있으면 지난번 무게, 없으면 지금 무게로 어림한 값입니다. 고르면 계획이 그 운동으로 바뀝니다. 기구가 사용 중이거나 다른 도구밖에 없을 때 쓰세요.',
   '• 빠른 기록: 세트 카드의 숫자를 누르면 횟수·무게·초를 바로 입력할 수 있고(뒤 세트가 따라감), 세트마다 지난번 기록이 한 줄 보여 누르면 그 값으로 채워집니다. 최고 기록을 넘기면 완료 화면에 "개인 기록 갱신" 배지가 뜹니다.',
   '• 완료 화면의 컨디션(1~5)과 강도(RPE 6~10)는 보고서에 쓰입니다. 운동 중 나가도 저장/버리기를 고를 수 있고, 앱을 닫았다가 이어서 할 수 있습니다.']},
  {id:'library',title:{en:'Exercise library',ko:'운동 라이브러리'},en:[
@@ -140,6 +140,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.39',date:'2026-11-11',en:'Warm-up steps and starting weight are adjustable; a swap starts from your last weight for the new exercise, or an estimate.',ko:'워밍업 단계 수·시작 무게 조절, 대체하면 새 운동의 지난번 무게나 어림 무게로 시작.'},
  {v:'0.38',date:'2026-11-11',en:'Large text option and larger tap areas.',ko:'글자 크기 "크게" 설정과 더 넓은 누르는 영역.'},
  {v:'0.37',date:'2026-11-11',en:'Goals per exercise with progress on the dashboard.',ko:'운동별 목표와 대시보드 진행률.'},
  {v:'0.36',date:'2026-11-11',en:'Tempo and breathing hint, and muscles already worked today, on the get-ready screen.',ko:'준비 화면에 템포·호흡 힌트와 오늘 이미 한 부위 표시.'},

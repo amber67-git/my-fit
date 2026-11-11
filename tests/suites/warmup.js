@@ -47,6 +47,25 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   // off: none
   await start('ex_bench',60,false);
   check('with the setting off there are no warm-ups', await page.evaluate(()=>!window.__T.P.sets.some(s=>s.warm)));
+  // v0.39: number of steps and the working weight they start from
+  await page.evaluate(()=>{ const T=window.__T; T.P.active=false; document.querySelector('#perf')?.remove(); T.S.settings.warmupOn=true; T.S.tab='settings'; T.S.sub=null; T.render(); });
+  const ui=await page.evaluate(()=>({steps:[...document.querySelectorAll('[data-snum="warmupSteps"]')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join(','),min:[...document.querySelectorAll('[data-snum="warmupMinLv"]')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join(','),scheme:document.querySelector('#wu-scheme')?.textContent}));
+  check('with warm-ups on, Settings offers 1/2/3 steps (2 chosen) and 20/40/60 kg (20 chosen)', ui.steps==='1,2*,3'&&ui.min==='20kg*,40kg,60kg'&&ui.scheme==='50% × 8 · 70% × 5', JSON.stringify(ui));
+  await page.click('[data-snum="warmupSteps"][data-v="3"]'); await page.waitForTimeout(60);
+  check('choosing 3 shows 40% × 10 · 60% × 5 · 80% × 3', await page.evaluate(()=>document.querySelector('#wu-scheme')?.textContent)==='40% × 10 · 60% × 5 · 80% × 3');
+  await start('ex_bench',40,true);
+  const three=await page.evaluate(()=>window.__T.P.sets.filter(s=>s.warm).map(s=>s.weight+'x'+s.reps).join(','));
+  check('bench 40 kg with 3 steps: 15×10, 25×5, 32.5×3', three==='15x10,25x5,32.5x3', three);
+  await page.evaluate(()=>{ const T=window.__T; T.P.active=false; document.querySelector('#perf')?.remove(); T.S.settings.warmupSteps=1; T.S.settings.warmupMinLv=2; });
+  await start('ex_bench',35,true);
+  check('starting weight 40 kg: bench 35 kg gets no warm-up', await page.evaluate(()=>!window.__T.P.sets.some(s=>s.warm)));
+  await start('ex_bench',40,true);
+  const one=await page.evaluate(()=>window.__T.P.sets.filter(s=>s.warm).map(s=>s.weight+'x'+s.reps).join(','));
+  check('1 step at 40 kg: one warm-up of 25 × 5 (60 %)', one==='25x5', one);
+  await page.evaluate(()=>{ const T=window.__T; T.P.active=false; document.querySelector('#perf')?.remove(); T.S.settings.unit='lb'; T.S.tab='settings'; T.S.sub=null; T.render(); });
+  const lb=await page.evaluate(()=>[...document.querySelectorAll('[data-snum="warmupMinLv"]')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join(','));
+  check('in lb the choices read 45/95/135 lb and keep the chosen level', lb==='45lb,95lb*,135lb', lb);
+  await page.evaluate(()=>{ const T=window.__T; T.S.settings.unit='kg'; T.S.settings.warmupSteps=2; T.S.settings.warmupMinLv=1; T.S.settings.warmupOn=false; });
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
