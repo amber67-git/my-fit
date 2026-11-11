@@ -39,7 +39,7 @@ claude.ai 링크와 Netlify·GitHub Pages 링크는 저장소가 서로 다릅�
 - **옛 주소**: https://amber67-git.github.io/my-fit/ — 계속 동작하지만 이사 안내 띠가 뜨고 앱 설치를 권하지 않습니다. 같은 GitHub 주소에 ClassDesk·StudyDesk가 있어 현재 안드로이드 Chrome에서는 설치가 서로 막히기 때문입니다(Chromium 버그로 보고됨).
 - 이유·규칙·소유자 할 일·기기별 이사 순서: [`docs/own-origin.md`](docs/own-origin.md). manifest `id`(`/app`)는 앞으로 절대 바꾸지 않습니다.
 
-## 기능 (v0.40.0)
+## 기능 (v0.40.1)
 
 - 5탭: Dashboard / Weekly / Monthly / Report / Settings, 상단 EN | KO 스위치
 - 운동 라이브러리 355개 (풀업 단계별 운동 포함: 데드 행·굽힌 팔 매달리기는 초 단위 버티기 세트; 맨몸·바벨·덤벨·케틀벨·밴드·머신·케이블·짐볼·요가·스트레칭·스포츠/야외, 부위·도구 태그, 주동근·보조근 세부 자극 부위, 2~4단계 운동 방법), 추가·편집·숨기기
