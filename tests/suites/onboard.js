@@ -8,7 +8,8 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   const browser = await chromium.launch(LAUNCH);
   const errors=[]; const check=(name,ok,info)=>{ console.log((ok?'ok   ':'FAIL ')+name+(info!==undefined?' — '+info:'')); if(!ok)errors.push(name); };
   const fresh=async(seen)=>{ const ctx=await browser.newContext({ viewport:{width:390,height:780}, deviceScaleFactor:2, reducedMotion:'reduce', colorScheme:'light' }); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
-    await page.addInitScript(([s,v])=>{ if(!sessionStorage.getItem('init')){ localStorage.clear(); if(s)localStorage.setItem('wwt.seenVersion',v); sessionStorage.setItem('init','1'); } },[seen,APP_VER]);
+    /* a new context starts with empty storage; only seed the seen version (never clear on load: a reload must keep the data) */
+    await page.addInitScript(([s,v])=>{ if(s&&!localStorage.getItem('wwt.seenVersion'))localStorage.setItem('wwt.seenVersion',v); },[seen,APP_VER]);
     await page.goto('file://'+HARNESS); return {ctx,page,errs}; };
   // 1. brand-new user: onboarding appears
   let {ctx,page,errs}=await fresh(false);
@@ -28,7 +29,7 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('"See my week" closes the sheet and opens the weekly tab', await page.evaluate(()=>!document.querySelector('#sheet')&&window.__T.S.tab==='week'));
   // reload: no onboarding again (seenVersion now set)
   await page.reload(); await page.waitForTimeout(1800);
-  check('onboarding does not come back after the first run', await page.locator('#ob').count()===0);
+  { const dbg=await page.evaluate(()=>({ob:!!document.querySelector('#ob'),seen:localStorage.getItem('wwt.seenVersion'),plans:Object.keys(window.__T.S.plans).filter(k=>window.__T.planOf(k).length).length})); check('onboarding does not come back after the first run', !dbg.ob, JSON.stringify(dbg)); }
   check('no page errors (new user)', errs.length===0, errs.join(' | '));
   await ctx.close();
   // 2. skip works and leaves the app empty
