@@ -1,8 +1,8 @@
 // My Fit service worker: app shell offline + updates on reload
-const VERSION = 'v0.40.0';
+const VERSION = 'v0.40.1';
 const SHELL = 'myfit-shell-' + VERSION;
 const RUNTIME = 'myfit-runtime';
-const SHELL_FILES = ['./', './index.html', './firebase-config.js?v=20261019b', './manifest.webmanifest?v=0.40.0', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
+const SHELL_FILES = ['./', './index.html', './firebase-config.js?v=20261019b', './manifest.webmanifest?v=0.40.1', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 // cache: 'reload' skips the browser's HTTP cache, so a new version never stores an older copy of a shell file
 self.addEventListener('install', e => { e.waitUntil(caches.open(SHELL).then(c => c.addAll(SHELL_FILES.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('myfit-shell-') && k !== SHELL).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
