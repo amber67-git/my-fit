@@ -1,8 +1,8 @@
 // ---------- In-app guide (Settings → Guide) ----------
 // Keep this current: any PR that changes what a user sees or does must update the matching section, add a line to
 // GUIDE_HISTORY when the change is major, and bump GUIDE_VERSION / GUIDE_DATE (rule in CLAUDE.md, checked by tests/suites/guide.js).
-const GUIDE_VERSION='0.34.0';   // the app version this guide was written against
-const GUIDE_DATE='2026-11-10';  // FAQ current as of
+const GUIDE_VERSION='0.35.0';   // the app version this guide was written against
+const GUIDE_DATE='2026-11-11';  // FAQ current as of
 // Section bodies: a string is a paragraph; a string starting with "• " is a bullet; {q,a} is a FAQ entry.
 const GUIDE=[
  {id:'start',title:{en:'Getting started',ko:'시작하기'},en:[
@@ -43,6 +43,7 @@ const GUIDE=[
   '• Timed exercises (stretching, cardio) use a countdown; on the completion screen you can correct the duration and, for cardio, enter distance and average heart rate.',
   '• Hold exercises (dead hang, flexed-arm hang): the set card has a stopwatch instead of a weight — tap "Start hold", hang, tap again when you let go. The seconds are saved as that set, the rest timer starts, and the phone buzzes once you pass your target. You can also type the seconds with the − / + buttons.',
   '• Under every step the card shows the common mistake to avoid; for stretches, cool-downs and warm-ups it shows a tip (breathing, how long to hold) instead.',
+  '• Set details (Settings → Goals, off by default): each working set gets a type chip (Normal → Drop set → To failure) and, once ticked, RPE buttons 6–10. The workout\'s RPE on the completion screen is pre-filled from the average of the set RPEs, and the CSV export includes set_rpe and set_kind.',
   '• Warm-up sets (Settings → Goals, off by default): exercises at 20 kg / 45 lb or more start with two dashed warm-up cards, 8 reps at 50 % and 5 at 70 % of the working weight. Tick them like any set; they are not counted in volume, records or progression.',
   '• When Smart mode changed a target (from v0.32 on), a line under it says why: weight up because last time\'s average reps reached the target, the same because they fell short, or lighter in a deload week or the first week back. Exercises with no history, preset-mode plans and targets you change yourself (or swap, copy, or convert to another unit) show no line.',
   '• Swap: on the get-ready screen, "Swap" lists exercises that work the same main muscles, best matches first. Pick one and it replaces the planned exercise with its own targets — useful when a machine is taken or you have different equipment.',
@@ -54,6 +55,7 @@ const GUIDE=[
   '• 시간형 운동(스트레칭·유산소)은 카운트다운으로 진행하고, 완료 화면에서 시간을 고치거나 유산소는 거리·평균 심박을 넣을 수 있습니다.',
   '• 버티기 운동(데드 행, 굽힌 팔 매달리기): 세트 카드에 무게 대신 스톱워치가 있습니다. "버티기 시작"을 누르고 매달렸다가 손을 놓을 때 다시 누르면 그 초가 세트로 저장되고 휴식 타이머가 시작되며, 목표 초를 넘기면 진동이 한 번 옵니다. − / + 버튼으로 초를 직접 넣어도 됩니다.',
   '• 단계 카드마다 동작 설명 아래에 피해야 할 흔한 실수가 보이고, 스트레칭·쿨다운·워밍업은 실수 대신 팁(호흡, 유지 시간)이 보입니다.',
+  '• 세트 상세 기록(설정 → 목표, 기본은 꺼짐): 본 세트마다 유형 칩(일반 → 드롭세트 → 실패까지)이 생기고, 체크한 세트에는 RPE 6~10 버튼이 나옵니다. 완료 화면의 운동 RPE는 세트 RPE 평균으로 미리 채워지고, CSV 내보내기에 세트별 RPE와 세트 유형 열이 들어갑니다.',
   '• 워밍업 세트(설정 → 목표, 기본은 꺼짐): 20kg·45lb 이상 운동은 점선 카드 두 장으로 시작합니다. 작업 무게의 50%로 8회, 70%로 5회입니다. 다른 세트처럼 체크하면 되고, 볼륨·기록·자동 증량에는 들어가지 않습니다.',
   '• 스마트 모드가 목표를 바꾼 경우(v0.32부터) 목표 아래 한 줄로 그 이유가 나옵니다. 지난번 평균 횟수가 목표를 채워 무게가 올랐는지, 못 채워 그대로인지, 디로드 주나 복귀 첫 주라 가벼운지 알려 줍니다. 기록이 없는 운동, 프리셋 모드 계획, 직접 고치거나 대체·복사·단위 변환한 목표에는 나오지 않습니다.',
   '• 대체: 준비 화면에서 "대체"를 누르면 같은 주동근을 쓰는 운동이 잘 맞는 순서로 나옵니다. 고르면 그 운동의 기본 목표로 계획이 바뀝니다. 기구가 사용 중이거나 다른 도구밖에 없을 때 쓰세요.',
@@ -132,6 +134,7 @@ const GUIDE=[
 ];
 // Curated major changes (newest first). The full list is in "What's new".
 const GUIDE_HISTORY=[
+ {v:'0.35',date:'2026-11-11',en:'Optional set details: RPE per set and drop / to-failure marks.',ko:'선택형 세트 상세 기록: 세트별 RPE와 드롭세트·실패까지 표시.'},
  {v:'0.34',date:'2026-11-10',en:'Weekly review card on the dashboard for the first days of a new week, savable as an image.',ko:'새 주 첫 며칠 동안 대시보드에 지난주 리뷰 카드, 이미지로 저장 가능.'},
  {v:'0.33',date:'2026-11-10',en:'Optional warm-up sets before heavy lifts (50 % × 8, 70 % × 5), kept out of volume and records.',ko:'무거운 운동 앞 선택형 워밍업 세트(50%×8, 70%×5), 볼륨·기록에서 제외.'},
  {v:'0.32',date:'2026-11-10',en:'When Smart mode adjusts a target from your history, the get-ready screen says why (up, same, deload, first week back); targets without a stored reason show no line.',ko:'스마트 모드가 기록을 보고 목표를 조정하면 준비 화면에서 그 이유를 알려 줌(증량·유지·디로드·복귀 첫 주). 이유가 저장되지 않은 목표에는 나오지 않음.'},
