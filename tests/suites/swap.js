@@ -51,7 +51,9 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   check('picking it plans 20 kg × 10 (the best reps at that weight; undone sets ignored)', last.w===20&&last.reps===10, JSON.stringify(last));
   await openSwap(60,false);
   const bw=await page.evaluate(()=>{ const T=window.__T; const ids=[...document.querySelectorAll('#swaplist [data-swap]')]; const b=ids.find(x=>{ const e=T.S.exercises.find(y=>y.id===x.dataset.swap); return e&&!(e.weight>0); }); return b?{id:b.dataset.swap,sub:!!b.querySelector('.swapw')}:null; });
-  check('a bodyweight option shows no estimated weight', !bw||!bw.sub, JSON.stringify(bw));
+  check('a bodyweight option is offered and shows no estimated weight', !!bw&&!bw.sub, JSON.stringify(bw));
+  const row=await page.evaluate(()=>document.querySelector('#swaplist [data-swap="ex_dbbench"] .sub')?.textContent||'');
+  check('the row\'s targets use the start weight that will be applied (17.5kg), not the library default', /17\.5kg/.test(row)&&!/(^|[^.\d])12kg/.test(row), row);
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
