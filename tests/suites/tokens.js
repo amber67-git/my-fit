@@ -11,15 +11,15 @@ const defined = new Set([...tokens.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));
 // 1. no raw colours outside the token blocks
 const raw = [...rules.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)/g)].map(m => m[0]);
 check('no raw colours in the rules (use var(--…))', raw.length === 0, raw.slice(0, 8).join(' '));
-// 2. common scale values go through tokens
+// 2. common scale values go through tokens (whitespace after the colon is allowed and still caught)
 const lit = (re) => [...rules.matchAll(re)].map(m => m[0]);
-const r = lit(/border-radius:(8|10|12|14|999)px(?=[;}])/g);
+const r = lit(/border-radius:\s*(8|10|12|14|999)px(?=\s*[;}])/g);
 check('radii 8/10/12/14/999 px use --r-sm/--r-md/--r/--r-lg/--r-pill', r.length === 0, r.slice(0, 6).join(' '));
-const f = lit(/font-size:(10|11|12|13|14|15|16|17|18|20|22)px(?=[;}])/g);
+const f = lit(/font-size:\s*(10|11|12|13|14|15|16|17|18|20|22)px(?=\s*[;}])/g);
 check('font sizes on the type scale use --fs-*', f.length === 0, f.slice(0, 6).join(' '));
-const w = lit(/font-weight:(400|600|700)(?=[;}])/g);
+const w = lit(/font-weight:\s*(400|600|700)(?=\s*[;}])/g);
 check('font weights use --fw-*', w.length === 0, w.slice(0, 6).join(' '));
-const g = lit(/(?<![-\w])gap:(4|6|8|12|16)px(?=[ ;}])/g);
+const g = lit(/(?<![-\w])gap:\s*(4|6|8|12|16)px(?=\s*[ ;}])/g);
 check('gaps of 4/6/8/12/16 px use --sp-*', g.length === 0, g.slice(0, 6).join(' '));
 // 3. every var(--x) used anywhere in the page is defined (or set at runtime / given a fallback)
 const runtime = new Set(['--bm-gap', '--nav-w', '--nav-h']);
