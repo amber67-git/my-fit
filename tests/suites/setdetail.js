@@ -41,6 +41,13 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   const csv=await page.evaluate(()=>window.__T.rptCsv());
   const head=csv.split('\n').find(l=>l.startsWith('date,exercise_id'))||''; const line=csv.split('\n').find(l=>/ex_bench/.test(l)&&/,10,fail/.test(l));
   check('CSV has set_rpe and set_kind columns with the values', /set_rpe,set_kind/.test(head)&&!!line, head.slice(-40)+' :: '+(line||'').slice(-30));
+  // every CSV row of the sets section has as many columns as the header (timed entries included)
+  const cols=await page.evaluate(()=>{ const T=window.__T; T.S.logs['2026-01-02']={entries:[{id:'tm',planItemId:'ptm',exId:'ex_hamstring',mode:'time',startedAt:1,endedAt:2,duration:120,sets:[],memo:'',condition:3,rpe:0}]}; const lines=T.rptCsv().split('\n'); const hi=lines.findIndex(l=>l.startsWith('date,exercise_id')); const n=s=>{ let c=1,q=false; for(const ch of s){ if(ch==='"')q=!q; else if(ch===','&&!q)c++; } return c; }; const head=n(lines[hi]); const rows=[]; for(let i=hi+1;i<lines.length&&lines[i]&&!lines[i].startsWith('#');i++)rows.push(n(lines[i])); return {head,bad:rows.filter(x=>x!==head).length,rows:rows.length}; });
+  check('every sets-section CSV row (timed rows too) has the header\'s column count', cols.bad===0&&cols.rows>3, JSON.stringify(cols));
+  // accessibility: chip names its current type, RPE buttons expose the pressed state
+  await start(true); await page.click('[data-p="skind"][data-i="0"]'); await page.waitForTimeout(40); await page.click('[data-p="setdone"][data-i="0"]'); await page.waitForTimeout(40); await page.click('[data-p="srpe"][data-i="0"][data-v="8"]'); await page.waitForTimeout(40);
+  const a11y=await page.evaluate(()=>({chip:document.querySelector('[data-p="skind"][data-i="0"]').getAttribute('aria-label'),pressed:[...document.querySelectorAll('[data-p="srpe"][data-i="0"]')].map(b=>b.getAttribute('aria-pressed')).join(',')}));
+  check('the type chip\'s accessible name includes the current type; the chosen RPE is aria-pressed', /세트 유형: 드롭세트/.test(a11y.chip)&&a11y.pressed==='false,false,true,false,false', JSON.stringify(a11y));
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
