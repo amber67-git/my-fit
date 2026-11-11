@@ -50,6 +50,11 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   // remove
   await page.click('#goal-del'); await page.waitForTimeout(60);
   check('removing the goal deletes only that goal', await page.evaluate(()=>window.__T.S.settings.goals.length===1&&window.__T.S.settings.goals[0].exId==='ex_bench'));
+  // switching kg -> lb converts weight goals with the logs (a 80 kg goal must not read 80 lb and look reached)
+  const lb=await page.evaluate(()=>{ const T=window.__T; const S=T.S; S.settings.goals=[{id:'gx',exId:'ex_bench',kind:'w',target:80,start:70,by:'2027-01-01',made:'2026-11-11'},{id:'gy',exId:'ex_deadhang',kind:'r',target:30,start:20,by:'2027-01-01',made:'2026-11-11'}]; S.tab='settings'; S.sub=null; T.render(); document.querySelector('[data-unit="lb"]').click(); const g=S.settings.goals; const out={w:[g[0].target,g[0].start],r:[g[1].target,g[1].start]}; S.tab='dash'; T.render(); out.card=document.querySelector('#goalscard')?.innerText.replace(/\s+/g,' ')||''; document.querySelector('#tabs [data-tab="settings"]')?.click(); S.tab='settings'; T.render(); document.querySelector('[data-unit="kg"]').click(); out.back=[S.settings.goals[0].target,S.settings.goals[0].start]; return out; });
+  check('kg → lb converts the weight goal (80 → 176.5, start 70 → 154.5) and leaves the seconds goal alone', lb.w[0]===176.5&&lb.w[1]===154.5&&lb.r[0]===30&&lb.r[1]===20, JSON.stringify(lb));
+  check('after the switch the dashboard card reads the target in lb (/ 176.5 lb), never 80 lb', /\/ 176\.5 lb/.test(lb.card)&&!/\/ 80 lb/.test(lb.card), lb.card);
+  check('switching back gives 80 / 70 kg again', lb.back[0]===80&&lb.back[1]===70, JSON.stringify(lb.back));
   check('no page errors', errs.length===0, errs.join(' | '));
   console.log('errors',JSON.stringify(errors)); await browser.close(); process.exit(errors.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });
