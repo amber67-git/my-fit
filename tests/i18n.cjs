@@ -6,7 +6,7 @@ const {chromium}=require(process.env.PW_MODULE||'playwright'); const fs=require(
 const HARNESS=process.env.HARNESS||'http://127.0.0.1:8080/build/test.html'; const SRC=fs.readFileSync(path.resolve(__dirname,'..','src','app.html'),'utf8');
 const APP_VER=(SRC.match(/APP_VERSION='([^']+)'/)||[])[1]; const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{};
 // Latin tokens that are fine on a Korean screen: units, acronyms, product names, the language switch itself.
-const KO_ALLOW=new Set(['kg','lb','km','cm','min','sec','bpm','RPE','PR','PRs','1RM','CSV','JSON','EN','KO','Firebase','Google','My','Fit','Netlify','GitHub','Chrome','Safari','Android','iPhone','iOS','id','app','v','vs','AM','PM','A','B','x','e.g.','FAQ','ID','URL','PWA','Smart','Preset','RM','e1RM','MIT','AB','RDL','MTB','streak','ClassDesk','StudyDesk','react-native-body-highlighter','avataaars']);
+const KO_ALLOW=new Set(['kg','lb','km','cm','min','sec','bpm','RPE','PR','PRs','1RM','CSV','JSON','EN','KO','Firebase','Google','Claude','My','Fit','Netlify','GitHub','Chrome','Safari','Android','iPhone','iOS','id','app','v','vs','AM','PM','A','B','x','e.g.','FAQ','ID','URL','PWA','Smart','Preset','RM','e1RM','MIT','AB','RDL','MTB','streak','ClassDesk','StudyDesk','react-native-body-highlighter','avataaars']);
 // Addresses and code inside a string are not translatable text; only those parts are removed before the scan.
 const ADDR_RE=/(https?:\/\/\S+|chrome:\/\/\S+|[a-z0-9-]+(\.[a-z0-9-]+)*\.(app|io|com|ai)(\/\S*)?|\/my-fit\b)/gi;
 // Verbatim citations of another product's English text that the Korean guide quotes on purpose.

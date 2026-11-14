@@ -8,6 +8,8 @@ const LAUNCH=process.env.PW_CHROMIUM?{executablePath:process.env.PW_CHROMIUM}:{}
   const browser = await chromium.launch(LAUNCH);
   const errors=[]; const check=(name,ok,info)=>{ console.log((ok?'ok   ':'FAIL ')+name+(info!==undefined?' — '+info:'')); if(!ok)errors.push(name); };
   const fresh=async(seen)=>{ const ctx=await browser.newContext({ viewport:{width:390,height:780}, deviceScaleFactor:2, reducedMotion:'reduce', colorScheme:'light' }); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
+    /* a fixed Wednesday: onboarding plans only this week's remaining days, so a weekend run would leave nothing to check */
+    await page.clock.install({ time: new Date('2026-11-11T10:00:00') }); await page.clock.runFor(1);
     /* a new context starts with empty storage; only seed the seen version (never clear on load: a reload must keep the data) */
     await page.addInitScript(([s,v])=>{ if(s&&!localStorage.getItem('wwt.seenVersion'))localStorage.setItem('wwt.seenVersion',v); },[seen,APP_VER]);
     await page.goto('file://'+HARNESS); return {ctx,page,errs}; };
