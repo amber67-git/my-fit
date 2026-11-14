@@ -2432,6 +2432,7 @@ const canSave=()=>!IN_ARTIFACT||!!DL;
 function refreshSaveUi(){ const ok=canSave();
   document.querySelectorAll('[data-act="wk-share"]').forEach(b=>{ b.textContent=ok?t('wk_save_img'):t('copy'); });
   document.querySelectorAll('[data-act="rpt-text"]').forEach(tx=>{ const row=tx.parentElement; const csv=row&&row.querySelector('[data-act="rpt-csv"]'); if(ok&&!csv){ const b=document.createElement('button'); b.className='btn sec grow'; b.dataset.act='rpt-csv'; b.textContent=t('rpt_csv'); row.appendChild(b); } else if(!ok&&csv)csv.remove(); });
+  const cp=document.querySelector('#cp'); if(ok&&cp&&EXPORT_JSON&&!document.querySelector('#dl')){ cp.insertAdjacentHTML('afterend',`<button class="btn sec" style="margin-top:8px" id="dl">${esc(t('download'))}</button>`); document.querySelector('#dl').addEventListener('click',saveExport); }
   if(!ok)document.querySelectorAll('#dl').forEach(b=>b.remove()); }
 if(IN_ARTIFACT){ window.claude.use('downloads').then(d=>{ DL=d; if(d)refreshSaveUi(); }).catch(()=>{}); }
 function dataUrlBlob(u){ const i=u.indexOf(','); const bin=atob(u.slice(i+1)); const a=new Uint8Array(bin.length); for(let k=0;k<bin.length;k++)a[k]=bin.charCodeAt(k); return new Blob([a],{type:(u.slice(0,i).match(/data:([^;]+)/)||[])[1]||'application/octet-stream'}); }
@@ -3022,7 +3023,9 @@ view.addEventListener('click',e=>{
 });
 
 // backup file: {app:'my-fit', version, exportedAt, ...data}. Import also accepts older files without app/version.
-function openExport(){ const json=JSON.stringify({app:'my-fit',version:APP_VERSION,exportedAt:new Date().toISOString(),exercises:S.exercises,routines:S.routines,settings:S.settings,plans:S.plans,logs:S.logs,body:S.body,notes:S.notes},null,1); showSheet(`<h2 style="margin-bottom:10px">${esc(t('export'))}</h2><textarea id="exp" rows="8" readonly>${esc(json)}</textarea><button class="btn pri" style="margin-top:10px" id="cp">${esc(t('copy'))}</button>${canSave()?`<button class="btn sec" style="margin-top:8px" id="dl">${esc(t('download'))}</button>`:''}`); $('#dl')?.addEventListener('click',()=>saveFile('my-fit-'+todayKey()+'.json',json,'application/json'));
+let EXPORT_JSON=''; // the JSON of the open export sheet, so a late-arriving save capability can add its button
+function saveExport(){ if(EXPORT_JSON)saveFile('my-fit-'+todayKey()+'.json',EXPORT_JSON,'application/json'); }
+function openExport(){ const json=EXPORT_JSON=JSON.stringify({app:'my-fit',version:APP_VERSION,exportedAt:new Date().toISOString(),exercises:S.exercises,routines:S.routines,settings:S.settings,plans:S.plans,logs:S.logs,body:S.body,notes:S.notes},null,1); showSheet(`<h2 style="margin-bottom:10px">${esc(t('export'))}</h2><textarea id="exp" rows="8" readonly>${esc(json)}</textarea><button class="btn pri" style="margin-top:10px" id="cp">${esc(t('copy'))}</button>${canSave()?`<button class="btn sec" style="margin-top:8px" id="dl">${esc(t('download'))}</button>`:''}`); $('#dl')?.addEventListener('click',saveExport);
       $('#cp').addEventListener('click',()=>{navigator.clipboard.writeText(json).then(()=>toast(t('copied'))).catch(()=>{$('#exp').select();});}); }
 // ---------- moved to its own origin ----------
 // My Fit now lives on its own origin (Netlify, owner's account, named by the amber-<app> rule). The old GitHub Pages copy keeps working,
