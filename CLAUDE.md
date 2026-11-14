@@ -8,7 +8,7 @@
 3. CodeRabbit 리뷰를 기다린다: `gh api --paginate repos/amber67-git/my-fit/pulls/N/comments`와 `gh api --paginate repos/amber67-git/my-fit/pulls/N/reviews`에서 `coderabbitai[bot]`의 댓글을 최대 10분(30초 간격) 폴링. 연결 전이거나 10분 안에 안 오면 "리뷰 없음"으로 기록하고 진행한다.
 4. 리뷰 댓글은 전부 읽고 판단한다. 실제 버그·회귀는 고쳐서 같은 브랜치에 커밋·푸시하고(다시 리뷰 대기), 오탐이나 의도된 동작은 PR 댓글로 이유를 남긴다.
 5. 테스트가 통과하고 반영이 끝나면 REST로 스쿼시 머지한다: `gh api -X PUT repos/amber67-git/my-fit/pulls/N/merge -f merge_method=squash`. 브랜치는 삭제한다. GraphQL은 이 세션에서 막혀 있으니 `gh pr merge`는 쓰지 않는다.
-6. 머지 후 배포 성공을 확인한다(GitHub Pages 실행, 그리고 Netlify가 연결된 뒤에는 커밋 상태의 Netlify 체크. 이 세션은 netlify.app에 접속하지 못하므로 라이브 확인은 체크 결과로 대신한다). E2E 스모크 워크플로(`.github/workflows/e2e.yml`, `tests/smoke.cjs`) 결과를 확인한다. PR 단계에서도 같은 워크플로가 돌므로 머지 전에 통과를 확인한다. 아티팩트(https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j)도 같은 버전으로 갱신한다.
+6. 머지 후 배포 성공을 확인한다(GitHub Pages 실행, 그리고 Netlify가 연결된 뒤에는 커밋 상태의 Netlify 체크. 이 세션은 netlify.app에 접속하지 못하므로 라이브 확인은 체크 결과로 대신한다). E2E 스모크 워크플로(`.github/workflows/e2e.yml`, `tests/smoke.cjs`) 결과를 확인한다. PR 단계에서도 같은 워크플로가 돌므로 머지 전에 통과를 확인한다. 아티팩트(https://claude.ai/artifact/CJtK7LTZNTx4DQJtFMWL9j)도 같은 버전으로 갱신한다. 아티팩트의 런타임 기능은 `{db:{}, user:{}, downloads:true}`다. 다시 게시할 때 `capabilities`를 생략하면 그대로 유지되고, 바꿀 때는 세 개를 모두 적는다.
 7. 사용자에게는 한국어로: 무엇이 바뀌었는지, 리뷰 댓글이 몇 개였고 어떻게 처리했는지, 배포 결과, 권한·네트워크 한계를 보고한다. 사용자가 직접 열어 봐야 하는 것(PR, 라이브 앱, 아티팩트, 시안 페이지, Actions 실행)은 항상 링크를 함께 붙인다.
 
 ## 검증 최소선 (머지 전)
@@ -17,6 +17,7 @@
 - 사용자에게 보이는 글을 바꿨으면 `NODE_PATH=/opt/node22/lib/node_modules node tests/i18n.cjs`(서버 띄운 뒤)로 EN/KO 교차검증을 돌린다. 새 문구는 항상 EN·KO 두 벌을 같이 넣는다.
 - 그림을 바꿨으면 `cd build && node ../tools/joints.js`(관절 각도)와 `node ../tools/audit.js`(바닥·겹침) 실행, 바뀐 그림은 `tools/zoom4.html?ids=…`(build/ 기준으로 열기)로 렌더해서 직접 본다.
 - 앱 코드(index.html, sw.js, manifest, icons)를 바꾼 PR은 APP_VERSION, CHANGELOG, sw.js의 VERSION, README의 버전·운동 개수를 함께 올린다.
+- CSS는 `docs/design-tokens.md`의 토큰(`var(--…)`)으로 쓴다. 날 색·스케일 숫자를 새로 넣지 않는다(`tests/suites/tokens.js`가 검사).
 - **설정 → 가이드(`src/guide.js`)를 함께 갱신한다.** 사용자가 보는 동작·화면·주소·설치 방법이 바뀌는 PR은 해당 절(`GUIDE`)을 고치고, 큰 변경이면 `GUIDE_HISTORY` 맨 위에 한 줄을 추가하며, `GUIDE_VERSION`을 그 APP_VERSION으로, `GUIDE_DATE`를 그날로 바꾼다. 내부 수정만 있는 패치는 가이드를 안 건드려도 되지만 `tests/suites/guide.js`가 major.minor 일치와 이력 맨 위 버전을 검사하므로 minor가 오르면 반드시 갱신한다. EN·KO 두 언어를 같은 구조로 쓴다. 문서·설정만 바꾼 PR(README, PLAN, CLAUDE.md, .github, .coderabbit.yaml, docs/)은 버전을 올리지 않는다.
 
 ## 권한·한계
