@@ -24,7 +24,7 @@ const LAUNCH = process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMI
         if (mode === 'gone') { const e = new Error('x'); e.code = 'unavailable'; throw e; }
         return { status: 'saved' };
       } });
-      window.claude = Object.freeze({ use: async (n) => (n === 'downloads' && mode !== 'none') ? dl : null });
+      window.claude = Object.freeze({ use: (n) => (n === 'downloads' && mode !== 'none') ? (mode === 'late' ? new Promise(r => setTimeout(() => r(dl), 1500)) : Promise.resolve(dl)) : Promise.resolve(null) });
     }, [mode, APP_VER]);
     await page.goto('file://' + HARNESS); await page.waitForTimeout(400);
     await page.evaluate(() => { const T = window.__T, S = T.S; S.settings.lang = 'ko'; S.plans = {}; S.logs = {};
@@ -70,6 +70,24 @@ const LAUNCH = process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMI
   await page.evaluate(() => { const T = window.__T; T.S.tab = 'report'; T.render(); });
   await clearToasts(page); await page.click('[data-act="rpt-csv"]'); await page.waitForTimeout(200);
   check('an unavailable save says so and hides the CSV button', /파일 저장을 쓸 수 없어요/.test(await toasts(page)) && await page.locator('[data-act="rpt-csv"]').count() === 0, await toasts(page));
+  await ctx.close();
+
+  // 3b. withdrawn while the JSON sheet is open: its download button goes, Copy stays
+  ({ ctx, page, errs } = await open('gone'));
+  await page.evaluate(() => { const T = window.__T; T.S.tab = 'settings'; T.S.sub = null; T.render(); }); await page.click('[data-act="export"]'); await page.locator('#dl').waitFor({ timeout: 3000 });
+  await page.click('#dl'); await page.waitForTimeout(200);
+  check('a failed save inside the open JSON sheet removes its download button and keeps Copy', await page.locator('#dl').count() === 0 && await page.locator('#cp').count() === 1);
+  await ctx.close();
+
+  // 3c. the capability arrives late: only the save controls change, the page is not rebuilt
+  ({ ctx, page, errs } = await open('late'));
+  await page.evaluate(() => { const T = window.__T; T.S.tab = 'report'; T.render(); const v = document.querySelector('[data-act="rpt-text"]'); v.dataset.sentinel = 'kept'; const i = document.createElement('input'); i.id = 'draft'; i.value = 'typed but not saved'; v.parentElement.parentElement.appendChild(i); });
+  check('before the capability answers there is no CSV button', await page.locator('[data-act="rpt-csv"]').count() === 0);
+  await page.clock.runFor(1600); await page.waitForTimeout(150);
+  const late = await page.evaluate(() => ({ csv: document.querySelectorAll('[data-act="rpt-csv"]').length, kept: document.querySelector('[data-act="rpt-text"]')?.dataset.sentinel, draft: document.querySelector('#draft')?.value }));
+  check('when it arrives the CSV button appears without rebuilding the page (draft input kept)', late.csv === 1 && late.kept === 'kept' && late.draft === 'typed but not saved', JSON.stringify(late));
+  await page.click('[data-act="rpt-csv"]'); await page.waitForTimeout(150);
+  check('the late-added CSV button works', /\.csv$/.test((await page.evaluate(() => window.__saved.slice(-1)[0]?.filename)) || ''));
   await ctx.close();
 
   // 4. artifact without the capability: Copy instead of files
